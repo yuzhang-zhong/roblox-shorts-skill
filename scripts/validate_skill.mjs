@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 /**
  * validate_skill.mjs
- * Zero-dependency package validator for roblox-style-skill.
+ * Zero-dependency package validator for roblox-style-video.
  */
 
 import fs from "node:fs";
@@ -128,8 +128,8 @@ if (!fmMatch) {
   fail("SKILL.md must begin with YAML frontmatter");
 }
 const fm = fmMatch[1];
-if (!/^name:\s*roblox-style-skill\s*$/m.test(fm)) {
-  fail("SKILL.md YAML frontmatter must declare name: roblox-style-skill");
+if (!/^name:\s*roblox-style-video\s*$/m.test(fm)) {
+  fail("SKILL.md YAML frontmatter must declare name: roblox-style-video");
 }
 
 const verMatch = fm.match(/^\s+version:\s*["']?([0-9]+\.[0-9]+\.[0-9]+)["']?\s*$/m);
@@ -178,4 +178,4 @@ if (skillWords > 5500) {
   fail(`Keep SKILL.md at 5,500 words or fewer; found ${skillWords}`);
 }
 
-console.log(`roblox-style-skill v${skillVersion} package is valid (${requiredFiles.length} files checked, ${skillWords} words in SKILL.md)`);
+console.log(`roblox-style-video v${skillVersion} package is valid (${requiredFiles.length} files checked, ${skillWords} words in SKILL.md)`);

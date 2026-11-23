@@ -1,72 +1,25 @@
-<div align="center">
-
-<img src="../../assets/icon.svg" alt="roblox-style-skill" width="112" />
-
-# roblox-style-skill
+# roblox-style-video
 
 [English](../../README.md) · [简体中文](../../README.zh-CN.md) · [繁體中文](README.zh-TW.md) · [日本語](README.ja.md) · [한국어](README.ko.md) · [Español](README.es.md) · **Français** · [Deutsch](README.de.md) · [Português](README.pt-BR.md) · [Русский](README.ru.md)
 
-Générez des courts-métrages 9:16 d'avatars Roblox R6 et blocky avec proportions stud verrouillées, storyboards et prompts adaptés à chaque modèle.
-
-</div>
-
-Demander simplement « un personnage Roblox qui boit un café » ou mentionner `C-shaped claw hands` dans un générateur vidéo produit souvent quatre dérives : cinq doigts humains, des pinces en C et un tenon Lego sur la tête, des voxels cubiques façon Minecraft, ou des jambes écartées avec des baskets. `roblox-style-skill` verrouille la géométrie standard de Roblox Studio avant l'animation : torse rectangulaire `2x2x1`, deux jambes `1x2x1` jointives de même largeur que le torse, mains `1x2x1` pleines sans doigts ni pinces, tête cylindrique biseautée `1:1` avec visage 2D imprimé, matériau `SmoothPlastic` sur plaque `Studs` et bulles de chat `BillboardGui`.
-
-![Aperçu du pipeline](../pipeline.svg)
-
-## Aperçu visuel et 6 exemples de shorts 9:16
-
-| Planche 3 vues R6 (`0° / 45° / 90°`) | Contrôle géométrique (`FAIL` vs. `PASS`) |
-| :---: | :---: |
-| <img src="../../assets/showcase/momo_turnaround_sheet.en.png" width="410" alt="Turnaround" /> | <img src="../../assets/showcase/drift_rescue_comparison.en.png" width="410" alt="Drift check" /> |
-
-Six exemples verticaux 9:16 couvrant les 6 modèles narratifs et 6 moteurs vidéo :
-
-| 01 · Réveil du lundi (`Kling`) | 02 · Sky Obby (`Hailuo`) | 03 · Y2K vs. Noob (`Seedance`) |
-| :---: | :---: | :---: |
-| <img src="../../examples/monday-alarm-meltdown/assets/monday_alarm_meltdown.gif" width="165" alt="Case 01" /> | <img src="../../examples/obby-sky-run/assets/obby_sky_run.gif" width="165" alt="Case 02" /> | <img src="../../examples/duo-bestie-contrast/assets/duo_bestie_contrast.gif" width="165" alt="Case 03" /> |
-| [Planche](../../examples/monday-alarm-meltdown/assets/storyboard_contact_sheet.en.png) · [MP4](../../examples/monday-alarm-meltdown/assets/monday_alarm_meltdown.mp4) · [Dossier](../../examples/monday-alarm-meltdown/) | [Planche](../../examples/obby-sky-run/assets/obby_storyboard_sheet.en.png) · [MP4](../../examples/obby-sky-run/assets/obby_sky_run.mp4) · [Dossier](../../examples/obby-sky-run/) | [Planche](../../examples/duo-bestie-contrast/assets/duo_storyboard_sheet.en.png) · [MP4](../../examples/duo-bestie-contrast/assets/duo_bestie_contrast.mp4) · [Dossier](../../examples/duo-bestie-contrast/) |
-| **04 · Café Tycoon (`Wan`)** | **05 · Défilé Y2K (`Sora`)** | **06 · Pizza brûlée (`Runway`)** |
-| <img src="../../examples/cozy-cafe-tycoon/assets/cozy_cafe_tycoon.gif" width="165" alt="Case 04" /> | <img src="../../examples/runway-outfit-drop/assets/runway_outfit_drop.gif" width="165" alt="Case 05" /> | <img src="../../examples/burnt-pizza-slapstick/assets/burnt_pizza_slapstick.gif" width="165" alt="Case 06" /> |
-| [Planche](../../examples/cozy-cafe-tycoon/assets/cafe_storyboard_sheet.en.png) · [MP4](../../examples/cozy-cafe-tycoon/assets/cozy_cafe_tycoon.mp4) · [Dossier](../../examples/cozy-cafe-tycoon/) | [Planche](../../examples/runway-outfit-drop/assets/runway_storyboard_sheet.en.png) · [MP4](../../examples/runway-outfit-drop/assets/runway_outfit_drop.mp4) · [Dossier](../../examples/runway-outfit-drop/) | [Planche](../../examples/burnt-pizza-slapstick/assets/pizza_storyboard_sheet.en.png) · [MP4](../../examples/burnt-pizza-slapstick/assets/burnt_pizza_slapstick.mp4) · [Dossier](../../examples/burnt-pizza-slapstick/) |
-
-## Bibliothèque classique d'avatars, tenues et visages Roblox
-
-Pré-rendue dans [`assets/library/`](../../assets/library/catalog.json) et [`references/classic-roblox-catalog.md`](../../references/classic-roblox-catalog.md) ([planche avatars](../../assets/showcase/classic_avatars_lineup.en.png) · [planche visages](../../assets/showcase/classic_faces_atlas.en.png)) :
-
-| Classic Noob | Classic Guest | Bacon Hair | Builderman | Speedrunner | Story Hoodie |
-| :---: | :---: | :---: | :---: | :---: | :---: |
-| <img src="../../assets/library/avatars/avatar_noob.png" width="115" alt="Noob" /> | <img src="../../assets/library/avatars/avatar_guest.png" width="115" alt="Guest" /> | <img src="../../assets/library/avatars/avatar_bacon.png" width="115" alt="Bacon" /> | <img src="../../assets/library/avatars/avatar_builderman.png" width="115" alt="Builderman" /> | <img src="../../assets/library/avatars/avatar_obby.png" width="115" alt="Speedrunner" /> | <img src="../../assets/library/avatars/avatar_theo.png" width="115" alt="Story Hoodie" /> |
-
-| `Smile :)` | `Chill -_-` | `Check It` | `Grin :D` | `Shocked` | `Tears` | `Bloxxer` | `KO X_X` |
-| :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: |
-| <img src="../../assets/library/faces/face_smile.png" width="82" alt="Smile" /> | <img src="../../assets/library/faces/face_deadpan.png" width="82" alt="Chill" /> | <img src="../../assets/library/faces/face_smirk.png" width="82" alt="Check It" /> | <img src="../../assets/library/faces/face_grin.png" width="82" alt="Grin" /> | <img src="../../assets/library/faces/face_shocked.png" width="82" alt="Shocked" /> | <img src="../../assets/library/faces/face_tears.png" width="82" alt="Tears" /> | <img src="../../assets/library/faces/face_angry.png" width="82" alt="Bloxxer" /> | <img src="../../assets/library/faces/face_dizzy.png" width="82" alt="KO" /> |
+Skill d'agent et outils CLI Node.js pour préparer des vidéos courtes 9:16 de style Roblox. Un prompt vague du type « personnage Roblox » produit souvent cinq doigts humains, des pinces Lego en C et tenons sur la tête, des cubes voxel Minecraft ou des jambes écartées en baskets. `roblox-style-video` verrouille les proportions Roblox Studio (`2x2x1` pour le torse, jambes `1x2x1` jointes, mains blocs pleins, tête cylindrique `1:1` à visage 2D plat et plaque `Studs`), compile les prompts pour Kling, Seedance, Hailuo, Wan, Sora et Runway, et génère des aperçus 3D locaux avant d'utiliser vos crédits vidéo.
 
 ## Démarrage rapide
 
-Clonez le dépôt dans votre dossier local de Skills (compatible avec Claude Code, Codex, Cursor et GitHub Copilot) :
+Clonez dans votre dossier local de skills (compatible Codex, Claude Code, Cursor et GitHub Copilot) :
 
 ```bash
-git clone https://github.com/yuzhang-zhong/roblox-style-skill.git ~/.codex/skills/roblox-style-skill
+git clone https://github.com/yuzhang-zhong/roblox-style-video.git ~/.codex/skills/roblox-style-video
 ```
 
-Appelez `$roblox-style-skill` dans votre agent :
+Appelez `$roblox-style-video` dans votre agent :
 
 ```text
-Utilise $roblox-style-skill pour concevoir un court-métrage 9:16 de 15 secondes sur deux amis en shopping :
-un avatar streetwear Y2K et un Noob jaune classique. Génère les fiches personnages, les prompts 3 vues et un storyboard 4 plans pour Kling I2V.
+Utilise $roblox-style-video pour planifier un short 9:16 de 15 secondes sur deux amis en shopping :
+un avatar streetwear Y2K et un Classic Noob jaune. Donne les fiches personnages, prompts 3 vues et storyboard Kling I2V en 4 plans.
 ```
 
-## Outils CLI
-
-Les quatre scripts fonctionnent sous Node.js 18+ uniquement avec la bibliothèque standard :
-
-| Script | Rôle |
-| --- | --- |
-| [`scripts/avatar_spec.mjs`](../../scripts/avatar_spec.mjs) | Génère la fiche ADN du personnage (palette `BrickColor`, géométrie `2x2x1`/`1x2x1`) et le prompt 3 vues |
-| [`scripts/shot_compiler.mjs`](../../scripts/shot_compiler.mjs) | Compile les storyboards 9:16 et les prompts I2V/T2V pour `kling`, `seedance`, `hailuo`, `wan`, `sora` et `runway` |
-| [`scripts/drift_check.mjs`](../../scripts/drift_check.mjs) | Détecte doigts humains, pinces Lego, voxels et surcharge d'actions ; produit un prompt corrigé |
-| [`scripts/render_preview.mjs`](../../scripts/render_preview.mjs) | Effectue le rendu local 3D des planches 3 vues, comparatifs, storyboards et aperçus `.gif` / `.mp4` |
+Ou lancez directement les scripts CLI (Node.js 18+ requis, bibliothèque standard uniquement, sans `npm install` ni clé API) :
 
 ```bash
 node scripts/avatar_spec.mjs --archetype corporate-worker --rig chibi-blocky --material smooth-plastic --name "Momo" --lang fr
@@ -74,13 +27,52 @@ node scripts/shot_compiler.mjs --template daily-meltdown --duration 15 --engine 
 node scripts/drift_check.mjs --prompt "A cute Roblox girl with C-shaped claw hands drinks coffee with five fingers" --engine kling --mode t2v --lang fr
 ```
 
-## Documentation et langues prises en charge
+## Exemples et aperçus 3D locaux
 
-Les réponses de l'agent et l'option `--lang` prennent en charge 10 langues : `en`, `zh`, `zh-tw`, `ja`, `ko`, `es`, `fr`, `de`, `pt` et `ru`. Limitez chaque clip de 4 à 5 secondes à une seule action principale et générez une planche 3 vues avant un montage I2V multi-plans. Projet open-source indépendant, non affilié à Roblox Corporation.
+Les fichiers `.png`, `.gif` et `.mp4` du dépôt sont des aperçus 3D calculés hors ligne par `scripts/render_preview.mjs` afin de vérifier les proportions R6, le cadrage et les bulles de chat ; le rendu vidéo final nécessite un modèle externe.
 
-- [Flux de travail principal (`SKILL.md`)](../../SKILL.md)
-- [Géométrie, visages 2D et matériaux (`references/avatar-geometry-and-materials.md`)](../../references/avatar-geometry-and-materials.md)
-- [Guide de prompts par modèle (`references/model-prompt-playbook.md`)](../../references/model-prompt-playbook.md)
-- [Diagnostic et correction de dérive (`references/rescue-and-anti-drift.md`)](../../references/rescue-and-anti-drift.md)
-- [Rythme 9:16, éclairage et audio (`references/short-video-beats-and-audio.md`)](../../references/short-video-beats-and-audio.md)
-- [Six modèles de courts-métrages (`references/viral-archetypes-catalog.md`)](../../references/viral-archetypes-catalog.md)
+| Planche R6 3 vues (`0° / 45° / 90°`) | Contrôle géométrique (`FAIL` vs. `PASS`) |
+| :---: | :---: |
+| <img src="../../assets/showcase/momo_turnaround_sheet.en.png" width="380" alt="Turnaround sheet" /> | <img src="../../assets/showcase/drift_rescue_comparison.en.png" width="380" alt="Geometry drift check" /> |
+
+Six exemples de 15 secondes (`9:16`, 4 plans) couvrant les 6 gabarits et 6 moteurs vidéo :
+
+| 01 · Réveil lundi (`Kling`) | 02 · Sky Obby (`Hailuo`) | 03 · Y2K vs. Noob (`Seedance`) |
+| :---: | :---: | :---: |
+| <img src="../../examples/monday-alarm-meltdown/assets/monday_alarm_meltdown.gif" width="155" alt="Case 01" /> | <img src="../../examples/obby-sky-run/assets/obby_sky_run.gif" width="155" alt="Case 02" /> | <img src="../../examples/duo-bestie-contrast/assets/duo_bestie_contrast.gif" width="155" alt="Case 03" /> |
+| [Planche](../../examples/monday-alarm-meltdown/assets/storyboard_contact_sheet.en.png) · [MP4](../../examples/monday-alarm-meltdown/assets/monday_alarm_meltdown.mp4) · [Fichiers](../../examples/monday-alarm-meltdown/) | [Planche](../../examples/obby-sky-run/assets/obby_storyboard_sheet.en.png) · [MP4](../../examples/obby-sky-run/assets/obby_sky_run.mp4) · [Fichiers](../../examples/obby-sky-run/) | [Planche](../../examples/duo-bestie-contrast/assets/duo_storyboard_sheet.en.png) · [MP4](../../examples/duo-bestie-contrast/assets/duo_bestie_contrast.mp4) · [Fichiers](../../examples/duo-bestie-contrast/) |
+| **04 · Café Tycoon (`Wan`)** | **05 · Défilé Y2K (`Sora`)** | **06 · Pizza brûlée (`Runway`)** |
+| <img src="../../examples/cozy-cafe-tycoon/assets/cozy_cafe_tycoon.gif" width="155" alt="Case 04" /> | <img src="../../examples/runway-outfit-drop/assets/runway_outfit_drop.gif" width="155" alt="Case 05" /> | <img src="../../examples/burnt-pizza-slapstick/assets/burnt_pizza_slapstick.gif" width="155" alt="Case 06" /> |
+| [Planche](../../examples/cozy-cafe-tycoon/assets/cafe_storyboard_sheet.en.png) · [MP4](../../examples/cozy-cafe-tycoon/assets/cozy_cafe_tycoon.mp4) · [Fichiers](../../examples/cozy-cafe-tycoon/) | [Planche](../../examples/runway-outfit-drop/assets/runway_storyboard_sheet.en.png) · [MP4](../../examples/runway-outfit-drop/assets/runway_outfit_drop.mp4) · [Fichiers](../../examples/runway-outfit-drop/) | [Planche](../../examples/burnt-pizza-slapstick/assets/pizza_storyboard_sheet.en.png) · [MP4](../../examples/burnt-pizza-slapstick/assets/burnt_pizza_slapstick.mp4) · [Fichiers](../../examples/burnt-pizza-slapstick/) |
+
+## Bibliothèque classique d'avatars et visages Roblox
+
+Indexée dans [`assets/library/catalog.json`](../../assets/library/catalog.json) et [`references/classic-roblox-catalog.md`](../../references/classic-roblox-catalog.md) ([planche avatars](../../assets/showcase/classic_avatars_lineup.en.png) · [planche visages](../../assets/showcase/classic_faces_atlas.en.png)) :
+
+| Classic Noob (2006) | Classic Guest (2008) | Bacon Hair (2014) |
+| :---: | :---: | :---: |
+| <img src="../../assets/library/avatars/avatar_noob.png" width="125" alt="Classic Noob" /> | <img src="../../assets/library/avatars/avatar_guest.png" width="125" alt="Classic Guest" /> | <img src="../../assets/library/avatars/avatar_bacon.png" width="125" alt="Bacon Hair" /> |
+| **Builderman Hard Hat** | **Obby + Speed Coil** | **Storytime Hoodie** |
+| <img src="../../assets/library/avatars/avatar_builderman.png" width="125" alt="Builderman" /> | <img src="../../assets/library/avatars/avatar_obby.png" width="125" alt="Obby Speedrunner" /> | <img src="../../assets/library/avatars/avatar_theo.png" width="125" alt="Storytime Hoodie" /> |
+
+| `Smile :)` | `Chill -_-` | `Check It` | `Grin :D` |
+| :---: | :---: | :---: | :---: |
+| <img src="../../assets/library/faces/face_smile.png" width="95" alt="Smile" /> | <img src="../../assets/library/faces/face_deadpan.png" width="95" alt="Chill" /> | <img src="../../assets/library/faces/face_smirk.png" width="95" alt="Check It" /> | <img src="../../assets/library/faces/face_grin.png" width="95" alt="Grin" /> |
+| **`Shocked O_O`** | **`Waterfall Tears`** | **`Angry Bloxxer`** | **`KO Dizzy X_X`** |
+| <img src="../../assets/library/faces/face_shocked.png" width="95" alt="Shocked" /> | <img src="../../assets/library/faces/face_tears.png" width="95" alt="Waterfall Tears" /> | <img src="../../assets/library/faces/face_angry.png" width="95" alt="Angry Bloxxer" /> | <img src="../../assets/library/faces/face_dizzy.png" width="95" alt="KO Dizzy" /> |
+
+## Scripts CLI, limites et références
+
+- [`scripts/avatar_spec.mjs`](../../scripts/avatar_spec.mjs) : génère une fiche personnage (`BrickColor`, verrous `2x2x1` / `1x2x1`) et le prompt 3 vues.
+- [`scripts/shot_compiler.mjs`](../../scripts/shot_compiler.mjs) : compile les storyboards 9:16 et prompts I2V/T2V pour `kling`, `seedance`, `hailuo`, `wan`, `sora` et `runway`.
+- [`scripts/drift_check.mjs`](../../scripts/drift_check.mjs) : détecte doigts humains, pinces Lego, têtes voxel et surcharge d'actions, puis propose un prompt corrigé.
+- [`scripts/render_preview.mjs`](../../scripts/render_preview.mjs) : calcule en local les planches 3 vues, comparatifs, storyboards et aperçus `.gif` / `.mp4`.
+
+Limitez chaque plan de 4 à 5 secondes à une seule action principale et fixez une planche 3 vues avant un montage I2V multi-plans. Prend en charge 10 langues (`en`, `zh`, `zh-tw`, `ja`, `ko`, `es`, `fr`, `de`, `pt`, `ru`). Projet open-source sous [licence MIT](../../LICENSE), non affilié à Roblox Corporation.
+
+- [`SKILL.md`](../../SKILL.md)
+- [`references/avatar-geometry-and-materials.md`](../../references/avatar-geometry-and-materials.md)
+- [`references/classic-roblox-catalog.md`](../../references/classic-roblox-catalog.md)
+- [`references/model-prompt-playbook.md`](../../references/model-prompt-playbook.md)
+- [`references/rescue-and-anti-drift.md`](../../references/rescue-and-anti-drift.md)
+- [`references/short-video-beats-and-audio.md`](../../references/short-video-beats-and-audio.md) · [`references/viral-archetypes-catalog.md`](../../references/viral-archetypes-catalog.md)

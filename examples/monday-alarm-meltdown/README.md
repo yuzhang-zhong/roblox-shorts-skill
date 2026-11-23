@@ -1,6 +1,6 @@
 # Example 1: Monday 8 AM Alarm Meltdown / 周一早八闹钟破防记
 
-This folder contains a 15-second (`9:16` vertical, 4 shots) short-video package generated with the `roblox-style-skill` CLI scripts. It includes 3-view character turnaround sheets, 4 shot keyframes, localized storyboard contact sheets, a drift report, and `.gif` / `.mp4` previews.
+This folder contains a 15-second (`9:16` vertical, 4 shots) short-video package generated with the `roblox-style-video` CLI scripts. It includes 3-view character turnaround sheets, 4 shot keyframes, localized storyboard contact sheets, a drift report, and `.gif` / `.mp4` previews.
 
 ![Monday Alarm Meltdown Storyboard Contact Sheet (ZH)](assets/storyboard_contact_sheet.zh.png)
 

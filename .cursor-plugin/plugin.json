@@ -1,12 +1,12 @@
 {
-  "name": "roblox-style-skill",
+  "name": "roblox-style-video",
   "description": "Generate Roblox-style R6 and blocky avatar short videos with locked stud proportions, 9:16 storyboards, and model-specific prompts.",
-  "version": "1.2.0",
+  "version": "1.3.0",
   "author": {
     "name": "yuzhang-zhong"
   },
-  "homepage": "https://github.com/yuzhang-zhong/roblox-style-skill",
-  "repository": "https://github.com/yuzhang-zhong/roblox-style-skill",
+  "homepage": "https://github.com/yuzhang-zhong/roblox-style-video",
+  "repository": "https://github.com/yuzhang-zhong/roblox-style-video",
   "license": "MIT",
   "keywords": ["roblox", "ai-video", "short-video", "storyboard", "prompt-engineering"]
 }

@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.3.0
+
+- Renamed repository and skill identifier to `roblox-style-video`.
+- Rewrote `README.md`, `README.zh-CN.md`, and all 8 `docs/i18n/` translations using `readme-editorial` layout rules (left-aligned top screen, immediate quick start, explicit separation of offline 3D previews from external diffusion video models, mobile-safe 3-column and 4-column visual grids, and clean link lists).
+
 ## 1.2.0
 
 - Renamed package and skill identifier to `roblox-style-skill`.
