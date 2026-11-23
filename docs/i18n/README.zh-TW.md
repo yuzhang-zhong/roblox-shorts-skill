@@ -1,3 +1,5 @@
+<p><img src="../../assets/icon.svg" width="80" height="80" alt="" /></p>
+
 # roblox-style-video
 
 [English](../../README.md) · [简体中文](../../README.zh-CN.md) · **繁體中文** · [日本語](README.ja.md) · [한국어](README.ko.md) · [Español](README.es.md) · [Français](README.fr.md) · [Deutsch](README.de.md) · [Português](README.pt-BR.md) · [Русский](README.ru.md)
@@ -35,7 +37,7 @@ node scripts/drift_check.mjs --prompt "A cute Roblox girl with C-shaped claw han
 | :---: | :---: |
 | <img src="../../assets/showcase/momo_turnaround_sheet.zh.png" width="380" alt="Turnaround sheet" /> | <img src="../../assets/showcase/drift_rescue_comparison.zh.png" width="380" alt="Geometry drift check" /> |
 
-6 組 15 秒（`9:16`，4 鏡頭）短片範例包：
+六組短片範例的分鏡都按 15 秒（`9:16`，4 鏡頭）規劃；每支 MP4 都是 4 秒的本機預覽。
 
 | 01 · 週一鬧鐘破防 (`Kling`) | 02 · 天空跑酷闖關 (`Hailuo`) | 03 · 潮人與新手 (`Seedance`) |
 | :---: | :---: | :---: |
@@ -44,22 +46,6 @@ node scripts/drift_check.mjs --prompt "A cute Roblox girl with C-shaped claw han
 | **04 · 微縮甜點小店 (`Wan`)** | **05 · 走秀卡點換裝 (`Sora`)** | **06 · 烤焦披薩翻車 (`Runway`)** |
 | <img src="../../examples/cozy-cafe-tycoon/assets/cozy_cafe_tycoon.gif" width="155" alt="Case 04" /> | <img src="../../examples/runway-outfit-drop/assets/runway_outfit_drop.gif" width="155" alt="Case 05" /> | <img src="../../examples/burnt-pizza-slapstick/assets/burnt_pizza_slapstick.gif" width="155" alt="Case 06" /> |
 | [分鏡圖](../../examples/cozy-cafe-tycoon/assets/cafe_storyboard_sheet.zh.png) · [MP4](../../examples/cozy-cafe-tycoon/assets/cozy_cafe_tycoon.mp4) · [檔案](../../examples/cozy-cafe-tycoon/) | [分鏡圖](../../examples/runway-outfit-drop/assets/runway_storyboard_sheet.zh.png) · [MP4](../../examples/runway-outfit-drop/assets/runway_outfit_drop.mp4) · [檔案](../../examples/runway-outfit-drop/) | [分鏡圖](../../examples/burnt-pizza-slapstick/assets/pizza_storyboard_sheet.zh.png) · [MP4](../../examples/burnt-pizza-slapstick/assets/burnt_pizza_slapstick.mp4) · [檔案](../../examples/burnt-pizza-slapstick/) |
-
-## 經典角色、服飾與表情素材庫
-
-索引位於 [`assets/library/catalog.json`](../../assets/library/catalog.json) 與 [`references/classic-roblox-catalog.md`](../../references/classic-roblox-catalog.md)（[角色全覽](../../assets/showcase/classic_avatars_lineup.zh.png) · [表情全覽](../../assets/showcase/classic_faces_atlas.zh.png)）：
-
-| Classic Noob (2006) | Classic Guest (2008) | Bacon Hair (2014) |
-| :---: | :---: | :---: |
-| <img src="../../assets/library/avatars/avatar_noob.png" width="125" alt="Classic Noob" /> | <img src="../../assets/library/avatars/avatar_guest.png" width="125" alt="Classic Guest" /> | <img src="../../assets/library/avatars/avatar_bacon.png" width="125" alt="Bacon Hair" /> |
-| **Builderman Hard Hat** | **Obby + Speed Coil** | **Storytime Hoodie** |
-| <img src="../../assets/library/avatars/avatar_builderman.png" width="125" alt="Builderman" /> | <img src="../../assets/library/avatars/avatar_obby.png" width="125" alt="Obby Speedrunner" /> | <img src="../../assets/library/avatars/avatar_theo.png" width="125" alt="Storytime Hoodie" /> |
-
-| `Smile :)` | `Chill -_-` | `Check It` | `Grin :D` |
-| :---: | :---: | :---: | :---: |
-| <img src="../../assets/library/faces/face_smile.png" width="95" alt="Smile" /> | <img src="../../assets/library/faces/face_deadpan.png" width="95" alt="Chill" /> | <img src="../../assets/library/faces/face_smirk.png" width="95" alt="Check It" /> | <img src="../../assets/library/faces/face_grin.png" width="95" alt="Grin" /> |
-| **`Shocked O_O`** | **`Waterfall Tears`** | **`Angry Bloxxer`** | **`KO Dizzy X_X`** |
-| <img src="../../assets/library/faces/face_shocked.png" width="95" alt="Shocked" /> | <img src="../../assets/library/faces/face_tears.png" width="95" alt="Waterfall Tears" /> | <img src="../../assets/library/faces/face_angry.png" width="95" alt="Angry Bloxxer" /> | <img src="../../assets/library/faces/face_dizzy.png" width="95" alt="KO Dizzy" /> |
 
 ## 命令列腳本、限制與參考文件
 
@@ -72,7 +58,6 @@ node scripts/drift_check.mjs --prompt "A cute Roblox girl with C-shaped claw han
 
 - [`SKILL.md`](../../SKILL.md)
 - [`references/avatar-geometry-and-materials.md`](../../references/avatar-geometry-and-materials.md)
-- [`references/classic-roblox-catalog.md`](../../references/classic-roblox-catalog.md)
 - [`references/model-prompt-playbook.md`](../../references/model-prompt-playbook.md)
 - [`references/rescue-and-anti-drift.md`](../../references/rescue-and-anti-drift.md)
 - [`references/short-video-beats-and-audio.md`](../../references/short-video-beats-and-audio.md) · [`references/viral-archetypes-catalog.md`](../../references/viral-archetypes-catalog.md)

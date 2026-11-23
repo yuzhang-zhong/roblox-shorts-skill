@@ -1,3 +1,5 @@
+<p><img src="../../assets/icon.svg" width="80" height="80" alt="" /></p>
+
 # roblox-style-video
 
 [English](../../README.md) · [简体中文](../../README.zh-CN.md) · [繁體中文](README.zh-TW.md) · [日本語](README.ja.md) · [한국어](README.ko.md) · **Español** · [Français](README.fr.md) · [Deutsch](README.de.md) · [Português](README.pt-BR.md) · [Русский](README.ru.md)
@@ -35,7 +37,7 @@ Todos los archivos `.png`, `.gif` y `.mp4` de este repositorio son vistas previa
 | :---: | :---: |
 | <img src="../../assets/showcase/momo_turnaround_sheet.en.png" width="380" alt="Turnaround sheet" /> | <img src="../../assets/showcase/drift_rescue_comparison.en.png" width="380" alt="Geometry drift check" /> |
 
-Seis paquetes de ejemplo de 15 segundos (`9:16`, 4 planos) para las 6 plantillas y 6 motores de vídeo:
+Seis ejemplos para seis plantillas y motores de vídeo. Cada guion gráfico está pensado para 15 segundos (`9:16`, 4 planos); cada MP4 es una vista previa local de 4 segundos.
 
 | 01 · Alarma lunes (`Kling`) | 02 · Sky Obby (`Hailuo`) | 03 · Y2K vs. Noob (`Seedance`) |
 | :---: | :---: | :---: |
@@ -44,22 +46,6 @@ Seis paquetes de ejemplo de 15 segundos (`9:16`, 4 planos) para las 6 plantillas
 | **04 · Café Tycoon (`Wan`)** | **05 · Pasarela Y2K (`Sora`)** | **06 · Pizza quemada (`Runway`)** |
 | <img src="../../examples/cozy-cafe-tycoon/assets/cozy_cafe_tycoon.gif" width="155" alt="Case 04" /> | <img src="../../examples/runway-outfit-drop/assets/runway_outfit_drop.gif" width="155" alt="Case 05" /> | <img src="../../examples/burnt-pizza-slapstick/assets/burnt_pizza_slapstick.gif" width="155" alt="Case 06" /> |
 | [Hoja](../../examples/cozy-cafe-tycoon/assets/cafe_storyboard_sheet.en.png) · [MP4](../../examples/cozy-cafe-tycoon/assets/cozy_cafe_tycoon.mp4) · [Archivos](../../examples/cozy-cafe-tycoon/) | [Hoja](../../examples/runway-outfit-drop/assets/runway_storyboard_sheet.en.png) · [MP4](../../examples/runway-outfit-drop/assets/runway_outfit_drop.mp4) · [Archivos](../../examples/runway-outfit-drop/) | [Hoja](../../examples/burnt-pizza-slapstick/assets/pizza_storyboard_sheet.en.png) · [MP4](../../examples/burnt-pizza-slapstick/assets/burnt_pizza_slapstick.mp4) · [Archivos](../../examples/burnt-pizza-slapstick/) |
-
-## Biblioteca clásica de avatares y caras Roblox
-
-Indexada en [`assets/library/catalog.json`](../../assets/library/catalog.json) y [`references/classic-roblox-catalog.md`](../../references/classic-roblox-catalog.md) ([lámina avatares](../../assets/showcase/classic_avatars_lineup.en.png) · [lámina caras](../../assets/showcase/classic_faces_atlas.en.png)):
-
-| Classic Noob (2006) | Classic Guest (2008) | Bacon Hair (2014) |
-| :---: | :---: | :---: |
-| <img src="../../assets/library/avatars/avatar_noob.png" width="125" alt="Classic Noob" /> | <img src="../../assets/library/avatars/avatar_guest.png" width="125" alt="Classic Guest" /> | <img src="../../assets/library/avatars/avatar_bacon.png" width="125" alt="Bacon Hair" /> |
-| **Builderman Hard Hat** | **Obby + Speed Coil** | **Storytime Hoodie** |
-| <img src="../../assets/library/avatars/avatar_builderman.png" width="125" alt="Builderman" /> | <img src="../../assets/library/avatars/avatar_obby.png" width="125" alt="Obby Speedrunner" /> | <img src="../../assets/library/avatars/avatar_theo.png" width="125" alt="Storytime Hoodie" /> |
-
-| `Smile :)` | `Chill -_-` | `Check It` | `Grin :D` |
-| :---: | :---: | :---: | :---: |
-| <img src="../../assets/library/faces/face_smile.png" width="95" alt="Smile" /> | <img src="../../assets/library/faces/face_deadpan.png" width="95" alt="Chill" /> | <img src="../../assets/library/faces/face_smirk.png" width="95" alt="Check It" /> | <img src="../../assets/library/faces/face_grin.png" width="95" alt="Grin" /> |
-| **`Shocked O_O`** | **`Waterfall Tears`** | **`Angry Bloxxer`** | **`KO Dizzy X_X`** |
-| <img src="../../assets/library/faces/face_shocked.png" width="95" alt="Shocked" /> | <img src="../../assets/library/faces/face_tears.png" width="95" alt="Waterfall Tears" /> | <img src="../../assets/library/faces/face_angry.png" width="95" alt="Angry Bloxxer" /> | <img src="../../assets/library/faces/face_dizzy.png" width="95" alt="KO Dizzy" /> |
 
 ## Scripts CLI, límites y referencias
 
@@ -72,7 +58,6 @@ Mantén una sola acción principal por cada clip de 4 a 5 segundos y fija una ho
 
 - [`SKILL.md`](../../SKILL.md)
 - [`references/avatar-geometry-and-materials.md`](../../references/avatar-geometry-and-materials.md)
-- [`references/classic-roblox-catalog.md`](../../references/classic-roblox-catalog.md)
 - [`references/model-prompt-playbook.md`](../../references/model-prompt-playbook.md)
 - [`references/rescue-and-anti-drift.md`](../../references/rescue-and-anti-drift.md)
 - [`references/short-video-beats-and-audio.md`](../../references/short-video-beats-and-audio.md) · [`references/viral-archetypes-catalog.md`](../../references/viral-archetypes-catalog.md)

@@ -1,3 +1,5 @@
+<p><img src="../../assets/icon.svg" width="80" height="80" alt="" /></p>
+
 # roblox-style-video
 
 [English](../../README.md) · [简体中文](../../README.zh-CN.md) · [繁體中文](README.zh-TW.md) · [日本語](README.ja.md) · **한국어** · [Español](README.es.md) · [Français](README.fr.md) · [Deutsch](README.de.md) · [Português](README.pt-BR.md) · [Русский](README.ru.md)
@@ -35,7 +37,7 @@ node scripts/drift_check.mjs --prompt "A cute Roblox girl with C-shaped claw han
 | :---: | :---: |
 | <img src="../../assets/showcase/momo_turnaround_sheet.en.png" width="380" alt="Turnaround sheet" /> | <img src="../../assets/showcase/drift_rescue_comparison.en.png" width="380" alt="Geometry drift check" /> |
 
-6가지 스토리 템플릿과 6개 비디오 엔진을 다루는 15초(`9:16`, 4컷) 예제 패키지:
+6가지 스토리 템플릿과 비디오 엔진의 예제입니다. 스토리보드는 15초(`9:16`, 4컷) 분량이며, 각 MP4는 4초짜리 로컬 미리보기입니다.
 
 | 01 · 월요일 알람 (`Kling`) | 02 · 스카이 오비 (`Hailuo`) | 03 · Y2K vs. 뉴비 (`Seedance`) |
 | :---: | :---: | :---: |
@@ -44,22 +46,6 @@ node scripts/drift_check.mjs --prompt "A cute Roblox girl with C-shaped claw han
 | **04 · 미니 카페 (`Wan`)** | **05 · 런웨이 변신 (`Sora`)** | **06 · 탄 피자 (`Runway`)** |
 | <img src="../../examples/cozy-cafe-tycoon/assets/cozy_cafe_tycoon.gif" width="155" alt="Case 04" /> | <img src="../../examples/runway-outfit-drop/assets/runway_outfit_drop.gif" width="155" alt="Case 05" /> | <img src="../../examples/burnt-pizza-slapstick/assets/burnt_pizza_slapstick.gif" width="155" alt="Case 06" /> |
 | [콘티](../../examples/cozy-cafe-tycoon/assets/cafe_storyboard_sheet.en.png) · [MP4](../../examples/cozy-cafe-tycoon/assets/cozy_cafe_tycoon.mp4) · [파일](../../examples/cozy-cafe-tycoon/) | [콘티](../../examples/runway-outfit-drop/assets/runway_storyboard_sheet.en.png) · [MP4](../../examples/runway-outfit-drop/assets/runway_outfit_drop.mp4) · [파일](../../examples/runway-outfit-drop/) | [콘티](../../examples/burnt-pizza-slapstick/assets/pizza_storyboard_sheet.en.png) · [MP4](../../examples/burnt-pizza-slapstick/assets/burnt_pizza_slapstick.mp4) · [파일](../../examples/burnt-pizza-slapstick/) |
-
-## 클래식 Roblox 아바타 · 의상 · 표정 라이브러리
-
-[`assets/library/catalog.json`](../../assets/library/catalog.json) 및 [`references/classic-roblox-catalog.md`](../../references/classic-roblox-catalog.md) 수록 ([아바타 시트](../../assets/showcase/classic_avatars_lineup.en.png) · [표정 시트](../../assets/showcase/classic_faces_atlas.en.png)):
-
-| Classic Noob (2006) | Classic Guest (2008) | Bacon Hair (2014) |
-| :---: | :---: | :---: |
-| <img src="../../assets/library/avatars/avatar_noob.png" width="125" alt="Classic Noob" /> | <img src="../../assets/library/avatars/avatar_guest.png" width="125" alt="Classic Guest" /> | <img src="../../assets/library/avatars/avatar_bacon.png" width="125" alt="Bacon Hair" /> |
-| **Builderman Hard Hat** | **Obby + Speed Coil** | **Storytime Hoodie** |
-| <img src="../../assets/library/avatars/avatar_builderman.png" width="125" alt="Builderman" /> | <img src="../../assets/library/avatars/avatar_obby.png" width="125" alt="Obby Speedrunner" /> | <img src="../../assets/library/avatars/avatar_theo.png" width="125" alt="Storytime Hoodie" /> |
-
-| `Smile :)` | `Chill -_-` | `Check It` | `Grin :D` |
-| :---: | :---: | :---: | :---: |
-| <img src="../../assets/library/faces/face_smile.png" width="95" alt="Smile" /> | <img src="../../assets/library/faces/face_deadpan.png" width="95" alt="Chill" /> | <img src="../../assets/library/faces/face_smirk.png" width="95" alt="Check It" /> | <img src="../../assets/library/faces/face_grin.png" width="95" alt="Grin" /> |
-| **`Shocked O_O`** | **`Waterfall Tears`** | **`Angry Bloxxer`** | **`KO Dizzy X_X`** |
-| <img src="../../assets/library/faces/face_shocked.png" width="95" alt="Shocked" /> | <img src="../../assets/library/faces/face_tears.png" width="95" alt="Waterfall Tears" /> | <img src="../../assets/library/faces/face_angry.png" width="95" alt="Angry Bloxxer" /> | <img src="../../assets/library/faces/face_dizzy.png" width="95" alt="KO Dizzy" /> |
 
 ## CLI 스크립트, 제약 사항 및 문서
 
@@ -72,7 +58,6 @@ node scripts/drift_check.mjs --prompt "A cute Roblox girl with C-shaped claw han
 
 - [`SKILL.md`](../../SKILL.md)
 - [`references/avatar-geometry-and-materials.md`](../../references/avatar-geometry-and-materials.md)
-- [`references/classic-roblox-catalog.md`](../../references/classic-roblox-catalog.md)
 - [`references/model-prompt-playbook.md`](../../references/model-prompt-playbook.md)
 - [`references/rescue-and-anti-drift.md`](../../references/rescue-and-anti-drift.md)
 - [`references/short-video-beats-and-audio.md`](../../references/short-video-beats-and-audio.md) · [`references/viral-archetypes-catalog.md`](../../references/viral-archetypes-catalog.md)
