@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 /**
  * validate_skill.mjs
- * Zero-dependency package validator for roblox-shorts-skill.
+ * Zero-dependency package validator for roblox-style-skill.
  */
 
 import fs from "node:fs";
@@ -27,7 +27,15 @@ function readUtf8(relPath) {
 const requiredFiles = [
   "SKILL.md",
   "README.md",
-  "README.en.md",
+  "README.zh-CN.md",
+  "docs/i18n/README.zh-TW.md",
+  "docs/i18n/README.ja.md",
+  "docs/i18n/README.ko.md",
+  "docs/i18n/README.es.md",
+  "docs/i18n/README.fr.md",
+  "docs/i18n/README.de.md",
+  "docs/i18n/README.pt-BR.md",
+  "docs/i18n/README.ru.md",
   "LICENSE",
   "CHANGELOG.md",
   "package.json",
@@ -49,30 +57,65 @@ const requiredFiles = [
   "scripts/shot_compiler.mjs",
   "scripts/drift_check.mjs",
   "scripts/render_preview.mjs",
-  "assets/showcase/momo_turnaround_sheet.png",
-  "assets/showcase/drift_rescue_comparison.png",
+  "assets/showcase/momo_turnaround_sheet.zh.png",
+  "assets/showcase/momo_turnaround_sheet.en.png",
+  "assets/showcase/drift_rescue_comparison.zh.png",
+  "assets/showcase/drift_rescue_comparison.en.png",
+  "assets/showcase/classic_avatars_lineup.zh.png",
+  "assets/showcase/classic_avatars_lineup.en.png",
+  "assets/showcase/classic_faces_atlas.zh.png",
+  "assets/showcase/classic_faces_atlas.en.png",
+  "assets/library/catalog.json",
+  "references/classic-roblox-catalog.md",
   "examples/monday-alarm-meltdown/README.md",
   "examples/monday-alarm-meltdown/character_card.md",
   "examples/monday-alarm-meltdown/storyboard.md",
   "examples/monday-alarm-meltdown/prompts.json",
   "examples/monday-alarm-meltdown/drift_report.md",
-  "examples/monday-alarm-meltdown/assets/storyboard_contact_sheet.png",
+  "examples/monday-alarm-meltdown/assets/storyboard_contact_sheet.zh.png",
+  "examples/monday-alarm-meltdown/assets/storyboard_contact_sheet.en.png",
   "examples/monday-alarm-meltdown/assets/monday_alarm_meltdown.gif",
   "examples/monday-alarm-meltdown/assets/monday_alarm_meltdown.mp4",
   "examples/obby-sky-run/README.md",
   "examples/obby-sky-run/character_card.md",
   "examples/obby-sky-run/storyboard.md",
   "examples/obby-sky-run/prompts.json",
-  "examples/obby-sky-run/assets/obby_storyboard_sheet.png",
+  "examples/obby-sky-run/assets/obby_storyboard_sheet.zh.png",
+  "examples/obby-sky-run/assets/obby_storyboard_sheet.en.png",
   "examples/obby-sky-run/assets/obby_sky_run.gif",
   "examples/obby-sky-run/assets/obby_sky_run.mp4",
   "examples/duo-bestie-contrast/README.md",
   "examples/duo-bestie-contrast/character_card.md",
   "examples/duo-bestie-contrast/storyboard.md",
   "examples/duo-bestie-contrast/prompts.json",
-  "examples/duo-bestie-contrast/assets/duo_storyboard_sheet.png",
+  "examples/duo-bestie-contrast/assets/duo_storyboard_sheet.zh.png",
+  "examples/duo-bestie-contrast/assets/duo_storyboard_sheet.en.png",
   "examples/duo-bestie-contrast/assets/duo_bestie_contrast.gif",
-  "examples/duo-bestie-contrast/assets/duo_bestie_contrast.mp4"
+  "examples/duo-bestie-contrast/assets/duo_bestie_contrast.mp4",
+  "examples/cozy-cafe-tycoon/README.md",
+  "examples/cozy-cafe-tycoon/character_card.md",
+  "examples/cozy-cafe-tycoon/storyboard.md",
+  "examples/cozy-cafe-tycoon/prompts.json",
+  "examples/cozy-cafe-tycoon/assets/cafe_storyboard_sheet.zh.png",
+  "examples/cozy-cafe-tycoon/assets/cafe_storyboard_sheet.en.png",
+  "examples/cozy-cafe-tycoon/assets/cozy_cafe_tycoon.gif",
+  "examples/cozy-cafe-tycoon/assets/cozy_cafe_tycoon.mp4",
+  "examples/runway-outfit-drop/README.md",
+  "examples/runway-outfit-drop/character_card.md",
+  "examples/runway-outfit-drop/storyboard.md",
+  "examples/runway-outfit-drop/prompts.json",
+  "examples/runway-outfit-drop/assets/runway_storyboard_sheet.zh.png",
+  "examples/runway-outfit-drop/assets/runway_storyboard_sheet.en.png",
+  "examples/runway-outfit-drop/assets/runway_outfit_drop.gif",
+  "examples/runway-outfit-drop/assets/runway_outfit_drop.mp4",
+  "examples/burnt-pizza-slapstick/README.md",
+  "examples/burnt-pizza-slapstick/character_card.md",
+  "examples/burnt-pizza-slapstick/storyboard.md",
+  "examples/burnt-pizza-slapstick/prompts.json",
+  "examples/burnt-pizza-slapstick/assets/pizza_storyboard_sheet.zh.png",
+  "examples/burnt-pizza-slapstick/assets/pizza_storyboard_sheet.en.png",
+  "examples/burnt-pizza-slapstick/assets/burnt_pizza_slapstick.gif",
+  "examples/burnt-pizza-slapstick/assets/burnt_pizza_slapstick.mp4"
 ];
 
 for (const rel of requiredFiles) {
@@ -85,8 +128,8 @@ if (!fmMatch) {
   fail("SKILL.md must begin with YAML frontmatter");
 }
 const fm = fmMatch[1];
-if (!/^name:\s*roblox-shorts-skill\s*$/m.test(fm)) {
-  fail("SKILL.md YAML frontmatter must declare name: roblox-shorts-skill");
+if (!/^name:\s*roblox-style-skill\s*$/m.test(fm)) {
+  fail("SKILL.md YAML frontmatter must declare name: roblox-style-skill");
 }
 
 const verMatch = fm.match(/^\s+version:\s*["']?([0-9]+\.[0-9]+\.[0-9]+)["']?\s*$/m);
@@ -118,7 +161,7 @@ if (versions.size !== 1) {
 }
 
 const firstSentence =
-  "Plan, prompt, render, and debug authentic Roblox-style blocky avatar AI short videos with canonical 2x2x1/1x2x1 stud geometry, viral 9:16 storyboards, model-tuned I2V/T2V prompts, and 3D preview rendering.";
+  "Generate Roblox-style R6 and blocky avatar short videos with locked stud proportions, 9:16 storyboards, and model-specific prompts.";
 for (const [label, desc] of [
   ["package.json", pkg.description],
   [".claude-plugin/plugin.json", claudePlugin.description],
@@ -135,4 +178,4 @@ if (skillWords > 5500) {
   fail(`Keep SKILL.md at 5,500 words or fewer; found ${skillWords}`);
 }
 
-console.log(`roblox-shorts-skill v${skillVersion} package is valid (${requiredFiles.length} files checked, ${skillWords} words in SKILL.md)`);
+console.log(`roblox-style-skill v${skillVersion} package is valid (${requiredFiles.length} files checked, ${skillWords} words in SKILL.md)`);

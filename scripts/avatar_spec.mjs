@@ -54,6 +54,38 @@ const ARCHETYPES = {
     faceEn: "classic Roblox 2D Default Smile decal printed flat on the light grey barrel-cylinder head",
     faceZh: "浅灰桶状圆角圆柱头正面印有经典Roblox 2D默认微笑贴图"
   },
+  "classic-guest": {
+    labelZh: "经典游客形象 (2008 Guest)",
+    labelEn: "Authentic Roblox Classic Guest (R6)",
+    defaultRig: "r6",
+    defaultMaterial: "smooth-plastic",
+    headColor: "Institutional white #F8F8F8",
+    primaryColor: "Really black #111827",
+    secondaryColor: "Black #1B2A35",
+    accentColor: "Bright red #C4281C",
+    outfitEn: "black 2x2x1 Roblox R logo jacket with white cuffs, flush black 1x2x1 rectangular blocky pants",
+    outfitZh: "纯黑2x2x1胸前带红白R标夹克配白袖口、纯黑并拢齐平1x2x1方柱长裤",
+    accessoriesEn: "bright red Roblox baseball cap with curved front brim on the pale white 1:1 barrel head",
+    accessoriesZh: "纯白1:1桶状圆角头上佩戴亮红色经典Roblox棒球帽",
+    faceEn: "classic Roblox 2D Winning Grin (:D) decal with white top teeth bar",
+    faceZh: "经典Roblox 2D露齿笑(:D)平面贴图"
+  },
+  "builderman": {
+    labelZh: "经典建造者俱乐部 (Builderman)",
+    labelEn: "Classic Builderman / TBC Hard Hat (R6)",
+    defaultRig: "r6",
+    defaultMaterial: "smooth-plastic",
+    headColor: "Bright yellow #F5CD30",
+    primaryColor: "Bright orange #F97316",
+    secondaryColor: "Dark royal blue #1E3A8A",
+    accentColor: "Bright yellow #FACC15 (Hard Hat)",
+    outfitEn: "bright orange 2x2x1 zip hoodie with 3D hood, kangaroo pocket, and white drawstrings, dark royal-blue flush 1x2x1 blocky jeans",
+    outfitZh: "亮橙色2x2x1拉链连帽卫衣（带立体兜帽、白抽绳与袋鼠兜）、深宝蓝并拢1x2x1方柱牛仔裤",
+    accessoriesEn: "classic yellow ribbed Builder's Club construction hard hat on the yellow 1:1 barrel head",
+    accessoriesZh: "黄色1:1桶状头上佩戴经典黄色Builder's Club工程安全帽",
+    faceEn: "classic Roblox Check-It 2D smirk decal with angled brow",
+    faceZh: "经典Roblox 2D挑眉坏笑(Check It)贴图"
+  },
   "ugc-streetwear": {
     labelZh: "Y2K千禧穿搭潮人 (Dress-to-Impress)",
     labelEn: "Y2K UGC Streetwear Blocky Avatar",
@@ -200,10 +232,33 @@ Options:
   --material <id>    Surface shader: glossy-vinyl | matte-abs | clay-soft | neon-cyber
   --name <string>    Character name (default: "Bloxy")
   --accessory <str>  Optional extra UGC accessory to append
-  --lang <mode>      Output language: zh-en | zh | en (default: zh-en)
+  --lang <code>      Output language: en | zh | zh-tw | ja | ko | es | fr | de | pt | ru | zh-en (default: en)
   --json             Output structured JSON
   --help             Show this help message`);
 }
+
+const SUPPORTED_LANGS = new Set(["en", "zh", "zh-tw", "ja", "ko", "es", "fr", "de", "pt", "ru", "zh-en"]);
+
+export function normalizeLang(code = "en") {
+  const clean = String(code || "en").toLowerCase().trim();
+  if (clean === "zh-cn") return "zh";
+  if (clean === "pt-br") return "pt";
+  return SUPPORTED_LANGS.has(clean) ? clean : "en";
+}
+
+const AVATAR_HEADERS = {
+  en: { title: "Character DNA Card", field: "Field", spec: "Specification", neg: "Anti-Drift Negative Prompt" },
+  zh: { title: "角色设定卡", field: "字段", spec: "锁定参数", neg: "负向防串味词" },
+  "zh-tw": { title: "角色設定卡", field: "欄位", spec: "鎖定參數", neg: "負向防串味詞" },
+  ja: { title: "キャラクターDNAカード", field: "項目", spec: "固定パラメータ", neg: "スタイル崩れ防止ネガティブプロンプト" },
+  ko: { title: "캐릭터 DNA 카드", field: "항목", spec: "고정 사양", neg: "스타일 왜곡 방지 네거티브 프롬프트" },
+  es: { title: "Ficha ADN del Personaje", field: "Campo", spec: "Especificación", neg: "Prompt Negativo Anti-Deriva" },
+  fr: { title: "Fiche ADN du Personnage", field: "Champ", spec: "Spécification", neg: "Prompt Négatif Anti-Dérive" },
+  de: { title: "Charakter-DNA-Karte", field: "Feld", spec: "Spezifikation", neg: "Negativ-Prompt gegen Stilabweichung" },
+  pt: { title: "Ficha de DNA do Personagem", field: "Campo", spec: "Especificação", neg: "Prompt Negativo Anti-Desvio" },
+  ru: { title: "Карта ДНК персонажа", field: "Поле", spec: "Спецификация", neg: "Негативный промпт против искажений" },
+  "zh-en": { title: "Character DNA Card / 角色设定卡", field: "Field / 字段", spec: "Specification / 锁定参数", neg: "Anti-Drift Negative Prompt / 负向防串味词" }
+};
 
 export function parseArgs(argv) {
   const opts = {
@@ -212,7 +267,7 @@ export function parseArgs(argv) {
     material: "",
     name: "Bloxy",
     accessory: "",
-    lang: "zh-en",
+    lang: "en",
     json: false,
     help: false
   };
@@ -226,7 +281,7 @@ export function parseArgs(argv) {
     else if (arg === "--material" && argv[i + 1]) opts.material = argv[++i];
     else if (arg === "--name" && argv[i + 1]) opts.name = argv[++i];
     else if (arg === "--accessory" && argv[i + 1]) opts.accessory = argv[++i];
-    else if (arg === "--lang" && argv[i + 1]) opts.lang = argv[++i];
+    else if (arg === "--lang" && argv[i + 1]) opts.lang = normalizeLang(argv[++i]);
   }
   return opts;
 }
@@ -288,20 +343,23 @@ export function buildAvatarSpec(rawOpts = {}) {
   };
 }
 
-export function formatAvatarSpecMarkdown(spec, lang = "zh-en") {
+export function formatAvatarSpecMarkdown(spec, rawLang = "en") {
+  const lang = normalizeLang(rawLang);
+  const h = AVATAR_HEADERS[lang] || AVATAR_HEADERS.en;
+  const useZhText = lang === "zh" || lang === "zh-tw" || lang === "zh-en";
   const lines = [];
-  lines.push(`# Character DNA Card / 角色设定卡: ${spec.name}`);
+  lines.push(`# ${h.title}: ${spec.name} (\`lang: ${lang}\`)`);
   lines.push("");
-  lines.push("| Field / 字段 | Specification / 锁定参数 |");
+  lines.push(`| ${h.field} | ${h.spec} |`);
   lines.push("| --- | --- |");
-  lines.push(`| Archetype / 角色原型 | \`${spec.archetype}\` (${spec.archetypeLabel}) |`);
-  lines.push(`| Rig / 骨架比例 | \`${spec.rig}\` (${spec.rigLabel}) |`);
-  lines.push(`| Material / 表面材质 | \`${spec.material}\` (${spec.materialLabel}) |`);
-  lines.push(`| Hand Lock / 手部几何锁 | ${lang === "en" ? spec.locks.handsEn : `${spec.locks.handsZh} / ${spec.locks.handsEn}`} |`);
-  lines.push(`| Face Lock / 面部贴图锁 | ${lang === "en" ? spec.locks.headAndFaceEn : spec.locks.headAndFaceZh} |`);
-  lines.push(`| Outfit / 服装结构 | ${lang === "en" ? spec.locks.outfitEn : spec.locks.outfitZh} |`);
-  lines.push(`| UGC Accessories / 配饰锚点 | ${lang === "en" ? spec.locks.accessoriesEn : spec.locks.accessoriesZh} |`);
-  lines.push(`| Color Palette / 配色色板 | Head \`${spec.palette.head}\` · Primary \`${spec.palette.primary}\` · Secondary \`${spec.palette.secondary}\` · Accent \`${spec.palette.accent}\` |`);
+  lines.push(`| Archetype | \`${spec.archetype}\` (${spec.archetypeLabel}) |`);
+  lines.push(`| Rig | \`${spec.rig}\` (${spec.rigLabel}) |`);
+  lines.push(`| Material | \`${spec.material}\` (${spec.materialLabel}) |`);
+  lines.push(`| Hand Lock | ${useZhText ? `${spec.locks.handsZh} / ${spec.locks.handsEn}` : spec.locks.handsEn} |`);
+  lines.push(`| Face Lock | ${useZhText ? spec.locks.headAndFaceZh : spec.locks.headAndFaceEn} |`);
+  lines.push(`| Outfit | ${useZhText ? spec.locks.outfitZh : spec.locks.outfitEn} |`);
+  lines.push(`| UGC Accessories | ${useZhText ? spec.locks.accessoriesZh : spec.locks.accessoriesEn} |`);
+  lines.push(`| Color Palette | Head \`${spec.palette.head}\` · Primary \`${spec.palette.primary}\` · Secondary \`${spec.palette.secondary}\` · Accent \`${spec.palette.accent}\` |`);
   lines.push("");
 
   if (lang !== "zh") {
@@ -313,7 +371,7 @@ export function formatAvatarSpecMarkdown(spec, lang = "zh-en") {
     lines.push("");
   }
 
-  if (lang !== "en") {
+  if (useZhText) {
     lines.push("## 角色三视图生成提示词 (中文 · 即梦 / 可灵参考图 / 万相)");
     lines.push("");
     lines.push("```text");
@@ -322,10 +380,10 @@ export function formatAvatarSpecMarkdown(spec, lang = "zh-en") {
     lines.push("");
   }
 
-  lines.push("## Anti-Drift Negative Prompt / 负向防串味词");
+  lines.push(`## ${h.neg}`);
   lines.push("");
   lines.push("```text");
-  lines.push(lang === "zh" ? spec.negativePromptZh : `${spec.negativePromptEn}\n${spec.negativePromptZh}`);
+  lines.push(lang === "zh" ? spec.negativePromptZh : useZhText ? `${spec.negativePromptEn}\n${spec.negativePromptZh}` : spec.negativePromptEn);
   lines.push("```");
 
   return lines.join("\n");

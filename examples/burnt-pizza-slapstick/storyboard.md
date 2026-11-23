@@ -1,0 +1,100 @@
+﻿# 9:16 Storyboard & Prompt Pack: 黑暗料理与刚体倒地梗图 / Burnt Pizza Deadpan R6 Ragdoll Slapstick (`lang: zh-en`)
+
+- **Template**: `meme-slapstick`
+- **Target Engine**: `runway` (First-Frame I2V (首帧图生视频))
+- **Rig & Material**: `r6` · `glossy-vinyl`
+- **Format & Duration**: `9:16` · `15s` (`4` shots, 1 primary action per clip)
+
+## Beat Sheet Overview
+
+| Shot | Time | Beat Role | Single Action | Camera | SFX & Caption |
+| --- | --- | --- | --- | --- | --- |
+| 01 | 0.0s–3.8s | Hook / 黄金前3秒 | 用双侧1x2x1实心平头方柱手骄傲地端起托盘，上面放着一块烤得乌黑发亮的圆角方块黑暗料理披萨 | 明亮微缩厨房内从中景极速推至特写 | 欢快小号声突然走调 · 「耗时三小时的诚意大作」 |
+| 02 | 3.8s–7.5s | Escalation 1 / 动作推进 | 全身保持绝对静止，厨房灯光骤然熄灭，仅剩一束冷白顶光直直打在微笑的黄色圆柱头上 | 正脸特写死死固定机位，零运镜强化荒诞感 | 电闸拉下咔哒声 + 悬疑低音弦乐 · 「空气突然安静」 |
+| 03 | 7.5s–11.3s | Escalation 2 / 情绪升级 | 焦黑披萨升起一朵灰色方块烟雾，同时小人左侧黄色方柱手臂沿肩部接缝干脆脱落，啪嗒掉在餐桌上 | 中景轻微下摇看向掉落桌面的方柱手臂 | 清脆乐高/积木散架声 (Plastic Clatter!) · 「心态与胳膊一起崩了」 |
+| 04 | 11.3s–15.0s | Payoff & Loop / 反转收尾 | 全身不弯曲任何一个关节，像一块完整的积木雕像一样呈90度直挺挺向侧面拍倒在厨房地板上 | 微缩厨房全景固定机位，倒地瞬间轻微震动 | 经典闷响 (Oof!) + 结束定格鼓点 · 「厨神生涯，到此为止」 |
+
+## Compiled Shot Prompts
+
+### Shot 01 (0.0s–3.8s) · Hook / 黄金前3秒
+
+- **First-Frame Image Prompt (EN)**:
+  ```text
+  9:16 vertical keyframe still. Fast crash-zoom from medium shot to close-up in a bright kitchen. a classic R6 Roblox-style blocky figure with a bright yellow cylindrical head, blue blocky torso, green blocky legs, white chef hat, and fingerless and clawless solid 1x2x1 rectangular block hands positioned at the start of the action (proudly holds up a completely charred, pitch-black blocky pizza on a silver tray using both fingerless and clawless solid 1x2x1 rectangular block hands), displaying cheerful unchanging default black-line smile decal despite the disaster. Canonical Roblox 2x2x1 torso and flush 1x2x1 solid rectangular limbs, fingerless and clawless flat beveled block hands (no human fingers, no Lego C-claws), 1:1 barrel-beveled cylindrical head, SmoothPlastic shader on a classic Roblox studded baseplate, Motor6D rigid hinge joints.
+  ```
+- **Video Motion Prompt (RUNWAY · EN)**:
+  ```text
+  Camera (9:16): Fast crash-zoom from medium shot to close-up in a bright kitchen. Subject (r6): a classic R6 Roblox-style blocky figure with a bright yellow cylindrical head, blue blocky torso, green blocky legs, white chef hat, and fingerless and clawless solid 1x2x1 rectangular block hands. Action: The figure proudly holds up a completely charred, pitch-black blocky pizza on a silver tray using both fingerless and clawless solid 1x2x1 rectangular block hands while maintaining cheerful unchanging default black-line smile decal despite the disaster. Physics: Canonical Roblox 2x2x1 torso and flush 1x2x1 solid rectangular limbs, fingerless and clawless flat beveled block hands (no human fingers, no Lego C-claws), 1:1 barrel-beveled cylindrical head, SmoothPlastic shader on a classic Roblox studded baseplate, Motor6D rigid hinge joints.
+  ```
+- **首帧静态图提示词 (ZH)**:
+  ```text
+  9:16竖屏首帧关键帧静帧。明亮微缩厨房内从中景极速推至特写。戴白色方块厨师帽的经典R6黄头蓝衣Roblox方块小人（1x2x1实心平头方柱手、纯平2D默认微笑贴图、刚性不弯曲四肢）处于动作起始位（用双侧1x2x1实心平头方柱手骄傲地端起托盘，上面放着一块烤得乌黑发亮的圆角方块黑暗料理披萨），面部呈现面对灾难现场依然保持毫无波澜的经典2D默认微笑贴图。纯正Roblox 2x2x1长方体躯干配并拢齐平的1x2x1实心平头方柱四肢（无人类五指、无乐高C型钩爪），1:1上下大圆角桶状圆柱头，SmoothPlastic平滑塑料配经典Roblox方格Studs底板，Motor6D刚性转轴关节。
+  ```
+- **图生视频动态提示词 (RUNWAY · ZH)**:
+  ```text
+  机位（9:16）：明亮微缩厨房内从中景极速推至特写。主体（r6）：戴白色方块厨师帽的经典R6黄头蓝衣Roblox方块小人（1x2x1实心平头方柱手、纯平2D默认微笑贴图、刚性不弯曲四肢）。动作：小人用双侧1x2x1实心平头方柱手骄傲地端起托盘，上面放着一块烤得乌黑发亮的圆角方块黑暗料理披萨，面对灾难现场依然保持毫无波澜的经典2D默认微笑贴图。物理约束：纯正Roblox 2x2x1长方体躯干配并拢齐平的1x2x1实心平头方柱四肢（无人类五指、无乐高C型钩爪），1:1上下大圆角桶状圆柱头，SmoothPlastic平滑塑料配经典Roblox方格Studs底板，Motor6D刚性转轴关节。
+  ```
+
+### Shot 02 (3.8s–7.5s) · Escalation 1 / 动作推进
+
+- **First-Frame Image Prompt (EN)**:
+  ```text
+  9:16 vertical keyframe still. Locked-off frontal close-up, zero camera motion. a classic R6 Roblox-style blocky figure with a bright yellow cylindrical head, blue blocky torso, green blocky legs, white chef hat, and fingerless and clawless solid 1x2x1 rectangular block hands positioned at the start of the action (stands completely motionless as the kitchen lights abruptly cut out, leaving only a harsh white top spotlight on its smiling yellow head), displaying the exact same painted smile staring into the void under harsh top shadows. Canonical Roblox 2x2x1 torso and flush 1x2x1 solid rectangular limbs, fingerless and clawless flat beveled block hands (no human fingers, no Lego C-claws), 1:1 barrel-beveled cylindrical head, SmoothPlastic shader on a classic Roblox studded baseplate, Motor6D rigid hinge joints.
+  ```
+- **Video Motion Prompt (RUNWAY · EN)**:
+  ```text
+  Camera (9:16): Locked-off frontal close-up, zero camera motion. Subject (r6): a classic R6 Roblox-style blocky figure with a bright yellow cylindrical head, blue blocky torso, green blocky legs, white chef hat, and fingerless and clawless solid 1x2x1 rectangular block hands. Action: The figure stands completely motionless as the kitchen lights abruptly cut out, leaving only a harsh white top spotlight on its smiling yellow head while maintaining the exact same painted smile staring into the void under harsh top shadows. Physics: Canonical Roblox 2x2x1 torso and flush 1x2x1 solid rectangular limbs, fingerless and clawless flat beveled block hands (no human fingers, no Lego C-claws), 1:1 barrel-beveled cylindrical head, SmoothPlastic shader on a classic Roblox studded baseplate, Motor6D rigid hinge joints.
+  ```
+- **首帧静态图提示词 (ZH)**:
+  ```text
+  9:16竖屏首帧关键帧静帧。正脸特写死死固定机位，零运镜强化荒诞感。戴白色方块厨师帽的经典R6黄头蓝衣Roblox方块小人（1x2x1实心平头方柱手、纯平2D默认微笑贴图、刚性不弯曲四肢）处于动作起始位（全身保持绝对静止，厨房灯光骤然熄灭，仅剩一束冷白顶光直直打在微笑的黄色圆柱头上），面部呈现冷酷顶光阴影下一模一样的2D印刷微笑。纯正Roblox 2x2x1长方体躯干配并拢齐平的1x2x1实心平头方柱四肢（无人类五指、无乐高C型钩爪），1:1上下大圆角桶状圆柱头，SmoothPlastic平滑塑料配经典Roblox方格Studs底板，Motor6D刚性转轴关节。
+  ```
+- **图生视频动态提示词 (RUNWAY · ZH)**:
+  ```text
+  机位（9:16）：正脸特写死死固定机位，零运镜强化荒诞感。主体（r6）：戴白色方块厨师帽的经典R6黄头蓝衣Roblox方块小人（1x2x1实心平头方柱手、纯平2D默认微笑贴图、刚性不弯曲四肢）。动作：小人全身保持绝对静止，厨房灯光骤然熄灭，仅剩一束冷白顶光直直打在微笑的黄色圆柱头上，冷酷顶光阴影下一模一样的2D印刷微笑。物理约束：纯正Roblox 2x2x1长方体躯干配并拢齐平的1x2x1实心平头方柱四肢（无人类五指、无乐高C型钩爪），1:1上下大圆角桶状圆柱头，SmoothPlastic平滑塑料配经典Roblox方格Studs底板，Motor6D刚性转轴关节。
+  ```
+
+### Shot 03 (7.5s–11.3s) · Escalation 2 / 情绪升级
+
+- **First-Frame Image Prompt (EN)**:
+  ```text
+  9:16 vertical keyframe still. Medium shot with a subtle downward tilt toward the detached blocky arm. a classic R6 Roblox-style blocky figure with a bright yellow cylindrical head, blue blocky torso, green blocky legs, white chef hat, and fingerless and clawless solid 1x2x1 rectangular block hands positioned at the start of the action (a puff of gray blocky smoke rises from the burnt pizza while the avatar's left yellow rectangular arm block detaches cleanly and clatters onto the table), displaying still smiling without blinking. Canonical Roblox 2x2x1 torso and flush 1x2x1 solid rectangular limbs, fingerless and clawless flat beveled block hands (no human fingers, no Lego C-claws), 1:1 barrel-beveled cylindrical head, SmoothPlastic shader on a classic Roblox studded baseplate, Motor6D rigid hinge joints.
+  ```
+- **Video Motion Prompt (RUNWAY · EN)**:
+  ```text
+  Camera (9:16): Medium shot with a subtle downward tilt toward the detached blocky arm. Subject (r6): a classic R6 Roblox-style blocky figure with a bright yellow cylindrical head, blue blocky torso, green blocky legs, white chef hat, and fingerless and clawless solid 1x2x1 rectangular block hands. Action: The figure a puff of gray blocky smoke rises from the burnt pizza while the avatar's left yellow rectangular arm block detaches cleanly and clatters onto the table while maintaining still smiling without blinking. Physics: Canonical Roblox 2x2x1 torso and flush 1x2x1 solid rectangular limbs, fingerless and clawless flat beveled block hands (no human fingers, no Lego C-claws), 1:1 barrel-beveled cylindrical head, SmoothPlastic shader on a classic Roblox studded baseplate, Motor6D rigid hinge joints.
+  ```
+- **首帧静态图提示词 (ZH)**:
+  ```text
+  9:16竖屏首帧关键帧静帧。中景轻微下摇看向掉落桌面的方柱手臂。戴白色方块厨师帽的经典R6黄头蓝衣Roblox方块小人（1x2x1实心平头方柱手、纯平2D默认微笑贴图、刚性不弯曲四肢）处于动作起始位（焦黑披萨升起一朵灰色方块烟雾，同时小人左侧黄色方柱手臂沿肩部接缝干脆脱落，啪嗒掉在餐桌上），面部呈现依然眨都不眨地保持默认微笑贴图。纯正Roblox 2x2x1长方体躯干配并拢齐平的1x2x1实心平头方柱四肢（无人类五指、无乐高C型钩爪），1:1上下大圆角桶状圆柱头，SmoothPlastic平滑塑料配经典Roblox方格Studs底板，Motor6D刚性转轴关节。
+  ```
+- **图生视频动态提示词 (RUNWAY · ZH)**:
+  ```text
+  机位（9:16）：中景轻微下摇看向掉落桌面的方柱手臂。主体（r6）：戴白色方块厨师帽的经典R6黄头蓝衣Roblox方块小人（1x2x1实心平头方柱手、纯平2D默认微笑贴图、刚性不弯曲四肢）。动作：小人焦黑披萨升起一朵灰色方块烟雾，同时小人左侧黄色方柱手臂沿肩部接缝干脆脱落，啪嗒掉在餐桌上，依然眨都不眨地保持默认微笑贴图。物理约束：纯正Roblox 2x2x1长方体躯干配并拢齐平的1x2x1实心平头方柱四肢（无人类五指、无乐高C型钩爪），1:1上下大圆角桶状圆柱头，SmoothPlastic平滑塑料配经典Roblox方格Studs底板，Motor6D刚性转轴关节。
+  ```
+
+### Shot 04 (11.3s–15.0s) · Payoff & Loop / 反转收尾
+
+- **First-Frame Image Prompt (EN)**:
+  ```text
+  9:16 vertical keyframe still. Wide locked-off diorama shot with a tiny floor-impact shake. a classic R6 Roblox-style blocky figure with a bright yellow cylindrical head, blue blocky torso, green blocky legs, white chef hat, and fingerless and clawless solid 1x2x1 rectangular block hands positioned at the start of the action (tips sideways at a strict 90-degree angle onto the kitchen floor like a solid statue without bending a single joint), displaying sideways default smile decal facing the camera from the floor. Canonical Roblox 2x2x1 torso and flush 1x2x1 solid rectangular limbs, fingerless and clawless flat beveled block hands (no human fingers, no Lego C-claws), 1:1 barrel-beveled cylindrical head, SmoothPlastic shader on a classic Roblox studded baseplate, Motor6D rigid hinge joints.
+  ```
+- **Video Motion Prompt (RUNWAY · EN)**:
+  ```text
+  Camera (9:16): Wide locked-off diorama shot with a tiny floor-impact shake. Subject (r6): a classic R6 Roblox-style blocky figure with a bright yellow cylindrical head, blue blocky torso, green blocky legs, white chef hat, and fingerless and clawless solid 1x2x1 rectangular block hands. Action: The figure tips sideways at a strict 90-degree angle onto the kitchen floor like a solid statue without bending a single joint while maintaining sideways default smile decal facing the camera from the floor. Physics: Canonical Roblox 2x2x1 torso and flush 1x2x1 solid rectangular limbs, fingerless and clawless flat beveled block hands (no human fingers, no Lego C-claws), 1:1 barrel-beveled cylindrical head, SmoothPlastic shader on a classic Roblox studded baseplate, Motor6D rigid hinge joints.
+  ```
+- **首帧静态图提示词 (ZH)**:
+  ```text
+  9:16竖屏首帧关键帧静帧。微缩厨房全景固定机位，倒地瞬间轻微震动。戴白色方块厨师帽的经典R6黄头蓝衣Roblox方块小人（1x2x1实心平头方柱手、纯平2D默认微笑贴图、刚性不弯曲四肢）处于动作起始位（全身不弯曲任何一个关节，像一块完整的积木雕像一样呈90度直挺挺向侧面拍倒在厨房地板上），面部呈现倒在地板上依然侧着脸对镜头保持微笑贴图。纯正Roblox 2x2x1长方体躯干配并拢齐平的1x2x1实心平头方柱四肢（无人类五指、无乐高C型钩爪），1:1上下大圆角桶状圆柱头，SmoothPlastic平滑塑料配经典Roblox方格Studs底板，Motor6D刚性转轴关节。
+  ```
+- **图生视频动态提示词 (RUNWAY · ZH)**:
+  ```text
+  机位（9:16）：微缩厨房全景固定机位，倒地瞬间轻微震动。主体（r6）：戴白色方块厨师帽的经典R6黄头蓝衣Roblox方块小人（1x2x1实心平头方柱手、纯平2D默认微笑贴图、刚性不弯曲四肢）。动作：小人全身不弯曲任何一个关节，像一块完整的积木雕像一样呈90度直挺挺向侧面拍倒在厨房地板上，倒在地板上依然侧着脸对镜头保持微笑贴图。物理约束：纯正Roblox 2x2x1长方体躯干配并拢齐平的1x2x1实心平头方柱四肢（无人类五指、无乐高C型钩爪），1:1上下大圆角桶状圆柱头，SmoothPlastic平滑塑料配经典Roblox方格Studs底板，Motor6D刚性转轴关节。
+  ```
+
+## Shared Anti-Drift Negative Prompt
+
+```text
+human fingers, five-fingered hand, Lego solid 1x2x1 rectangular block hands, Lego hook hands, Lego top head studs, Minecraft sharp voxel cube head, separated thin legs with thigh gap, protruding human sneakers, realistic human face, 3D protruding nose, skin pores, rubbery noodle limbs, foot sliding, morphing clothes, watermark
+人类五指，真实人手，乐高1x2x1实心平头方柱手，乐高钩子手，乐高头顶圆柱凸起颗粒，我的世界直角像素方块头，双腿分叉有空隙，外凸真人运动鞋，真实人类面部骨骼，3D凸起高鼻梁，皮肤毛孔，橡胶面条状弯曲四肢，脚底打滑，服装中途变形，水印文字
+```

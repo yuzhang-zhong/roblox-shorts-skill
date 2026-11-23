@@ -1,20 +1,20 @@
 ---
-name: roblox-shorts-skill
+name: roblox-style-skill
 description: |
-  Plan, prompt, render, and debug authentic Roblox-style blocky avatar AI short videos with canonical 2x2x1/1x2x1 stud geometry, viral 9:16 storyboards, model-tuned I2V/T2V prompts, and 3D preview rendering.
+  Generate Roblox-style R6 and blocky avatar short videos with locked stud proportions, 9:16 storyboards, and model-specific prompts.
   Use when the user wants to generate Roblox-style avatar videos, blocky 3D character shorts, Douyin/Xiaohongshu/TikTok Roblox skits, R6/R15/chibi-plush character turnaround sheets, or prompts for Kling (可灵), Seedance/Jimeng (即梦), Hailuo MiniMax (海螺), Wan (通义万相), Sora, or Runway, or when fixing AI video defects such as human fingers, Lego C-claws/studs, Minecraft voxels, realistic faces, or rubbery limbs.
 license: MIT
 metadata:
-  version: "1.1.0"
+  version: "1.2.0"
 ---
 
-# Roblox Shorts Skill / 方块片场
+# Roblox Style Skill
 
 ## Core Objective / 核心目标
 
 Help creators turn a short-video idea into a geometry-consistent Roblox-style blocky avatar video package: a locked Character DNA card, a 3-view reference sheet prompt, a 9:16 beat-timed storyboard, model-specific Image-to-Video (I2V) or Text-to-Video (T2V) prompts, and prompt patches when a video clip drifts.
 
-Respond in the user's language. When the user requests bilingual output, provide Chinese explanations alongside English generation prompts and Chinese prompt equivalents for domestic engines (Kling 可灵, Seedance/Jimeng 即梦, Hailuo 海螺, Wan 通义万相).
+Respond in the user's language (`en`, `zh`, `zh-tw`, `ja`, `ko`, `es`, `fr`, `de`, `pt`, `ru`). When the user requests bilingual output or uses domestic Chinese video engines (Kling 可灵, Seedance/Jimeng 即梦, Hailuo 海螺, Wan 通义万相), provide localized explanations alongside English generation prompts and Chinese prompt equivalents.
 
 General video diffusion models default to human anatomy, Lego minifigures, or Minecraft voxels when prompted vaguely with "Roblox character." This skill prevents style drift by locking **eight authentic Roblox visual invariants** before writing motion prompts:
 
@@ -78,7 +78,7 @@ Default assumptions when unspecified:
 Read `references/avatar-geometry-and-materials.md` and run `scripts/avatar_spec.mjs` to lock the avatar's silhouette, hand shape, face decal, and material shader before drafting any scene prompts:
 
 ```bash
-node scripts/avatar_spec.mjs --archetype chibi-plush --rig chibi-blocky --material glossy-vinyl --name "Momo" --lang zh-en
+node scripts/avatar_spec.mjs --archetype chibi-plush --rig chibi-blocky --material glossy-vinyl --name "Momo" --lang en
 ```
 
 Give the user:
@@ -90,8 +90,8 @@ Give the user:
 
 Read `references/short-video-beats-and-audio.md` and `references/viral-archetypes-catalog.md`. Structure the short into three retention zones:
 
-- **Shot 1 (0.0s–3.5s) · Hook / 黄金前3秒**: immediate visual contrast, exaggerated 2D decal expression change, rapid push-in, or rigid blocky slapstick impact. Never open with a slow empty establishing shot.
-- **Shots 2 to N-1 · Escalation / 推进镜头**: 3.5s to 4.0s per shot. Each shot gets **one clear physical verb** (e.g., "slams the blocky alarm clock with a C-shaped hand" or "rigidly hops across neon pastel platforms").
+- **Shot 1 (0.0s to 3.5s) · Hook / 黄金前3秒**: immediate visual contrast, exaggerated 2D decal expression change, rapid push-in, or rigid blocky slapstick impact. Never open with a slow empty establishing shot.
+- **Shots 2 to N-1 · Escalation / 推进镜头**: 3.5s to 4.0s per shot. Each shot gets **one clear physical verb** (e.g., "slams the blocky alarm clock with a solid rectangular block hand" or "rigidly hops across neon pastel platforms").
 - **Final Shot · Payoff or Loop / 反转或无缝循环**: deadpan freeze-frame, sudden lighting shift, ragdoll flop, or a pose that matches Frame 1 for infinite replay on TikTok/Douyin.
 
 ### Step 3: Compile Model-Tuned Prompts
@@ -99,7 +99,7 @@ Read `references/short-video-beats-and-audio.md` and `references/viral-archetype
 Read `references/model-prompt-playbook.md` and run `scripts/shot_compiler.mjs` to generate shot-by-shot prompts tailored to the user's video engine:
 
 ```bash
-node scripts/shot_compiler.mjs --template daily-meltdown --duration 15 --engine kling --rig chibi-blocky --lang zh-en
+node scripts/shot_compiler.mjs --template daily-meltdown --duration 15 --engine kling --rig chibi-blocky --lang en
 ```
 
 Every compiled shot must include:
@@ -113,7 +113,7 @@ Every compiled shot must include:
 Before handing off custom prompts, or whenever the user reports a broken generation, run `scripts/drift_check.mjs`:
 
 ```bash
-node scripts/drift_check.mjs --prompt "A cute Roblox character walking in a room and drinking coffee then waving" --engine kling --mode t2v --lang zh-en
+node scripts/drift_check.mjs --prompt "A cute Roblox character walking in a room and drinking coffee then waving" --engine kling --mode t2v --lang en
 ```
 
 Read `references/rescue-and-anti-drift.md` when troubleshooting specific defects:

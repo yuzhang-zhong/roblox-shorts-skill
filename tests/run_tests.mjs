@@ -4,9 +4,9 @@ import { execFileSync } from "node:child_process";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 
-import { buildAvatarSpec } from "../scripts/avatar_spec.mjs";
-import { compileStoryboard } from "../scripts/shot_compiler.mjs";
-import { inspectPrompt } from "../scripts/drift_check.mjs";
+import { buildAvatarSpec, formatAvatarSpecMarkdown, normalizeLang } from "../scripts/avatar_spec.mjs";
+import { compileStoryboard, formatStoryboardMarkdown } from "../scripts/shot_compiler.mjs";
+import { inspectPrompt, formatDriftCheckMarkdown } from "../scripts/drift_check.mjs";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(__dirname, "..");
@@ -70,10 +70,23 @@ test("drift_check flags human fingers and multi-verb overload as FAIL, and passe
   assert.equal(goodReport.overallStatus, "PASS");
 });
 
+test("CLI formatters support 10 languages plus zh-en backward compatibility", () => {
+  const spec = buildAvatarSpec({ archetype: "chibi-plush", name: "Momo" });
+  const plan = compileStoryboard({ template: "daily-meltdown", duration: 15, engine: "kling" });
+  const report = inspectPrompt({ prompt: "Roblox R6 character waves", engine: "kling", mode: "i2v" });
+
+  for (const code of ["en", "zh", "zh-tw", "ja", "ko", "es", "fr", "de", "pt", "ru", "zh-en"]) {
+    assert.equal(normalizeLang(code), code);
+    assert.match(formatAvatarSpecMarkdown(spec, code), new RegExp(`lang: ${code}`));
+    assert.match(formatStoryboardMarkdown(plan, code), new RegExp(`lang: ${code}`));
+    assert.match(formatDriftCheckMarkdown(report, code), new RegExp(`lang: ${code}`));
+  }
+});
+
 test("validate_skill CLI verifies repository files, versions, and manifests", () => {
   const out = execFileSync(process.execPath, [path.join(ROOT, "scripts", "validate_skill.mjs")], {
     cwd: ROOT,
     encoding: "utf8"
   });
-  assert.match(out, /roblox-shorts-skill v1\.1\.0 package is valid/);
+  assert.match(out, /roblox-style-skill v1\.2\.0 package is valid/);
 });

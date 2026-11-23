@@ -1,11 +1,11 @@
 {
-  "name": "roblox-shorts-skill",
-  "version": "1.1.0",
+  "name": "roblox-style-skill",
+  "version": "1.2.0",
   "private": false,
   "type": "module",
-  "description": "Plan, prompt, render, and debug authentic Roblox-style blocky avatar AI short videos with canonical 2x2x1/1x2x1 stud geometry, viral 9:16 storyboards, model-tuned I2V/T2V prompts, and 3D preview rendering.",
+  "description": "Generate Roblox-style R6 and blocky avatar short videos with locked stud proportions, 9:16 storyboards, and model-specific prompts.",
   "license": "MIT",
-  "repository": "github:yuzhang-zhong/roblox-shorts-skill",
+  "repository": "github:yuzhang-zhong/roblox-style-skill",
   "keywords": [
     "agent-skill",
     "codex-skill",

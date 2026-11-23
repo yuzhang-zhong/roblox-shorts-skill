@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.2.0
+
+- Renamed package and skill identifier to `roblox-style-skill`.
+- Set English as the default `README.md`, added `README.zh-CN.md` and 8 translated READMEs in `docs/i18n/` (`zh-TW`, `ja`, `ko`, `es`, `fr`, `de`, `pt-BR`, `ru`), and added 10-language `--lang` support across CLI scripts.
+- Added localized Chinese (`.zh.png`) and English (`.en.png`) turnaround, anti-drift comparison, and storyboard contact sheets, and redesigned `docs/pipeline.svg` with a light neutral studio palette.
+
 ## 1.1.0
 
 - Upgraded core Roblox geometry system to canonical `2×2×1` torso + four flush `1×2×1` solid rectangular limb blocks and `1:1` barrel-beveled cylindrical head (`SpecialMesh`), explicitly distinguishing authentic Roblox solid blocky hands from Lego minifigure C-shaped claw hooks.

@@ -375,9 +375,18 @@ Options:
   --rig <id>         Override rig: chibi-blocky | r6 | r15
   --aspect <ratio>   Aspect ratio: 9:16 | 16:9 | 1:1 (default: 9:16)
   --topic <string>   Optional custom topic subtitle override
-  --lang <mode>      Output language: zh-en | zh | en (default: zh-en)
+  --lang <code>      Output language: en | zh | zh-tw | ja | ko | es | fr | de | pt | ru | zh-en (default: en)
   --json             Output structured JSON
   --help             Show this help message`);
+}
+
+const SUPPORTED_LANGS = new Set(["en", "zh", "zh-tw", "ja", "ko", "es", "fr", "de", "pt", "ru", "zh-en"]);
+
+export function normalizeLang(code = "en") {
+  const clean = String(code || "en").toLowerCase().trim();
+  if (clean === "zh-cn") return "zh";
+  if (clean === "pt-br") return "pt";
+  return SUPPORTED_LANGS.has(clean) ? clean : "en";
 }
 
 export function parseArgs(argv) {
@@ -388,7 +397,7 @@ export function parseArgs(argv) {
     rig: "",
     aspect: "9:16",
     topic: "",
-    lang: "zh-en",
+    lang: "en",
     json: false,
     help: false
   };
@@ -403,7 +412,7 @@ export function parseArgs(argv) {
     else if (arg === "--rig" && argv[i + 1]) opts.rig = argv[++i].toLowerCase();
     else if (arg === "--aspect" && argv[i + 1]) opts.aspect = argv[++i];
     else if (arg === "--topic" && argv[i + 1]) opts.topic = argv[++i];
-    else if (arg === "--lang" && argv[i + 1]) opts.lang = argv[++i];
+    else if (arg === "--lang" && argv[i + 1]) opts.lang = normalizeLang(argv[++i]);
   }
   return opts;
 }
@@ -508,29 +517,31 @@ export function compileStoryboard(rawOpts = {}) {
   };
 }
 
-export function formatStoryboardMarkdown(plan, lang = "zh-en") {
+export function formatStoryboardMarkdown(plan, rawLang = "en") {
+  const lang = normalizeLang(rawLang);
+  const useZhText = lang === "zh" || lang === "zh-tw" || lang === "zh-en";
   const lines = [];
-  lines.push(`# 9:16 Short-Video Storyboard & Prompt Pack: ${plan.title}`);
+  lines.push(`# 9:16 Storyboard & Prompt Pack: ${plan.title} (\`lang: ${lang}\`)`);
   lines.push("");
-  lines.push(`- **Template / 模板**: \`${plan.template}\``);
-  lines.push(`- **Target Engine / 目标模型**: \`${plan.engine}\` (${plan.workflowMode})`);
-  lines.push(`- **Rig & Material / 骨架与材质**: \`${plan.rig}\` · \`${plan.material}\``);
-  lines.push(`- **Format & Duration / 画幅与时长**: \`${plan.aspect}\` · \`${plan.durationSeconds}s\` (\`${plan.shotCount}\` shots, 1 primary action per clip)`);
+  lines.push(`- **Template**: \`${plan.template}\``);
+  lines.push(`- **Target Engine**: \`${plan.engine}\` (${plan.workflowMode})`);
+  lines.push(`- **Rig & Material**: \`${plan.rig}\` · \`${plan.material}\``);
+  lines.push(`- **Format & Duration**: \`${plan.aspect}\` · \`${plan.durationSeconds}s\` (\`${plan.shotCount}\` shots, 1 primary action per clip)`);
   lines.push("");
-  lines.push("## Beat Sheet Overview / 黄金分镜节奏表");
+  lines.push("## Beat Sheet Overview");
   lines.push("");
-  lines.push("| Shot | Time | Beat Role | Single Action / 单一刚体动作 | Camera / 运镜 | SFX & Caption / 音效与花字 |");
+  lines.push("| Shot | Time | Beat Role | Single Action | Camera | SFX & Caption |");
   lines.push("| --- | --- | --- | --- | --- | --- |");
 
   for (const s of plan.shots) {
-    const actionText = lang === "en" ? s.actionEn : s.actionZh;
-    const cameraText = lang === "en" ? s.cameraEn : s.cameraZh;
+    const actionText = useZhText ? s.actionZh : s.actionEn;
+    const cameraText = useZhText ? s.cameraZh : s.cameraEn;
     lines.push(
       `| ${String(s.shotNumber).padStart(2, "0")} | ${s.timeWindow} | ${s.role} | ${actionText} | ${cameraText} | ${s.sfx} · 「${s.caption}」 |`
     );
   }
   lines.push("");
-  lines.push("## Compiled Shot Prompts / 分镜首帧与动态提示词");
+  lines.push("## Compiled Shot Prompts");
   lines.push("");
 
   for (const s of plan.shots) {
@@ -546,7 +557,7 @@ export function formatStoryboardMarkdown(plan, lang = "zh-en") {
       lines.push(`  ${s.i2vPromptEn}`);
       lines.push("  ```");
     }
-    if (lang !== "en") {
+    if (useZhText) {
       lines.push("- **首帧静态图提示词 (ZH)**:");
       lines.push("  ```text");
       lines.push(`  ${s.firstFramePromptZh}`);
@@ -559,10 +570,10 @@ export function formatStoryboardMarkdown(plan, lang = "zh-en") {
     lines.push("");
   }
 
-  lines.push("## Shared Anti-Drift Negative Prompt / 统一负向防串味词");
+  lines.push("## Shared Anti-Drift Negative Prompt");
   lines.push("");
   lines.push("```text");
-  lines.push(lang === "zh" ? NEGATIVE_GUARD_ZH : `${NEGATIVE_GUARD}\n${NEGATIVE_GUARD_ZH}`);
+  lines.push(lang === "zh" ? NEGATIVE_GUARD_ZH : useZhText ? `${NEGATIVE_GUARD}\n${NEGATIVE_GUARD_ZH}` : NEGATIVE_GUARD);
   lines.push("```");
 
   return lines.join("\n");

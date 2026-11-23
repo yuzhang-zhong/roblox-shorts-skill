@@ -1,23 +1,26 @@
 #!/usr/bin/env node
 /**
  * render_preview.mjs
- * Procedural 3D Signed Distance Field (SDF) Raymarching Studio Renderer
- * for Roblox-style blocky characters, turnaround sheets, anti-drift comparisons,
- * 9:16 storyboard keyframes, and animated GIF/MP4 short video previews.
+ * Authentic Roblox R6 / Blocky 3D Studio & Brookhaven Set Renderer.
  *
- * Uses zero external npm packages (Node.js standard library + zlib PNG encoder).
+ * Implements canonical Roblox R6 proportions (1 stud = 0.34 world units):
+ * - Torso: 2.0 x 2.0 x 1.0 studs with 0.08 stud bevel + 3D collar/hoodie/pocket/cuffs
+ * - Neck:  0.55 x 0.20 x 0.55 studs
+ * - Head:  Classic Roblox SpecialMesh barrel cylinder (R=0.64, H=1.24 studs, 0.30 stud deep bevel)
+ * - Hair:  Tapered 3D NURBS-style capsule strand clumps (messy swept bangs, pigtails, cap, crown)
+ * - Limbs: Flush 0.98 x 2.0 x 0.98 stud solid rectangular arms & legs with short-sleeve/shoe steps
+ * - World: Bright Brookhaven/Studio daytime lighting, 3D studded baseplate, and soft sun shadows.
  */
 
 import fs from "node:fs";
 import path from "node:path";
 import zlib from "node:zlib";
-import { execFileSync } from "node:child_process";
+import { execFileSync, spawn } from "node:child_process";
 import { fileURLToPath } from "node:url";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(__dirname, "..");
 
-// ---------- Math & Vector Helpers ----------
 const clamp = (x, a, b) => (x < a ? a : x > b ? b : x);
 const mix = (a, b, t) => a + (b - a) * t;
 const smoothstep = (e0, e1, x) => {
@@ -59,17 +62,14 @@ function rotZ(p, ang) {
   return { x: c * p.x - s * p.y, y: s * p.x + c * p.y, z: p.z };
 }
 
-// ---------- 3D Signed Distance Primitives ----------
 function sdRoundBox(p, b, r) {
-  const qx = Math.abs(p.x) - b.x;
-  const qy = Math.abs(p.y) - b.y;
-  const qz = Math.abs(p.z) - b.z;
+  const qx = Math.abs(p.x) - b.x + r;
+  const qy = Math.abs(p.y) - b.y + r;
+  const qz = Math.abs(p.z) - b.z + r;
   const ox = Math.max(qx, 0);
   const oy = Math.max(qy, 0);
   const oz = Math.max(qz, 0);
-  const outside = Math.hypot(ox, oy, oz);
-  const inside = Math.min(Math.max(qx, qy, qz), 0);
-  return outside + inside - r;
+  return Math.hypot(ox, oy, oz) + Math.min(Math.max(qx, qy, qz), 0) - r;
 }
 
 function sdRoundedCylinder(p, ra, rb, h) {
@@ -80,162 +80,294 @@ function sdRoundedCylinder(p, ra, rb, h) {
   return Math.min(Math.max(dx, dy), 0) + Math.hypot(ox, oy) - rb;
 }
 
-// Fingerless C-shaped Roblox claw hand around local origin (opening downward -Y)
-function sdCClawHand(p, scale = 1.0) {
-  const q = mul3(p, 1 / scale);
-  const qRot = rotX(q, Math.PI / 2);
-  const dOuter = sdRoundedCylinder(qRot, 0.19, 0.035, 0.12);
-  const dInnerHole = sdRoundedCylinder(qRot, 0.095, 0.01, 0.22);
-  const dSlot = sdRoundBox(sub3(q, v3(0, -0.15, 0)), v3(0.082, 0.14, 0.22), 0.015);
-  const dCut = Math.min(dInnerHole, dSlot);
-  return Math.max(dOuter, -dCut) * scale;
+function sdSphere(p, r) {
+  return len3(p) - r;
 }
 
-// ---------- 2D Face Decal Texture Evaluator ----------
-function evalFaceDecal(u, v, expression = "happy") {
-  // u in [-1, 1] across front of head, v in [-1, 1] vertically
-  if (Math.abs(u) > 0.85 || Math.abs(v) > 0.85) return null;
+function sdTaperedCapsule(p, a, b, r1, r2) {
+  const pa = sub3(p, a);
+  const ba = sub3(b, a);
+  const baba = dot3(ba, ba) || 1e-6;
+  const h = clamp(dot3(pa, ba) / baba, 0, 1);
+  const r = r1 + (r2 - r1) * h;
+  return len3(sub3(pa, mul3(ba, h))) - r;
+}
 
-  // Blush ovals
-  if (expression === "happy" || expression === "shocked" || expression === "tears") {
-    const bL = Math.hypot((u + 0.42) / 0.13, (v + 0.12) / 0.075);
-    const bR = Math.hypot((u - 0.42) / 0.13, (v + 0.12) / 0.075);
-    if (bL < 1.0 || bR < 1.0) {
-      return [251, 113, 133]; // soft rose blush decal
-    }
+function sdLegoCClaw(p, scale = 1.0) {
+  const q = mul3(p, 1 / scale);
+  const qRot = rotX(q, Math.PI / 2);
+  const dOuter = sdRoundedCylinder(qRot, 0.16, 0.03, 0.10);
+  const dInner = sdRoundedCylinder(qRot, 0.08, 0.01, 0.18);
+  const dSlot = sdRoundBox(sub3(q, v3(0, -0.12, 0)), v3(0.07, 0.12, 0.18), 0.01);
+  return Math.max(dOuter, -Math.min(dInner, dSlot)) * scale;
+}
+
+// ---------- Roblox Face Atlas Evaluator ----------
+function evalFaceDecal(u, v, expression = "smile") {
+  if (Math.abs(u) > 0.44 || Math.abs(v) > 0.44) return null;
+
+  const ink = [16, 20, 28];
+  const white = [255, 255, 255];
+  const mouthIn = [82, 18, 24];
+  const tongue = [244, 102, 112];
+  const tear = [96, 195, 255];
+
+  const ex = Math.abs(u) - 0.125;
+  const ey = v - 0.085;
+
+  if (expression === "slam" || expression === "angry") {
+    const by = ey - (0.095 - (0.14 - Math.abs(u)) * 0.35);
+    if (Math.abs(ex) < 0.075 && Math.abs(by) < 0.018) return ink;
+  } else if (expression === "shocked" || expression === "tears") {
+    const by = ey - (0.105 + (0.14 - Math.abs(u)) * 0.25);
+    if (Math.abs(ex) < 0.075 && Math.abs(by) < 0.016) return ink;
+  } else if (expression === "smirk") {
+    const slope = u > 0 ? 0.25 : -0.1;
+    const by = ey - (0.095 + ex * slope);
+    if (Math.abs(ex) < 0.072 && Math.abs(by) < 0.016) return ink;
   }
 
-  // Waterfall tear strips for "tears"
   if (expression === "tears") {
-    const inTearL = Math.abs(u + 0.28) < 0.085 && v < 0.08 && v > -0.68;
-    const inTearR = Math.abs(u - 0.28) < 0.085 && v < 0.08 && v > -0.68;
-    if (inTearL || inTearR) {
-      const stripe = Math.sin(v * 35) > 0 ? [56, 189, 248] : [125, 211, 252];
-      return stripe;
+    if (Math.abs(ex) < 0.036 && v < 0.03 && v > -0.34) {
+      return tear;
     }
   }
 
-  // Eyes
-  const ex = Math.abs(u) - 0.27;
-  const ey = v - 0.16;
-
-  if (expression === "deadpan" || expression === "slam") {
-    // Horizontal flat line eyes (-_-)
-    if (Math.abs(ex) < 0.13 && Math.abs(ey) < 0.038) {
-      return [15, 23, 42];
-    }
-    // Brow
-    if (expression === "slam" && Math.abs(ex) < 0.14 && Math.abs(ey - 0.11 + ex * 0.35) < 0.03) {
-      return [15, 23, 42];
-    }
+  if (expression === "deadpan") {
+    if (Math.abs(ex) < 0.068 && Math.abs(ey) < 0.018) return ink;
   } else if (expression === "dizzy") {
-    // @ _ @ spiral rings
-    const r = Math.hypot(ex, ey);
-    if (r < 0.145 && (Math.abs(r - 0.12) < 0.028 || Math.abs(r - 0.055) < 0.025)) {
-      return [15, 23, 42];
-    }
+    const d1 = Math.abs(ex - ey);
+    const d2 = Math.abs(ex + ey);
+    if (Math.abs(ex) < 0.062 && Math.abs(ey) < 0.062 && (d1 < 0.02 || d2 < 0.02)) return ink;
   } else if (expression === "shocked") {
-    // Hollow ring eyes O_O
-    const r = Math.hypot(ex, ey * 0.85);
-    if (r < 0.145 && r > 0.075) return [15, 23, 42];
-    if (r < 0.035) return [15, 23, 42];
+    const rOut = Math.hypot(ex / 0.072, ey / 0.082);
+    if (rOut < 1.0) {
+      if (rOut > 0.82) return ink;
+      const rPupil = Math.hypot(ex / 0.028, ey / 0.032);
+      if (rPupil < 1.0) return ink;
+      return white;
+    }
   } else {
-    // Glossy oval ink eyes with star/circle specular highlight
-    const r = Math.hypot(ex / 0.095, ey / 0.135);
-    if (r < 1.0) {
-      const hl1 = Math.hypot((ex + 0.03) / 0.032, (ey - 0.04) / 0.038);
-      const hl2 = Math.hypot((ex - 0.025) / 0.018, (ey + 0.035) / 0.022);
-      if (hl1 < 1.0 || hl2 < 1.0) return [255, 255, 255];
-      return [15, 23, 42];
+    const rEye = Math.hypot(ex / 0.044, ey / 0.078);
+    if (rEye < 1.0) {
+      const hl = Math.hypot((ex + 0.012) / 0.015, (ey - 0.028) / 0.021);
+      if (hl < 1.0) return white;
+      return ink;
     }
   }
 
-  // Mouth
-  const my = v + 0.22;
-  if (expression === "shocked" || expression === "tears") {
-    // Rounded rectangular gasp/wail mouth
-    if (Math.abs(u) < 0.15 && Math.abs(my) < 0.095) {
-      if (Math.abs(u) > 0.11 || Math.abs(my) > 0.065) return [15, 23, 42];
-      return my > 0.02 ? [255, 255, 255] : [225, 29, 72];
+  const my = v + 0.115;
+  if (expression === "shocked" || expression === "tears" || expression === "grin") {
+    const rx = expression === "shocked" ? 0.075 : 0.125;
+    const ry = 0.085;
+    if (expression === "shocked") {
+      const rM = Math.hypot(u / rx, my / ry);
+      if (rM < 1.0) {
+        if (rM > 0.78) return ink;
+        if (my > 0.025) return white;
+        if (my < -0.025) return tongue;
+        return mouthIn;
+      }
+    } else {
+      const inTop = my <= 0.035 && my >= -ry;
+      const rArc = Math.hypot(u / rx, (my - 0.035) / (ry + 0.035));
+      if (inTop && rArc < 1.0) {
+        if (rArc > 0.84 || my > 0.018) return ink;
+        if (my > -0.012) return white;
+        if (my < -0.045 && Math.abs(u) < rx * 0.55) return tongue;
+        return mouthIn;
+      }
     }
   } else if (expression === "deadpan" || expression === "dizzy") {
-    if (Math.abs(u) < 0.13 && Math.abs(my) < 0.028) return [15, 23, 42];
+    if (Math.abs(u) < 0.075 && Math.abs(my) < 0.016) return ink;
+  } else if (expression === "slam" || expression === "smirk") {
+    const sy = my - u * 0.18 - u * u * 0.45;
+    if (u > -0.10 && u < 0.12 && Math.abs(sy) < 0.018) return ink;
   } else {
-    // Classic curved smile or smirk
-    const curve = u * u * 1.1;
-    if (Math.abs(u) < 0.22 && Math.abs(my - curve + 0.04) < 0.034) {
-      return [15, 23, 42];
+    const curve = u * u * 1.65;
+    if (Math.abs(u) < 0.135 && Math.abs(my - curve + 0.026) < 0.019) {
+      return ink;
     }
   }
 
   return null;
 }
 
-// ---------- Scene Material Palette (Official Roblox BrickColors) ----------
-function getPalette(theme = "momo") {
+function getCastPreset(theme = "theo") {
   if (theme === "noob") {
     return {
-      head: [245, 205, 48], // Bright yellow
-      torso: [13, 105, 172], // Bright blue
-      shirtAccent: [56, 189, 248],
-      arms: [245, 205, 48], // Bare Bright yellow arms
-      FullBareArms: true,
-      legs: [164, 189, 71], // Br. yellowish green
-      legCuff: [142, 168, 56],
-      hair: null,
+      skin: [245, 205, 48],
+      top: [13, 105, 172],
+      trim: [10, 85, 142],
+      accent: [255, 255, 255],
+      pants: [164, 189, 71],
+      shoes: null,
+      sleeves: "none",
+      hairStyle: "bald",
+      hairColor: null,
       hat: null,
-      bag: null
+      details: []
     };
   }
-  if (theme === "y2k") {
+  if (theme === "guest") {
     return {
-      head: [248, 217, 109], // Warm yellowish orange
-      torso: [24, 30, 44], // Really black puffer
-      shirtAccent: [192, 132, 252], // Electric purple graphic
-      arms: [24, 30, 44],
-      FullBareArms: false,
-      legs: [147, 197, 253], // Pastel blue denim blocks
-      legCuff: [30, 41, 59],
-      hair: [244, 114, 182], // Pastel pink 3D UGC hair
-      hat: [251, 207, 232],
-      bag: [168, 85, 247]
+      skin: [242, 243, 243],
+      top: [22, 26, 34],
+      trim: [15, 18, 24],
+      accent: [239, 68, 68],
+      pants: [24, 30, 40],
+      shoes: [248, 250, 252],
+      sleeves: "long",
+      hairStyle: "bald",
+      hairColor: null,
+      hat: "cap_red",
+      details: ["roblox_r", "cuffs"]
+    };
+  }
+  if (theme === "bacon") {
+    return {
+      skin: [229, 228, 223],
+      top: [99, 95, 98],
+      trim: [13, 105, 172],
+      accent: [255, 255, 255],
+      pants: [27, 42, 53],
+      shoes: [241, 245, 249],
+      sleeves: "long",
+      hairStyle: "messy",
+      hairColor: [124, 62, 28],
+      hat: null,
+      details: ["kangaroo", "cuffs"]
+    };
+  }
+  if (theme === "builderman") {
+    return {
+      skin: [245, 205, 48],
+      top: [249, 115, 22],
+      trim: [194, 65, 12],
+      accent: [255, 255, 255],
+      pants: [30, 58, 138],
+      shoes: [71, 85, 105],
+      sleeves: "long",
+      hairStyle: "bald",
+      hairColor: null,
+      hat: "hardhat_yellow",
+      details: ["hood", "kangaroo", "cuffs"]
     };
   }
   if (theme === "obby") {
     return {
-      head: [245, 205, 48], // Bright yellow
-      torso: [0, 170, 228], // Cyan jersey
-      shirtAccent: [255, 255, 255], // Classic Roblox R stripe
-      arms: [245, 205, 48], // Bare yellow R6 arms with Speed Coil
-      FullBareArms: true,
-      legs: [255, 85, 163], // Hot pink blocky legs
-      legCuff: [163, 230, 53],
-      hair: null,
-      hat: [218, 38, 38], // Classic Red Roblox Visor
-      bag: [241, 245, 249]
+      skin: [245, 205, 48],
+      top: [0, 162, 232],
+      trim: [2, 132, 199],
+      accent: [255, 255, 255],
+      pants: [30, 41, 59],
+      shoes: [248, 250, 252],
+      sleeves: "short",
+      hairStyle: "under_cap",
+      hairColor: [72, 42, 24],
+      hat: "cap_red",
+      details: ["roblox_r", "speed_coil"]
     };
   }
-  // Default: "momo" (Matcha cardigan worker / student on canonical Roblox blocky rig)
+  if (theme === "y2k") {
+    return {
+      skin: [255, 214, 170],
+      top: [244, 114, 182],
+      trim: [236, 72, 153],
+      accent: [255, 255, 255],
+      pants: [125, 178, 248],
+      shoes: [255, 255, 255],
+      sleeves: "long",
+      hairStyle: "pigtails",
+      hairColor: [68, 36, 24],
+      hat: "crown",
+      details: ["hood", "kangaroo", "heart"]
+    };
+  }
+  if (theme === "chef") {
+    return {
+      skin: [252, 208, 162],
+      top: [255, 251, 235],
+      trim: [217, 119, 6],
+      accent: [251, 113, 133],
+      pants: [71, 85, 105],
+      shoes: [248, 250, 252],
+      sleeves: "long",
+      hairStyle: "bald",
+      hairColor: null,
+      hat: "toque_white",
+      details: ["kangaroo", "cuffs"]
+    };
+  }
+  if (theme === "base-gray") {
+    return {
+      skin: [203, 213, 225],
+      top: [148, 163, 184],
+      trim: [100, 116, 139],
+      accent: [226, 232, 240],
+      pants: [100, 116, 139],
+      shoes: null,
+      sleeves: "none",
+      hairStyle: "bald",
+      hairColor: null,
+      hat: null,
+      details: []
+    };
+  }
   return {
-    head: [253, 234, 141], // Cool yellow
-    torso: [110, 231, 183], // Mint / Matcha cardigan
-    shirtAccent: [244, 63, 94], // Red tie
-    arms: [110, 231, 183], // Matcha sleeves with yellow blocky hands at bottom
-    FullBareArms: false,
-    legs: [71, 85, 105], // Dark stone grey blocky trousers
-    legCuff: [51, 65, 85],
-    hair: [68, 44, 32], // 3D Espresso brown UGC bob hair with bangs
-    hat: [248, 250, 252], // White Roblox headphones
-    bag: [56, 189, 248]
+    skin: [252, 208, 162],
+    top: [56, 152, 242],
+    trim: [37, 122, 212],
+    accent: [255, 255, 255],
+    pants: [45, 55, 72],
+    shoes: [248, 250, 252],
+    sleeves: "long",
+    hairStyle: "messy",
+    hairColor: [115, 56, 26],
+    hat: null,
+    details: ["hood", "kangaroo", "cuffs", "moon"]
   };
 }
 
-// ---------- Canonical Roblox R6 / Blocky Avatar SDF Evaluator ----------
-// Exact Roblox Stud Scale (1 stud = 0.38 units):
-// - Torso: 2.0 x 2.0 x 1.0 studs -> half-extents (0.38, 0.38, 0.19)
-// - Legs:  1.0 x 2.0 x 1.0 studs each -> half-extents (0.185, 0.38, 0.19) FLUSH at x = +/-0.192
-// - Arms:  1.0 x 2.0 x 1.0 studs each -> half-extents (0.185, 0.38, 0.19) FLUSH at x = +/-0.578
-// - Head:  1.2 x 1.2 x 1.2 studs barrel cylinder -> radius 0.245, half-height 0.24, barrel fillet 0.088
+function evalHairSDF(pHead, style, driftMode) {
+  if (!style || style === "bald" || driftMode !== "none") return 1e9;
+  const dBound = len3(pHead) - 0.38;
+  if (dBound > 0.08) return dBound;
+
+  // Solid hair cap covering the entire upper dome of the barrel head (up to y = 0.248)
+  const qCap = { x: pHead.x / 0.242, y: (pHead.y - 0.11) / 0.142, z: (pHead.z + 0.01) / 0.242 };
+  let d = (len3(qCap) - 1.0) * 0.16;
+  d = Math.max(d, -(pHead.y - 0.05 + pHead.z * 0.18));
+
+  if (style === "messy") {
+    const strands = [
+      [v3(-0.13, 0.22, 0.04), v3(-0.15, 0.13, 0.235), 0.064, 0.032],
+      [v3(-0.04, 0.23, 0.05), v3(-0.05, 0.12, 0.245), 0.068, 0.034],
+      [v3(0.05, 0.23, 0.05), v3(0.07, 0.12, 0.245), 0.068, 0.034],
+      [v3(0.14, 0.21, 0.04), v3(0.17, 0.14, 0.225), 0.062, 0.030],
+      [v3(-0.08, 0.22, -0.02), v3(-0.13, 0.27, -0.05), 0.065, 0.032],
+      [v3(0.05, 0.22, -0.02), v3(0.10, 0.28, -0.04), 0.068, 0.032],
+      [v3(-0.21, 0.14, 0.02), v3(-0.235, 0.01, 0.05), 0.052, 0.026],
+      [v3(0.21, 0.14, 0.02), v3(0.235, 0.01, 0.05), 0.052, 0.026]
+    ];
+    for (const [a, b, r1, r2] of strands) {
+      d = Math.min(d, sdTaperedCapsule(pHead, a, b, r1, r2));
+    }
+  } else if (style === "pigtails") {
+    const strands = [
+      [v3(-0.11, 0.21, 0.06), v3(-0.12, 0.13, 0.24), 0.056, 0.032],
+      [v3(0.0, 0.22, 0.06), v3(0.0, 0.13, 0.245), 0.060, 0.034],
+      [v3(0.11, 0.21, 0.06), v3(0.12, 0.13, 0.24), 0.056, 0.032],
+      [v3(-0.23, 0.12, -0.02), v3(-0.35, -0.14, -0.04), 0.075, 0.035],
+      [v3(0.23, 0.12, -0.02), v3(0.35, -0.14, -0.04), 0.075, 0.035]
+    ];
+    for (const [a, b, r1, r2] of strands) {
+      d = Math.min(d, sdTaperedCapsule(pHead, a, b, r1, r2));
+    }
+  }
+  return d;
+}
+
 export function evalAvatarSDF(pWorld, cfg = {}) {
   const {
     pos = v3(0, 0, 0),
@@ -244,37 +376,34 @@ export function evalAvatarSDF(pWorld, cfg = {}) {
     waistPitch = 0,
     headYaw = 0,
     headPitch = 0,
-    armLPitch = -0.12,
-    armRPitch = -0.2,
+    armLPitch = -0.1,
+    armRPitch = -0.15,
     legLPitch = 0,
     legRPitch = 0,
-    expression = "happy",
-    theme = "momo",
-    driftMode = "none", // "none" | "human-fingers" | "lego-studs" | "minecraft-voxel"
-    hasBeanie = true,
-    hasBackpack = true,
+    expression = "smile",
+    theme = "theo",
+    driftMode = "none",
     hasMug = false
   } = cfg;
 
-  const pal = getPalette(theme);
+  const pal = getCastPreset(theme);
   let p = sub3(pWorld, pos);
   if (roll !== 0) {
-    p = add3(rotZ(sub3(p, v3(0, -0.78, 0)), -roll), v3(0, -0.78, 0));
+    p = add3(rotZ(sub3(p, v3(0, -0.82, 0)), -roll), v3(0, -0.82, 0));
   }
   p = rotY(p, -yaw);
 
-  // Bounding sphere fast reject
-  const dBound = len3(p) - 2.25;
-  if (dBound > 0.25) {
+  const dBound = len3(p) - 2.15;
+  if (dBound > 0.2) {
     return { d: dBound, color: [0, 0, 0], roughness: 0.5, id: 0 };
   }
 
   let bestD = 1e9;
-  let bestColor = pal.torso;
-  let bestRough = 0.18;
+  let bestColor = pal.top;
+  let bestRough = 0.32;
   let bestId = 1;
 
-  const addPart = (d, color, rough = 0.18, id = 1) => {
+  const addPart = (d, color, rough = 0.32, id = 1) => {
     if (d < bestD) {
       bestD = d;
       bestColor = color;
@@ -285,241 +414,226 @@ export function evalAvatarSDF(pWorld, cfg = {}) {
 
   const bevel = driftMode === "minecraft-voxel" ? 0.002 : 0.028;
 
-  // Upper body pivot at waist (y = -0.18)
-  const pWaist = rotX(sub3(p, v3(0, -0.18, 0)), -waistPitch);
-  const pUpper = add3(pWaist, v3(0, -0.18, 0));
+  const pWaist = rotX(sub3(p, v3(0, -0.16, 0)), -waistPitch);
+  const pUpper = add3(pWaist, v3(0, -0.16, 0));
 
-  // 1. Canonical 2x2x1 Roblox Torso (centered at y = 0.20)
-  const pTorso = sub3(pUpper, v3(0, 0.20, 0));
-  const dTorso = sdRoundBox(pTorso, v3(0.36, 0.36, 0.175), bevel);
+  // 1. Torso (2.0 x 2.0 x 1.0 studs)
+  const pTorso = sub3(pUpper, v3(0, 0.18, 0));
+  const dTorso = sdRoundBox(pTorso, v3(0.34, 0.34, 0.17), bevel);
   if (dTorso < bestD) {
-    let col = pal.torso;
-    if (pTorso.z > 0.14) {
-      if (theme === "momo") {
-        // Crisp white V-collar shirt, red tie, dark cardigan lapels & blue Roblox badge
-        if (Math.abs(pTorso.x) < 0.11 && pTorso.y > 0.08) col = [255, 255, 255];
-        if (Math.abs(pTorso.x) < 0.048 && pTorso.y > -0.22 && pTorso.y < 0.18) col = pal.shirtAccent;
-        if (Math.abs(Math.abs(pTorso.x) - 0.115) < 0.022) col = [52, 211, 153];
-        if (pTorso.x > 0.14 && pTorso.x < 0.29 && Math.abs(pTorso.y - 0.04) < 0.095) col = [56, 189, 248];
-      } else if (theme === "y2k") {
-        // Cropped jacket waist band + Y2K star/square graphic emblem
-        if (pTorso.y < -0.24) col = [248, 217, 109];
-        else if (Math.abs(pTorso.x) < 0.14 && Math.abs(pTorso.y - 0.04) < 0.14) col = pal.shirtAccent;
-      } else if (theme === "obby") {
-        // Classic tilted white/red Roblox [R] emblem on chest
-        const rx = pTorso.x * 0.96 - (pTorso.y - 0.04) * 0.26;
-        const ry = pTorso.x * 0.26 + (pTorso.y - 0.04) * 0.96;
-        if (Math.abs(rx) < 0.13 && Math.abs(ry) < 0.13) {
-          col = Math.abs(rx) < 0.045 && Math.abs(ry) < 0.045 ? [0, 170, 228] : [255, 255, 255];
-        }
+    let col = pal.top;
+    if (pal.details.includes("roblox_r") && pTorso.z > 0.13) {
+      const rx = pTorso.x * 0.96 - (pTorso.y - 0.04) * 0.26;
+      const ry = pTorso.x * 0.26 + (pTorso.y - 0.04) * 0.96;
+      if (Math.abs(rx) < 0.115 && Math.abs(ry) < 0.115) {
+        col = Math.abs(rx) < 0.04 && Math.abs(ry) < 0.04 ? pal.top : [255, 255, 255];
       }
     }
-    addPart(dTorso, col, 0.18, 2);
+    if (pal.details.includes("heart") && pTorso.z > 0.13) {
+      const hx = pTorso.x / 0.095;
+      const hy = (pTorso.y - 0.07) / 0.095;
+      if (Math.hypot(hx, hy - Math.sqrt(Math.abs(hx)) * 0.55) < 0.85) {
+        col = [255, 255, 255];
+      }
+    }
+    if (pal.details.includes("moon") && pTorso.z > 0.13) {
+      const d1 = Math.hypot(pTorso.x + 0.16, pTorso.y - 0.12);
+      const d2 = Math.hypot(pTorso.x + 0.135, pTorso.y - 0.135);
+      if (d1 < 0.068 && d2 > 0.052) {
+        col = [253, 224, 71];
+      }
+    }
+    addPart(dTorso, col, 0.42, 2);
   }
 
-  // 2. Optional Backpack / Jetpack on back (-Z)
-  if (hasBackpack && pal.bag) {
-    const pBag = sub3(pUpper, v3(0, 0.20, -0.27));
-    const dBag = sdRoundBox(pBag, v3(0.25, 0.26, 0.10), 0.03);
-    addPart(dBag, pal.bag, 0.18, 3);
+  if (pal.details.includes("hood")) {
+    const dHood = sdRoundBox(sub3(pUpper, v3(0, 0.51, -0.06)), v3(0.24, 0.065, 0.14), 0.035);
+    addPart(dHood, pal.trim, 0.45, 2);
+    const dStrL = sdRoundedCylinder(sub3(pUpper, v3(-0.065, 0.39, 0.175)), 0.014, 0.005, 0.095);
+    const dStrR = sdRoundedCylinder(sub3(pUpper, v3(0.065, 0.39, 0.175)), 0.014, 0.005, 0.095);
+    addPart(Math.min(dStrL, dStrR), pal.accent, 0.35, 3);
+  }
+  if (pal.details.includes("kangaroo")) {
+    const dKanga = sdRoundBox(sub3(pUpper, v3(0, -0.02, 0.165)), v3(0.20, 0.085, 0.022), 0.015);
+    addPart(dKanga, pal.trim, 0.48, 2);
   }
 
-  // 3. Canonical 1.2x1.2x1.2 Roblox Barrel-Beveled Head (centered at y = 0.83)
-  const pHeadLocal = rotY(rotX(sub3(pUpper, v3(0, 0.83, 0)), -headPitch), -headYaw);
+  // 2. Neck
+  const dNeck = sdRoundedCylinder(sub3(pUpper, v3(0, 0.53, 0)), 0.095, 0.015, 0.045);
+  addPart(dNeck, pal.skin, 0.35, 4);
+
+  // 3. Head
+  const pHeadLocal = rotY(rotX(sub3(pUpper, v3(0, 0.75, 0)), -headPitch), -headYaw);
   let dHead;
   if (driftMode === "minecraft-voxel") {
-    dHead = sdRoundBox(pHeadLocal, v3(0.28, 0.28, 0.28), 0.002);
+    dHead = sdRoundBox(pHeadLocal, v3(0.24, 0.24, 0.24), 0.002);
   } else {
-    // Authentic 1:1 Roblox SpecialMesh barrel cylinder with generous curved top & bottom bevels
-    dHead = sdRoundedCylinder(pHeadLocal, 0.255, 0.088, 0.245);
+    dHead = sdRoundedCylinder(pHeadLocal, 0.222, 0.082, 0.212);
   }
 
   if (dHead < bestD) {
-    let hCol = pal.head;
+    let hCol = pal.skin;
     if (driftMode === "minecraft-voxel") {
-      const vx = Math.floor((pHeadLocal.x + 2) * 9);
-      const vy = Math.floor((pHeadLocal.y + 2) * 9);
-      const vz = Math.floor((pHeadLocal.z + 2) * 9);
+      const vx = Math.floor((pHeadLocal.x + 2) * 10);
+      const vy = Math.floor((pHeadLocal.y + 2) * 10);
+      const vz = Math.floor((pHeadLocal.z + 2) * 10);
       if ((vx + vy + vz) % 2 === 0) {
-        hCol = [hCol[0] - 32, hCol[1] - 36, hCol[2] - 24];
+        hCol = [hCol[0] - 32, hCol[1] - 32, hCol[2] - 24];
       }
     }
-    if (pHeadLocal.z > 0.12) {
-      const u = pHeadLocal.x / 0.22;
-      const v = pHeadLocal.y / 0.20;
+    if (pHeadLocal.z > 0.08) {
+      const u = pHeadLocal.x / 0.44;
+      const v = pHeadLocal.y / 0.42;
       const decal = evalFaceDecal(u, v, expression);
       if (decal) hCol = decal;
     }
-    addPart(dHead, hCol, 0.14, 4);
+    addPart(dHead, hCol, 0.28, 4);
   }
 
-  // Drift failure visualizations (ONLY active in drift comparison panels)
   if (driftMode === "human-fingers") {
-    const pNose = sub3(pHeadLocal, v3(0, 0.01, 0.29));
-    const dNose = sdRoundBox(pNose, v3(0.045, 0.065, 0.085), 0.025);
-    addPart(dNose, [242, 170, 135], 0.35, 4);
+    const dNose = sdRoundBox(sub3(pHeadLocal, v3(0, 0.0, 0.25)), v3(0.038, 0.058, 0.075), 0.02);
+    addPart(dNose, [235, 165, 130], 0.35, 4);
   }
-
   if (driftMode === "lego-studs") {
-    // Unmistakable Lego cylindrical top stud on head + Lego shoulder studs
-    const pStud = sub3(pHeadLocal, v3(0, 0.29, 0));
-    const dStud = sdRoundedCylinder(pStud, 0.14, 0.015, 0.09);
-    const pShL = sub3(pUpper, v3(-0.56, 0.62, 0));
-    const pShR = sub3(pUpper, v3(0.56, 0.62, 0));
-    const dStuds = Math.min(
-      dStud,
-      sdRoundedCylinder(pShL, 0.085, 0.012, 0.06),
-      sdRoundedCylinder(pShR, 0.085, 0.012, 0.06)
-    );
-    addPart(dStuds, [250, 204, 21], 0.14, 4);
+    const dStud = sdRoundedCylinder(sub3(pHeadLocal, v3(0, 0.255, 0)), 0.115, 0.012, 0.065);
+    const dShL = sdRoundedCylinder(sub3(pUpper, v3(-0.51, 0.56, 0)), 0.075, 0.01, 0.05);
+    const dShR = sdRoundedCylinder(sub3(pUpper, v3(0.51, 0.56, 0)), 0.075, 0.01, 0.05);
+    addPart(Math.min(dStud, dShL, dShR), [250, 204, 21], 0.18, 4);
   }
 
-  // 4. Sculpted 3D Roblox UGC Hair, Visor & Headphones (when driftMode === "none")
   if (driftMode === "none") {
-    if (pal.hair) {
-      // 3D UGC blocky hair cap + front fringe bangs + side hair locks framing the Roblox barrel head
-      const pTopHair = sub3(pHeadLocal, v3(0, 0.19, -0.02));
-      const dTopHair = sdRoundBox(pTopHair, v3(0.265, 0.09, 0.265), 0.055);
-      const pBackHair = sub3(pHeadLocal, v3(0, 0.02, -0.21));
-      const dBackHair = sdRoundBox(pBackHair, v3(0.255, 0.21, 0.065), 0.04);
-      const pSideL = sub3(pHeadLocal, v3(-0.24, 0.03, 0.02));
-      const pSideR = sub3(pHeadLocal, v3(0.24, 0.03, 0.02));
-      const dSides = Math.min(
-        sdRoundBox(pSideL, v3(0.045, 0.19, 0.18), 0.03),
-        sdRoundBox(pSideR, v3(0.045, 0.19, 0.18), 0.03)
-      );
-      const pBangs = sub3(pHeadLocal, v3(0.03, 0.17, 0.22));
-      const dBangs = sdRoundBox(rotZ(pBangs, -0.12), v3(0.21, 0.055, 0.045), 0.025);
-      addPart(Math.min(dTopHair, dBackHair, dSides, dBangs), pal.hair, 0.28, 5);
+    if (pal.hairColor) {
+      const dHair = evalHairSDF(pHeadLocal, pal.hairStyle, driftMode);
+      addPart(dHair, pal.hairColor, 0.34, 5);
     }
-
-    if (hasBeanie && pal.hat) {
-      if (theme === "obby") {
-        // Classic Red Roblox Visor Cap
-        const pBand = sub3(pHeadLocal, v3(0, 0.16, 0));
-        const dBand = sdRoundedCylinder(pBand, 0.275, 0.025, 0.065);
-        const pBill = sub3(pHeadLocal, v3(0, 0.14, 0.22));
-        const dBill = sdRoundBox(pBill, v3(0.21, 0.02, 0.14), 0.015);
-        addPart(Math.min(dBand, dBill), pal.hat, 0.18, 5);
-      } else if (theme === "momo") {
-        // White Roblox Headphones on ears + headband
-        const pCupL = sub3(pHeadLocal, v3(-0.285, 0.02, 0.02));
-        const pCupR = sub3(pHeadLocal, v3(0.285, 0.02, 0.02));
-        const dCups = Math.min(
-          sdRoundBox(pCupL, v3(0.045, 0.11, 0.095), 0.025),
-          sdRoundBox(pCupR, v3(0.045, 0.11, 0.095), 0.025)
-        );
-        const pArch = sub3(pHeadLocal, v3(0, 0.295, 0.0));
-        const dArch = sdRoundBox(pArch, v3(0.26, 0.025, 0.05), 0.015);
-        addPart(Math.min(dCups, dArch), pal.hat, 0.16, 5);
-      } else if (theme === "y2k") {
-        // Cat-ear beanie + star visor glasses on forehead
-        const pHat = sub3(pHeadLocal, v3(0, 0.24, 0));
-        const dCap = sdRoundedCylinder(pHat, 0.285, 0.045, 0.09);
-        const pEarL = sub3(pHeadLocal, v3(-0.18, 0.35, 0.02));
-        const pEarR = sub3(pHeadLocal, v3(0.18, 0.35, 0.02));
-        const dEars = Math.min(
-          sdRoundBox(rotZ(pEarL, 0.25), v3(0.065, 0.08, 0.05), 0.02),
-          sdRoundBox(rotZ(pEarR, -0.25), v3(0.065, 0.08, 0.05), 0.02)
-        );
-        addPart(Math.min(dCap, dEars), pal.hat, 0.24, 5);
-      }
+    if (pal.hat === "cap_red") {
+      const dDome = sdRoundedCylinder(sub3(pHeadLocal, v3(0, 0.15, 0)), 0.238, 0.065, 0.085);
+      const dBrim = sdRoundBox(rotX(sub3(pHeadLocal, v3(0, 0.11, 0.19)), 0.12), v3(0.18, 0.018, 0.12), 0.012);
+      addPart(Math.min(dDome, dBrim), [225, 38, 38], 0.32, 5);
+    } else if (pal.hat === "hardhat_yellow") {
+      const dDome = sdRoundedCylinder(sub3(pHeadLocal, v3(0, 0.16, 0)), 0.248, 0.08, 0.095);
+      const dRidge = sdRoundBox(sub3(pHeadLocal, v3(0, 0.25, 0)), v3(0.035, 0.025, 0.22), 0.01);
+      const dBrim = sdRoundedCylinder(sub3(pHeadLocal, v3(0, 0.10, 0.03)), 0.275, 0.015, 0.018);
+      addPart(Math.min(dDome, dRidge, dBrim), [250, 204, 21], 0.20, 5);
+    } else if (pal.hat === "crown") {
+      const dRing = Math.max(
+        sdRoundedCylinder(sub3(pHeadLocal, v3(0, 0.23, 0)), 0.155, 0.015, 0.055),
+        -sdRoundedCylinder(sub3(pHeadLocal, v3(0, 0.24, 0)), 0.12, 0.01, 0.08)
+      );
+      addPart(dRing, [250, 204, 21], 0.16, 5);
+    } else if (pal.hat === "toque_white") {
+      const dBand = sdRoundedCylinder(sub3(pHeadLocal, v3(0, 0.19, 0)), 0.225, 0.02, 0.055);
+      const dPuff = sdRoundedCylinder(sub3(pHeadLocal, v3(0, 0.30, 0)), 0.26, 0.075, 0.11);
+      addPart(Math.min(dBand, dPuff), [255, 255, 255], 0.28, 5);
     }
   }
 
-  // 5. Canonical 1x2x1 Left & Right Arms (FLUSH against the 2x2x1 torso at x = +/-0.555)
+  // 5. Left & Right Arms
   for (const side of [-1, 1]) {
     const pitch = side < 0 ? armLPitch : armRPitch;
-    const pShoulder = sub3(pUpper, v3(side * 0.555, 0.42, 0));
+    const pShoulder = sub3(pUpper, v3(side * 0.51, 0.38, 0));
     const pArmLocal = rotX(pShoulder, pitch);
-    // Solid 1x2x1 rectangular block arm (center at y = -0.22 from shoulder pivot)
-    const pArmBlock = sub3(pArmLocal, v3(0, -0.22, 0));
-    const dArm = sdRoundBox(pArmBlock, v3(0.155, 0.36, 0.175), bevel * 0.85);
-    if (dArm < bestD) {
-      // Bottom 30% of the solid 1x2x1 block is the skin-colored blocky hand!
-      const isHandZone = !pal.FullBareArms && pArmBlock.y < -0.15;
-      const armCol = isHandZone ? pal.head : pal.arms;
-      addPart(dArm, armCol, 0.18, 6);
+    const pArm = sub3(pArmLocal, v3(0, -0.20, 0));
+
+    if (pal.sleeves === "long") {
+      const dSleeve = sdRoundBox(sub3(pArm, v3(0, 0.05, 0)), v3(0.164, 0.28, 0.164), bevel * 0.85);
+      addPart(dSleeve, pal.top, 0.42, 6);
+      const dCuff = sdRoundBox(sub3(pArm, v3(0, -0.21, 0)), v3(0.168, 0.032, 0.168), 0.012);
+      addPart(dCuff, pal.trim, 0.45, 6);
+      const dHand = sdRoundBox(sub3(pArm, v3(0, -0.28, 0)), v3(0.158, 0.065, 0.158), bevel * 0.8);
+      addPart(dHand, pal.skin, 0.32, 7);
+    } else if (pal.sleeves === "short") {
+      const dShortSleeve = sdRoundBox(sub3(pArm, v3(0, 0.22, 0)), v3(0.172, 0.135, 0.172), bevel * 0.85);
+      addPart(dShortSleeve, pal.top, 0.42, 6);
+      const dBareArm = sdRoundBox(sub3(pArm, v3(0, -0.02, 0)), v3(0.162, 0.32, 0.162), bevel * 0.85);
+      addPart(dBareArm, pal.skin, 0.32, 6);
+    } else {
+      const dBareArm = sdRoundBox(pArm, v3(0.162, 0.34, 0.162), bevel * 0.85);
+      addPart(dBareArm, pal.skin, 0.32, 6);
     }
 
-    // Glowing Red Roblox Speed Coil around right arm for Obby Runner
-    if (theme === "obby" && side === 1 && driftMode === "none") {
-      for (const cy of [-0.08, -0.22, -0.36]) {
+    if (pal.details.includes("speed_coil") && side === 1 && driftMode === "none") {
+      for (const cy of [-0.08, -0.20, -0.32]) {
         const pCoil = sub3(pArmLocal, v3(0, cy, 0));
-        const dCoilRing = Math.max(
-          sdRoundedCylinder(pCoil, 0.215, 0.02, 0.032),
-          -sdRoundedCylinder(pCoil, 0.165, 0.01, 0.06)
+        const dCoil = Math.max(
+          sdRoundedCylinder(pCoil, 0.195, 0.018, 0.026),
+          -sdRoundedCylinder(pCoil, 0.155, 0.01, 0.05)
         );
-        addPart(dCoilRing, [255, 50, 70], 0.05, 8);
+        addPart(dCoil, [255, 45, 65], 0.08, 8);
       }
     }
 
-    // Hand drift comparisons (ONLY active in drift comparison panels)
-    const pHandEnd = sub3(pArmLocal, v3(0, -0.62, 0));
+    const pHandEnd = sub3(pArmLocal, v3(0, -0.56, 0));
     if (driftMode === "human-fingers") {
-      const dPalm = sdRoundBox(pHandEnd, v3(0.11, 0.07, 0.06), 0.02);
-      let dFingers = dPalm;
+      let dFingers = sdRoundBox(pHandEnd, v3(0.10, 0.06, 0.055), 0.015);
       for (let f = -2; f <= 2; f++) {
-        const pf = sub3(pHandEnd, v3(f * 0.044, -0.12, 0));
-        dFingers = Math.min(dFingers, sdRoundBox(pf, v3(0.015, 0.075, 0.016), 0.008));
+        const pf = sub3(pHandEnd, v3(f * 0.04, -0.11, 0));
+        dFingers = Math.min(dFingers, sdRoundBox(pf, v3(0.014, 0.07, 0.015), 0.007));
       }
-      addPart(dFingers, [242, 170, 135], 0.35, 7);
+      addPart(dFingers, [235, 165, 130], 0.35, 7);
     } else if (driftMode === "lego-studs") {
-      // Show C-shaped Lego claw hook as part of the Lego contamination FAIL case!
-      const dLegoClaw = sdCClawHand(sub3(pArmLocal, v3(0, -0.66, 0)), 0.85);
-      addPart(dLegoClaw, [250, 204, 21], 0.16, 7);
+      const dClaw = sdLegoCClaw(sub3(pArmLocal, v3(0, -0.60, 0)), 0.85);
+      addPart(dClaw, [250, 204, 21], 0.18, 7);
     }
 
-    // Optional Bloxy Cola / Coffee Mug attached cleanly to right blocky hand
     if (hasMug && side === 1 && driftMode === "none") {
-      const pMug = sub3(pArmLocal, v3(0, -0.52, 0.24));
-      const dMug = sdRoundedCylinder(pMug, 0.115, 0.02, 0.15);
-      addPart(dMug, [245, 158, 11], 0.14, 8);
+      const pMug = sub3(pArmLocal, v3(0, -0.46, 0.22));
+      const dMug = sdRoundedCylinder(pMug, 0.105, 0.018, 0.135);
+      addPart(dMug, [239, 68, 68], 0.18, 8);
     }
   }
 
-  // 6. Canonical 1x2x1 Left & Right Legs (sitting FLUSH side-by-side matching torso width!)
+  // 6. Left & Right Legs
   for (const side of [-1, 1]) {
     const pitch = side < 0 ? legLPitch : legRPitch;
-    const pHip = sub3(p, v3(side * 0.184, -0.18, 0));
+    const pHip = sub3(p, v3(side * 0.172, -0.16, 0));
     const pLegLocal = rotX(pHip, pitch);
-    const pLeg = sub3(pLegLocal, v3(0, -0.36, 0));
-    const dLeg = sdRoundBox(pLeg, v3(0.155, 0.36, 0.175), bevel * 0.85);
-    if (dLeg < bestD) {
-      const legCol = pLeg.y < -0.26 ? pal.legCuff : pal.legs;
-      addPart(dLeg, legCol, 0.22, 9);
+    const pLeg = sub3(pLegLocal, v3(0, -0.34, 0));
+    const dLeg = sdRoundBox(pLeg, v3(0.165, 0.34, 0.168), bevel * 0.85);
+    addPart(dLeg, pal.pants, 0.45, 9);
+
+    if (pal.shoes) {
+      const pShoe = sub3(pLegLocal, v3(0, -0.63, 0.012));
+      const dShoe = sdRoundBox(pShoe, v3(0.172, 0.058, 0.182), 0.022);
+      addPart(dShoe, pal.shoes, 0.32, 10);
     }
   }
 
   return { d: bestD, color: bestColor, roughness: bestRough, id: bestId };
 }
 
-// ---------- Raymarcher & Studio Shader ----------
 export function render3DViewport(width, height, sceneFn, camCfg = {}) {
   const buf = new Uint8Array(width * height * 4);
-  const ro = camCfg.ro || v3(0, 0.45, 4.2);
-  const ta = camCfg.ta || v3(0, 0.2, 0);
-  const fov = camCfg.fov || 1.85;
-  const bgTop = camCfg.bgTop || [15, 23, 42];
-  const bgBot = camCfg.bgBot || [30, 41, 59];
-  const floorY = camCfg.floorY ?? -0.98;
-  const floorColor1 = camCfg.floorColor1 || [30, 41, 59];
-  const floorColor2 = camCfg.floorColor2 || [22, 32, 50];
+  const ro = camCfg.ro || v3(0, 0.32, 3.15);
+  const ta = camCfg.ta || v3(0, 0.08, 0);
+  const fov = camCfg.fov || 1.9;
+  const bgTop = camCfg.bgTop || [125, 198, 252];
+  const bgBot = camCfg.bgBot || [224, 242, 254];
+  const floorY = camCfg.floorY ?? -0.86;
+  const floorColor1 = camCfg.floorColor1 || [148, 163, 184];
+  const floorColor2 = camCfg.floorColor2 || [132, 148, 170];
 
   const fw = norm3(sub3(ta, ro));
   const rt = norm3(cross3(fw, v3(0, 1, 0)));
   const up = cross3(rt, fw);
 
-  const keyLight = norm3(v3(0.65, 0.85, 0.72));
-  const rimLight = norm3(v3(-0.75, 0.45, -0.6));
+  const keyLight = norm3(v3(0.58, 0.82, 0.68));
+  const fillLight = norm3(v3(-0.65, 0.35, 0.55));
+  const rimLight = norm3(v3(-0.55, 0.55, -0.75));
 
   const calcNormal = (p, centerDist) => {
-    const e = 0.003;
+    const e = 0.0025;
     const d0 = centerDist ?? sceneFn(p).d;
     const dx = sceneFn(v3(p.x + e, p.y, p.z)).d - d0;
     const dy = sceneFn(v3(p.x, p.y + e, p.z)).d - d0;
     const dz = sceneFn(v3(p.x, p.y, p.z + e)).d - d0;
     return norm3(v3(dx, dy, dz));
+  };
+
+  const calcSoftShadow = (orig, dir) => {
+    const h1 = sceneFn(add3(orig, mul3(dir, 0.12))).d;
+    const h2 = sceneFn(add3(orig, mul3(dir, 0.28))).d;
+    return clamp(0.55 + 0.45 * Math.min(h1 * 8.0, h2 * 4.5), 0.55, 1.0);
   };
 
   for (let py = 0; py < height; py++) {
@@ -529,29 +643,26 @@ export function render3DViewport(width, height, sceneFn, camCfg = {}) {
       const nx = ((2 * (px + 0.5)) / width - 1) * (width / height);
       const rd = norm3(add3(add3(mul3(rt, nx), mul3(up, ny)), mul3(fw, fov)));
 
-      // Background studio gradient
       let r = mix(bgTop[0], bgBot[0], vGrad);
       let g = mix(bgTop[1], bgBot[1], vGrad);
       let b = mix(bgTop[2], bgBot[2], vGrad);
 
-      // Fast ray-sphere bounding check around scene center (0, 0.1, 0) with radius 2.55
       const ocx = ro.x;
-      const ocy = ro.y - 0.1;
+      const ocy = ro.y - 0.05;
       const ocz = ro.z;
       const bSphere = ocx * rd.x + ocy * rd.y + ocz * rd.z;
-      const cSphere = ocx * ocx + ocy * ocy + ocz * ocz - 2.55 * 2.55;
+      const cSphere = ocx * ocx + ocy * ocy + ocz * ocz - 2.45 * 2.45;
       const disc = bSphere * bSphere - cSphere;
 
-      // Raymarch scene only when ray intersects the scene bounding sphere
       let t = disc > 0 ? Math.max(0.2, -bSphere - Math.sqrt(disc)) : 99.0;
-      const tMax = disc > 0 ? Math.min(8.5, -bSphere + Math.sqrt(disc)) : 0.0;
+      const tMax = disc > 0 ? Math.min(8.0, -bSphere + Math.sqrt(disc)) : 0.0;
       let hit = null;
       if (disc > 0 && tMax > 0.2) {
-        for (let step = 0; step < 34; step++) {
+        for (let step = 0; step < 36; step++) {
           if (t > tMax) break;
           const pos = add3(ro, mul3(rd, t));
           const res = sceneFn(pos);
-          if (res.d < 0.0035) {
+          if (res.d < 0.003) {
             hit = { pos, res, t };
             break;
           }
@@ -562,77 +673,59 @@ export function render3DViewport(width, height, sceneFn, camCfg = {}) {
       if (hit) {
         const N = calcNormal(hit.pos, hit.res.d);
         const V = mul3(rd, -1);
-        const ndotl = Math.max(0, dot3(N, keyLight));
-        // Soft subsurface wrap lighting for blind-box vinyl look
-        const wrapDiff = 0.42 + 0.58 * clamp((dot3(N, keyLight) + 0.35) / 1.35, 0, 1);
-        // Quick 2-sample ambient occlusion
-        const aoSample = sceneFn(add3(hit.pos, mul3(N, 0.08))).d / 0.08;
-        const ao = clamp(0.62 + 0.38 * aoSample, 0.55, 1.0);
+        const sh = dot3(N, keyLight) > 0 ? calcSoftShadow(add3(hit.pos, mul3(N, 0.015)), keyLight) : 0.55;
+        const keyDiff = Math.max(0, dot3(N, keyLight)) * sh;
+        const fillDiff = Math.max(0, dot3(N, fillLight)) * 0.28;
+        const skyAmb = 0.36 + 0.14 * (0.5 + 0.5 * N.y);
+        const aoSample = sceneFn(add3(hit.pos, mul3(N, 0.065))).d / 0.065;
+        const ao = clamp(0.68 + 0.32 * aoSample, 0.62, 1.0);
 
-        // Specular highlight (Blinn-Phong softbox)
+        const lighting = (skyAmb + keyDiff * 0.62 + fillDiff) * ao;
+
         const H = norm3(add3(keyLight, V));
-        const rough = hit.res.roughness ?? 0.2;
-        const specPow = rough < 0.2 ? 42 : 20;
-        const specStrength = rough < 0.2 ? 0.52 : 0.24;
+        const rough = hit.res.roughness ?? 0.32;
+        const specPow = rough < 0.25 ? 36 : 18;
+        const specStrength = (rough < 0.25 ? 0.38 : 0.16) * sh;
         const spec = Math.pow(Math.max(0, dot3(N, H)), specPow) * specStrength;
 
-        // Rim light
-        const fresnel = Math.pow(1 - Math.max(0, dot3(N, V)), 3.2);
-        const rim = fresnel * Math.max(0, dot3(N, rimLight)) * 0.45;
+        const fresnel = Math.pow(1 - Math.max(0, dot3(N, V)), 3.0);
+        const rim = fresnel * Math.max(0, dot3(N, rimLight)) * 0.28;
 
         const base = hit.res.color;
-        r = clamp(base[0] * wrapDiff * ao + 255 * spec + 120 * rim, 0, 255);
-        g = clamp(base[1] * wrapDiff * ao + 250 * spec + 210 * rim, 0, 255);
-        b = clamp(base[2] * wrapDiff * ao + 240 * spec + 255 * rim, 0, 255);
+        r = clamp(base[0] * lighting + 255 * spec + 245 * rim, 0, 255);
+        g = clamp(base[1] * lighting + 252 * spec + 248 * rim, 0, 255);
+        b = clamp(base[2] * lighting + 245 * spec + 255 * rim, 0, 255);
       } else if (rd.y < -0.001 && floorY !== null) {
-        // Intersect Roblox Studded Baseplate & SpawnLocation pad at y = floorY
         const tf = (floorY - ro.y) / rd.y;
         if (tf > 0 && tf < 14.0) {
           const fp = add3(ro, mul3(rd, tf));
-          const cellSize = 0.38;
+          const cellSize = 0.34;
           const gx = Math.floor(fp.x / cellSize);
           const gz = Math.floor(fp.z / cellSize);
-          const fx = (fp.x / cellSize - gx) - 0.5;
-          const fz = (fp.z / cellSize - gz) - 0.5;
+          const fx = fp.x / cellSize - gx - 0.5;
+          const fz = fp.z / cellSize - gz - 0.5;
 
           let tileCol = (gx + gz) & 1 ? [...floorColor1] : [...floorColor2];
 
-          // Roblox 1x1 square tile grid line + raised circular Baseplate Stud bump
           const isGridBorder = Math.abs(fx) > 0.45 || Math.abs(fz) > 0.45;
           const studR = Math.hypot(fx, fz);
           if (isGridBorder) {
-            tileCol = [tileCol[0] * 0.78, tileCol[1] * 0.78, tileCol[2] * 0.78];
+            tileCol = [tileCol[0] * 0.84, tileCol[1] * 0.84, tileCol[2] * 0.84];
           } else if (studR < 0.23 && studR > 0.17) {
-            // Directional bevel highlight/shadow on the Roblox Baseplate stud rim
-            const bump = (fx + fz) > 0 ? 1.18 : 0.76;
-            tileCol = [
-              clamp(tileCol[0] * bump, 0, 255),
-              clamp(tileCol[1] * bump, 0, 255),
-              clamp(tileCol[2] * bump, 0, 255)
-            ];
+            const bump = fx + fz > 0 ? 1.14 : 0.82;
+            tileCol = [tileCol[0] * bump, tileCol[1] * bump, tileCol[2] * bump];
           } else if (studR <= 0.17) {
-            tileCol = [
-              clamp(tileCol[0] * 1.07, 0, 255),
-              clamp(tileCol[1] * 1.07, 0, 255),
-              clamp(tileCol[2] * 1.07, 0, 255)
-            ];
+            tileCol = [tileCol[0] * 1.05, tileCol[1] * 1.05, tileCol[2] * 1.05];
           }
 
-          // Classic Roblox SpawnLocation emblem ring under character origin
-          const spawnR = Math.hypot(fp.x, fp.z);
-          if (spawnR < 0.92 && Math.abs(fp.x) < 0.98 && Math.abs(fp.z) < 0.98) {
-            if (Math.abs(spawnR - 0.74) < 0.045 || Math.abs(spawnR - 0.44) < 0.035) {
-              tileCol = [226, 232, 240];
-            }
-          }
-
-          // Soft contact shadow under character
-          const shadowProbe = sceneFn(v3(fp.x, floorY + 0.24, fp.z)).d;
-          const shadow = clamp(shadowProbe * 2.4, 0.34, 1.0);
-          const fade = Math.exp(-0.075 * tf * tf);
-          r = mix(r, tileCol[0] * shadow, fade);
-          g = mix(g, tileCol[1] * shadow, fade);
-          b = mix(b, tileCol[2] * shadow, fade);
+          const floorShadow =
+            Math.abs(fp.x) < 1.35 && Math.abs(fp.z) < 1.35
+              ? calcSoftShadow(v3(fp.x, floorY + 0.02, fp.z), keyLight)
+              : 1.0;
+          const fade = Math.exp(-0.065 * tf * tf);
+          r = mix(r, clamp(tileCol[0] * floorShadow, 0, 255), fade);
+          g = mix(g, clamp(tileCol[1] * floorShadow, 0, 255), fade);
+          b = mix(b, clamp(tileCol[2] * floorShadow, 0, 255), fade);
         }
       }
 
@@ -646,7 +739,6 @@ export function render3DViewport(width, height, sceneFn, camCfg = {}) {
   return buf;
 }
 
-// ---------- Pure Node PNG Encoder (Zero Dependencies) ----------
 const CRC_TABLE = (() => {
   const table = new Uint32Array(256);
   for (let n = 0; n < 256; n++) {
@@ -681,8 +773,8 @@ export function encodePNG(width, height, rgba) {
   const ihdr = Buffer.alloc(13);
   ihdr.writeUInt32BE(width, 0);
   ihdr.writeUInt32BE(height, 4);
-  ihdr[8] = 8; // bit depth
-  ihdr[9] = 6; // RGBA
+  ihdr[8] = 8;
+  ihdr[9] = 6;
   ihdr[10] = 0;
   ihdr[11] = 0;
   ihdr[12] = 0;
@@ -691,7 +783,7 @@ export function encodePNG(width, height, rgba) {
   const raw = Buffer.alloc((stride + 1) * height);
   for (let y = 0; y < height; y++) {
     const rowStart = y * (stride + 1);
-    raw[rowStart] = 0; // filter type 0
+    raw[rowStart] = 0;
     Buffer.from(rgba.buffer, rgba.byteOffset + y * stride, stride).copy(raw, rowStart + 1);
   }
   const idat = zlib.deflateSync(raw, { level: 6 });
@@ -703,190 +795,202 @@ export function encodePNG(width, height, rgba) {
   ]);
 }
 
-// ---------- Scene Builders for Keyframes & Animations ----------
 export function buildAlarmMeltdownScene(shotIndex, phase = 0.5) {
-  // Shot 1: Hook (vibrating red alarm clock + shocked head pop-up)
+  const bedroomBgTop = [147, 197, 253];
+  const bedroomBgBot = [241, 245, 249];
+  const woodFloor1 = [194, 142, 92];
+  const woodFloor2 = [178, 126, 78];
+
+  const evalAlarmClock = (p, center, squash = 1.0, tilt = 0.0) => {
+    const q = rotZ(sub3(p, center), tilt);
+    const rBody = 0.17;
+    const qCyl = rotX(v3(q.x, q.y / squash, q.z), Math.PI / 2);
+    const dBody = sdRoundedCylinder(qCyl, rBody, 0.025, 0.075);
+    const dDial = sdRoundedCylinder(sub3(qCyl, v3(0, 0.02, 0)), rBody * 0.78, 0.01, 0.078);
+    const dBellL = sdSphere(sub3(q, v3(-0.12, 0.19 * squash, 0)), 0.055);
+    const dBellR = sdSphere(sub3(q, v3(0.12, 0.19 * squash, 0)), 0.055);
+    let best = { d: dBody, color: [239, 68, 68], roughness: 0.22, id: 21 };
+    if (dDial < best.d) best = { d: dDial, color: [255, 255, 255], roughness: 0.2, id: 22 };
+    if (Math.min(dBellL, dBellR) < best.d) {
+      best = { d: Math.min(dBellL, dBellR), color: [250, 204, 21], roughness: 0.12, id: 23 };
+    }
+    return best;
+  };
+
   if (shotIndex === 0) {
-    const shake = Math.sin(phase * Math.PI * 8) * 0.06;
-    const popY = mix(-0.35, 0.05, smoothstep(0, 0.65, phase));
+    const shake = Math.sin(phase * Math.PI * 8) * 0.05;
+    const popY = mix(-0.18, 0.04, smoothstep(0, 0.65, phase));
     return {
       cam: {
-        ro: v3(0.15 + shake * 0.4, 0.55, 2.85 - phase * 0.25),
-        ta: v3(0, 0.35, 0.2),
-        fov: 1.9,
-        bgTop: [24, 24, 48],
-        bgBot: [45, 28, 58]
+        ro: v3(0.12 + shake * 0.3, 0.52, 2.35 - phase * 0.18),
+        ta: v3(0, 0.34, 0.15),
+        fov: 1.95,
+        bgTop: bedroomBgTop,
+        bgBot: bedroomBgBot,
+        floorY: -0.86,
+        floorColor1: woodFloor1,
+        floorColor2: woodFloor2
       },
       sceneFn: (p) => {
         const av = evalAvatarSDF(p, {
-          pos: v3(0.18, popY, -0.15),
-          yaw: -0.15,
-          armLPitch: -0.9,
-          armRPitch: -0.9,
+          pos: v3(0.14, popY, -0.12),
+          yaw: -0.14,
+          armLPitch: -0.85,
+          armRPitch: -0.85,
           expression: "shocked",
-          theme: "momo"
+          theme: "theo"
         });
-        if (p.y > 0.45 && av.d < p.y - 0.28) return av;
-        // Desk surface
-        const dDesk = sdRoundBox(sub3(p, v3(0, -0.42, 0.45)), v3(1.6, 0.08, 0.85), 0.02);
-        // Red blocky alarm clock on desk
-        const pClock = rotZ(sub3(p, v3(-0.32, -0.05 + Math.abs(shake) * 1.4, 0.55)), shake * 2.2);
-        const dClockBody = sdRoundBox(pClock, v3(0.24, 0.22, 0.14), 0.04);
-        const dClockFace = sdRoundBox(sub3(pClock, v3(0, 0, 0.06)), v3(0.18, 0.15, 0.1), 0.02);
-        const dBellL = sdRoundedCylinder(sub3(pClock, v3(-0.18, 0.28, 0)), 0.08, 0.02, 0.05);
-        const dBellR = sdRoundedCylinder(sub3(pClock, v3(0.18, 0.28, 0)), 0.08, 0.02, 0.05);
-
+        if (p.y > 0.38 && av.d < p.y - 0.22) return av;
+        const dDesk = sdRoundBox(sub3(p, v3(0, -0.36, 0.42)), v3(1.35, 0.06, 0.65), 0.02);
+        const clk = evalAlarmClock(p, v3(-0.28, -0.11 + Math.abs(shake) * 1.1, 0.48), 1.0, shake * 2.0);
         let best = av;
-        if (dDesk < best.d) best = { d: dDesk, color: [120, 82, 56], roughness: 0.35, id: 20 };
-        if (dClockBody < best.d) best = { d: dClockBody, color: [244, 63, 94], roughness: 0.15, id: 21 };
-        if (dClockFace < best.d) best = { d: dClockFace, color: [254, 249, 195], roughness: 0.2, id: 22 };
-        if (Math.min(dBellL, dBellR) < best.d) {
-          best = { d: Math.min(dBellL, dBellR), color: [250, 204, 21], roughness: 0.12, id: 23 };
-        }
+        if (dDesk < best.d) best = { d: dDesk, color: [161, 108, 68], roughness: 0.42, id: 20 };
+        if (clk.d < best.d) best = clk;
         return best;
       }
     };
   }
 
-  // Shot 2: Slamming the alarm clock with C-shaped hand
   if (shotIndex === 1) {
     const slamT = smoothstep(0.1, 0.65, phase);
-    const armAngle = mix(-2.1, -0.85, slamT);
-    const clockSquash = mix(0.22, 0.08, slamT);
+    const armAngle = mix(-2.0, -0.82, slamT);
+    const squash = mix(1.0, 0.42, slamT);
     return {
       cam: {
-        ro: v3(1.15, 0.42, 3.2),
-        ta: v3(-0.05, 0.12, 0.2),
-        fov: 1.85,
-        bgTop: [17, 34, 51],
-        bgBot: [30, 58, 76]
+        ro: v3(0.95, 0.42, 2.55),
+        ta: v3(-0.04, 0.16, 0.18),
+        fov: 1.9,
+        bgTop: bedroomBgTop,
+        bgBot: bedroomBgBot,
+        floorY: -0.86,
+        floorColor1: woodFloor1,
+        floorColor2: woodFloor2
       },
       sceneFn: (p) => {
         const av = evalAvatarSDF(p, {
-          pos: v3(0.25, 0.0, 0.0),
-          yaw: -0.45,
-          waistPitch: slamT * 0.22,
+          pos: v3(0.22, 0.0, 0.0),
+          yaw: -0.42,
+          waistPitch: slamT * 0.18,
           armRPitch: armAngle,
-          armLPitch: -0.3,
+          armLPitch: -0.25,
           expression: "slam",
-          theme: "momo"
+          theme: "theo"
         });
-        const dDesk = sdRoundBox(sub3(p, v3(0, -0.48, 0.45)), v3(1.6, 0.08, 0.85), 0.02);
-        const pClock = sub3(p, v3(-0.22, -0.38 + clockSquash, 0.48));
-        const dClock = sdRoundBox(pClock, v3(0.28, clockSquash, 0.18), 0.03);
+        const dDesk = sdRoundBox(sub3(p, v3(0, -0.42, 0.42)), v3(1.35, 0.06, 0.65), 0.02);
+        const clk = evalAlarmClock(p, v3(-0.22, -0.24, 0.45), squash, 0);
         let best = av;
-        if (dDesk < best.d) best = { d: dDesk, color: [120, 82, 56], roughness: 0.35, id: 20 };
-        if (dClock < best.d) best = { d: dClock, color: [244, 63, 94], roughness: 0.15, id: 21 };
+        if (dDesk < best.d) best = { d: dDesk, color: [161, 108, 68], roughness: 0.42, id: 20 };
+        if (clk.d < best.d) best = clk;
         return best;
       }
     };
   }
 
-  // Shot 3: Crying 2D waterfall tears in front of glowing laptop
   if (shotIndex === 2) {
     return {
       cam: {
-        ro: v3(Math.sin(phase * 0.6 - 0.3) * 0.55, 0.52, 2.95),
-        ta: v3(0, 0.28, 0.15),
-        fov: 1.9,
-        bgTop: [12, 22, 46],
-        bgBot: [20, 42, 78]
+        ro: v3(Math.sin(phase * 0.6 - 0.3) * 0.42, 0.48, 2.38),
+        ta: v3(0, 0.28, 0.12),
+        fov: 1.95,
+        bgTop: bedroomBgTop,
+        bgBot: bedroomBgBot,
+        floorY: -0.86,
+        floorColor1: woodFloor1,
+        floorColor2: woodFloor2
       },
       sceneFn: (p) => {
         const av = evalAvatarSDF(p, {
-          pos: v3(0, -0.02, -0.1),
+          pos: v3(0, -0.02, -0.08),
           yaw: 0,
-          headPitch: Math.sin(phase * Math.PI * 4) * 0.05,
-          armLPitch: -0.85,
-          armRPitch: -0.85,
+          headPitch: Math.sin(phase * Math.PI * 4) * 0.04,
+          armLPitch: -0.78,
+          armRPitch: -0.78,
           expression: "tears",
-          theme: "momo"
+          theme: "theo"
         });
-        const dDesk = sdRoundBox(sub3(p, v3(0, -0.48, 0.45)), v3(1.6, 0.08, 0.85), 0.02);
-        // Laptop base & screen
-        const dLapBase = sdRoundBox(sub3(p, v3(0, -0.37, 0.45)), v3(0.36, 0.025, 0.24), 0.015);
-        const pScreen = rotX(sub3(p, v3(0, -0.12, 0.64)), -0.25);
-        const dLapScreen = sdRoundBox(pScreen, v3(0.36, 0.24, 0.02), 0.015);
+        const dDesk = sdRoundBox(sub3(p, v3(0, -0.42, 0.42)), v3(1.35, 0.06, 0.65), 0.02);
+        const dLapBase = sdRoundBox(sub3(p, v3(0, -0.33, 0.40)), v3(0.32, 0.022, 0.22), 0.012);
+        const pScreen = rotX(sub3(p, v3(0, -0.11, 0.56)), -0.24);
+        const dLapScreen = sdRoundBox(pScreen, v3(0.32, 0.21, 0.018), 0.012);
         let best = av;
-        if (dDesk < best.d) best = { d: dDesk, color: [100, 72, 52], roughness: 0.35, id: 20 };
-        if (dLapBase < best.d) best = { d: dLapBase, color: [203, 213, 225], roughness: 0.2, id: 24 };
-        if (dLapScreen < best.d) best = { d: dLapScreen, color: [125, 211, 252], roughness: 0.08, id: 25 };
+        if (dDesk < best.d) best = { d: dDesk, color: [161, 108, 68], roughness: 0.42, id: 20 };
+        if (dLapBase < best.d) best = { d: dLapBase, color: [226, 232, 240], roughness: 0.22, id: 24 };
+        if (dLapScreen < best.d) best = { d: dLapScreen, color: [56, 189, 248], roughness: 0.12, id: 25 };
         return best;
       }
     };
   }
 
-  // Shot 4: 90-degree rigid waist face-plant onto keyboard
   const dropT = smoothstep(0.05, 0.55, phase);
-  const bounce = phase > 0.55 ? Math.abs(Math.sin((phase - 0.55) * Math.PI * 5)) * 0.12 * (1 - phase) : 0;
-  const pitch90 = mix(0.1, 1.32, dropT) - bounce;
+  const bounce = phase > 0.55 ? Math.abs(Math.sin((phase - 0.55) * Math.PI * 5)) * 0.1 * (1 - phase) : 0;
+  const pitch90 = mix(0.1, 1.25, dropT) - bounce;
   return {
     cam: {
-      ro: v3(1.25, 1.35, 3.1),
-      ta: v3(0, 0.05, 0.25),
-      fov: 1.85,
-      bgTop: [22, 24, 42],
-      bgBot: [38, 32, 56]
+      ro: v3(1.05, 1.15, 2.55),
+      ta: v3(0, 0.06, 0.20),
+      fov: 1.9,
+      bgTop: bedroomBgTop,
+      bgBot: bedroomBgBot,
+      floorY: -0.86,
+      floorColor1: woodFloor1,
+      floorColor2: woodFloor2
     },
     sceneFn: (p) => {
       const av = evalAvatarSDF(p, {
-        pos: v3(0, -0.02, -0.12),
+        pos: v3(0, -0.02, -0.10),
         yaw: 0,
         waistPitch: pitch90,
-        armLPitch: -0.4,
-        armRPitch: -0.4,
+        armLPitch: -0.38,
+        armRPitch: -0.38,
         expression: "dizzy",
-        theme: "momo"
+        theme: "theo"
       });
-      const dDesk = sdRoundBox(sub3(p, v3(0, -0.48, 0.45)), v3(1.6, 0.08, 0.85), 0.02);
-      const dKeyb = sdRoundBox(sub3(p, v3(0, -0.37, 0.42)), v3(0.38, 0.03, 0.18), 0.015);
+      const dDesk = sdRoundBox(sub3(p, v3(0, -0.42, 0.42)), v3(1.35, 0.06, 0.65), 0.02);
+      const dKeyb = sdRoundBox(sub3(p, v3(0, -0.33, 0.38)), v3(0.34, 0.025, 0.16), 0.012);
       let best = av;
-      if (dDesk < best.d) best = { d: dDesk, color: [120, 82, 56], roughness: 0.35, id: 20 };
-      if (dKeyb < best.d) best = { d: dKeyb, color: [241, 245, 249], roughness: 0.2, id: 24 };
+      if (dDesk < best.d) best = { d: dDesk, color: [161, 108, 68], roughness: 0.42, id: 20 };
+      if (dKeyb < best.d) best = { d: dKeyb, color: [248, 250, 252], roughness: 0.22, id: 24 };
       return best;
     }
   };
 }
 
 export function buildObbySkyScene(shotIndex, phase = 0.5) {
-  const jumpArc = Math.sin(phase * Math.PI) * 0.48;
-  const runSwing = Math.sin(phase * Math.PI * 2) * 0.72;
+  const jumpArc = Math.sin(phase * Math.PI) * 0.42;
+  const runSwing = Math.sin(phase * Math.PI * 2) * 0.68;
   return {
     cam: {
-      ro: v3(shotIndex === 1 ? 1.55 : -0.65, 0.65 + shotIndex * 0.08, 3.15),
-      ta: v3(0, 0.08, 0),
-      fov: 1.85,
-      bgTop: [14, 165, 233],
-      bgBot: [186, 230, 253],
-      floorY: -1.35,
+      ro: v3(shotIndex === 1 ? 1.35 : -0.58, 0.55 + shotIndex * 0.06, 2.75),
+      ta: v3(0, 0.06, 0),
+      fov: 1.9,
+      bgTop: [56, 189, 248],
+      bgBot: [224, 242, 254],
+      floorY: -1.28,
       floorColor1: [241, 245, 249],
       floorColor2: [226, 232, 240]
     },
     sceneFn: (p) => {
       const av = evalAvatarSDF(p, {
-        pos: v3(mix(-0.38, 0.38, phase), jumpArc, 0),
-        yaw: 0.52,
+        pos: v3(mix(-0.34, 0.34, phase), jumpArc, 0),
+        yaw: 0.48,
         armLPitch: runSwing,
         armRPitch: -runSwing,
         legLPitch: -runSwing,
         legRPitch: runSwing,
-        expression: shotIndex === 2 ? "shocked" : "happy",
-        theme: "obby",
-        hasBeanie: true,
-        hasBackpack: true
+        expression: shotIndex === 2 ? "shocked" : "grin",
+        theme: "obby"
       });
-      // Floating Roblox Studded Obby blocks + Glowing Red Neon Killbrick
-      const dPad1 = sdRoundBox(sub3(p, v3(-0.58, -0.88, 0)), v3(0.52, 0.12, 0.52), 0.03);
-      const dPad2 = sdRoundBox(sub3(p, v3(0.58, -0.72, 0)), v3(0.52, 0.12, 0.52), 0.03);
-      const dKillBrick = sdRoundBox(sub3(p, v3(0.18, -0.57, 0)), v3(0.08, 0.04, 0.48), 0.015);
+      const dPad1 = sdRoundBox(sub3(p, v3(-0.52, -0.84, 0)), v3(0.48, 0.11, 0.48), 0.03);
+      const dPad2 = sdRoundBox(sub3(p, v3(0.52, -0.68, 0)), v3(0.48, 0.11, 0.48), 0.03);
+      const dKillBrick = sdRoundBox(sub3(p, v3(0.16, -0.54, 0)), v3(0.075, 0.038, 0.44), 0.012);
       let best = av;
-      if (dPad1 < best.d) best = { d: dPad1, color: [244, 114, 182], roughness: 0.18, id: 30 };
+      if (dPad1 < best.d) best = { d: dPad1, color: [244, 114, 182], roughness: 0.22, id: 30 };
       if (dPad2 < best.d) {
         const c2 = shotIndex === 3 ? [56, 189, 248] : [74, 222, 128];
-        best = { d: dPad2, color: c2, roughness: 0.18, id: 31 };
+        best = { d: dPad2, color: c2, roughness: 0.22, id: 31 };
       }
       if (shotIndex === 2 && dKillBrick < best.d) {
-        best = { d: dKillBrick, color: [255, 45, 65], roughness: 0.04, id: 32 };
+        best = { d: dKillBrick, color: [255, 42, 62], roughness: 0.05, id: 32 };
       }
       return best;
     }
@@ -894,61 +998,182 @@ export function buildObbySkyScene(shotIndex, phase = 0.5) {
 }
 
 export function buildDuoComedyScene(shotIndex, phase = 0.5) {
-  const spinY = shotIndex === 1 ? phase * Math.PI * 2 : 0.22;
+  const spinY = shotIndex === 1 ? phase * Math.PI * 2 : 0.20;
   return {
     cam: {
-      ro: v3(0, 0.32, 3.65),
-      ta: v3(0, 0.08, 0),
-      fov: 1.88,
-      bgTop: [30, 27, 75],
-      bgBot: [59, 7, 100],
-      floorY: -0.92,
-      floorColor1: [76, 29, 149],
-      floorColor2: [59, 7, 100]
+      ro: v3(0, 0.28, 3.15),
+      ta: v3(0, 0.06, 0),
+      fov: 1.92,
+      bgTop: [165, 180, 252],
+      bgBot: [238, 242, 255],
+      floorY: -0.86,
+      floorColor1: [148, 163, 184],
+      floorColor2: [128, 144, 168]
     },
     sceneFn: (p) => {
-      // Left: Y2K Streetwear Avatar
       const leftAv = evalAvatarSDF(p, {
-        pos: v3(-0.62, 0, 0),
+        pos: v3(-0.54, 0, 0),
         yaw: spinY,
-        armLPitch: -0.42,
-        armRPitch: -0.68,
-        expression: shotIndex === 2 ? "shocked" : shotIndex === 3 ? "deadpan" : "happy",
+        armLPitch: -0.38,
+        armRPitch: -0.62,
+        expression: shotIndex === 2 ? "shocked" : shotIndex === 3 ? "deadpan" : "smirk",
         theme: "y2k",
-        hasBeanie: true,
-        hasBackpack: true,
         hasMug: true
       });
-      // Right: Authentic Classic Rigid R6 Noob (Bright Yellow / Bright Blue / Yellowish Green)
       const rightAv = evalAvatarSDF(p, {
-        pos: v3(0.54, 0, 0),
-        yaw: -0.22,
-        roll: shotIndex === 2 ? -0.24 : shotIndex === 3 ? -0.18 : 0,
-        headYaw: shotIndex === 3 ? 0.22 : 0,
+        pos: v3(0.48, 0, 0),
+        yaw: -0.20,
+        roll: shotIndex === 2 ? -0.22 : shotIndex === 3 ? -0.16 : 0,
+        headYaw: shotIndex === 3 ? 0.20 : 0,
         armLPitch: 0,
         armRPitch: 0,
         legLPitch: 0,
         legRPitch: 0,
-        expression: shotIndex === 3 ? "deadpan" : "happy",
-        theme: "noob",
-        hasBeanie: false,
-        hasBackpack: false
+        expression: shotIndex === 3 ? "deadpan" : "smile",
+        theme: "noob"
       });
       return leftAv.d < rightAv.d ? leftAv : rightAv;
     }
   };
 }
 
-export function renderRawPanelSet(tmpDir, force = false) {
+export function buildCozyCafeScene(shotIndex, phase = 0.5) {
+  const popY = shotIndex === 0 ? mix(-0.15, 0.02, smoothstep(0, 0.65, phase)) : 0.0;
+  const armWave = shotIndex === 3 ? -0.95 - Math.sin(phase * Math.PI * 4) * 0.25 : -0.72;
+  return {
+    cam: {
+      ro: v3(shotIndex === 1 ? 0.55 : -0.35, 0.52, 2.55),
+      ta: v3(0, 0.18, 0.15),
+      fov: 1.92,
+      bgTop: [254, 243, 199],
+      bgBot: [255, 251, 235],
+      floorY: -0.86,
+      floorColor1: [214, 178, 138],
+      floorColor2: [196, 158, 118]
+    },
+    sceneFn: (p) => {
+      const av = evalAvatarSDF(p, {
+        pos: v3(0, popY, -0.10),
+        yaw: shotIndex === 1 ? -0.25 : 0.12,
+        armLPitch: -0.55,
+        armRPitch: armWave,
+        expression: shotIndex === 3 ? "grin" : "smile",
+        theme: "chef",
+        hasMug: shotIndex === 2
+      });
+      // Bakery counter + Pastel tray + Golden croissant block + Floating gold coins
+      const dCounter = sdRoundBox(sub3(p, v3(0, -0.44, 0.42)), v3(1.25, 0.14, 0.45), 0.025);
+      const dTray = sdRoundBox(sub3(p, v3(-0.08, -0.28, 0.42)), v3(0.32, 0.02, 0.22), 0.012);
+      const dCroissant = sdRoundBox(rotY(sub3(p, v3(-0.08, -0.21, 0.42)), 0.35), v3(0.14, 0.055, 0.085), 0.035);
+      let best = av;
+      if (dCounter < best.d) best = { d: dCounter, color: [180, 124, 82], roughness: 0.38, id: 40 };
+      if (dTray < best.d) best = { d: dTray, color: [251, 207, 232], roughness: 0.22, id: 41 };
+      if (dCroissant < best.d) best = { d: dCroissant, color: [245, 158, 11], roughness: 0.24, id: 42 };
+      if (shotIndex === 3) {
+        for (const cx of [-0.32, 0.0, 0.32]) {
+          const dCoin = sdRoundedCylinder(rotX(sub3(p, v3(cx, 1.08 + Math.sin(phase * 6 + cx) * 0.06, 0.1)), Math.PI / 2), 0.085, 0.015, 0.025);
+          if (dCoin < best.d) best = { d: dCoin, color: [250, 204, 21], roughness: 0.12, id: 43 };
+        }
+      }
+      return best;
+    }
+  };
+}
+
+export function buildRunwayDropScene(shotIndex, phase = 0.5) {
+  const isTransformed = shotIndex >= 2;
+  const jumpY = shotIndex === 1 ? Math.sin(phase * Math.PI) * 0.45 : 0.0;
+  return {
+    cam: {
+      ro: v3(shotIndex === 3 ? 0.65 : 0, shotIndex === 2 ? 0.08 : 0.28, 2.75),
+      ta: v3(0, 0.12, 0),
+      fov: 1.92,
+      bgTop: isTransformed ? [192, 132, 252] : [203, 213, 225],
+      bgBot: isTransformed ? [244, 114, 182] : [241, 245, 249],
+      floorY: -0.86,
+      floorColor1: isTransformed ? [216, 180, 254] : [148, 163, 184],
+      floorColor2: isTransformed ? [192, 132, 252] : [128, 144, 168]
+    },
+    sceneFn: (p) => {
+      const av = evalAvatarSDF(p, {
+        pos: v3(0, jumpY, 0),
+        yaw: shotIndex === 1 ? phase * Math.PI * 2 : shotIndex === 3 ? 0.35 : 0,
+        headPitch: shotIndex === 0 ? 0.18 : 0,
+        armLPitch: isTransformed ? -0.45 : 0,
+        armRPitch: isTransformed ? -0.85 : 0,
+        expression: shotIndex === 0 ? "deadpan" : shotIndex === 1 ? "shocked" : "smirk",
+        theme: isTransformed ? "y2k" : "base-gray"
+      });
+      const dPodium = sdRoundedCylinder(sub3(p, v3(0, -0.78, 0)), 0.72, 0.03, 0.08);
+      let best = av;
+      if (dPodium < best.d) {
+        best = { d: dPodium, color: isTransformed ? [244, 114, 182] : [226, 232, 240], roughness: 0.18, id: 50 };
+      }
+      return best;
+    }
+  };
+}
+
+export function buildBurntPizzaScene(shotIndex, phase = 0.5) {
+  const fallRoll = shotIndex === 3 ? smoothstep(0, 0.65, phase) * 1.38 : 0;
+  return {
+    cam: {
+      ro: v3(shotIndex === 3 ? -0.35 : 0, shotIndex === 1 ? 0.45 : shotIndex === 3 ? 0.55 : 0.32, shotIndex === 1 ? 2.15 : shotIndex === 3 ? 3.45 : 2.85),
+      ta: v3(shotIndex === 3 ? -0.38 : 0, shotIndex === 3 ? -0.22 : 0.16, 0.1),
+      fov: 1.92,
+      bgTop: shotIndex === 1 ? [100, 116, 139] : [186, 230, 253],
+      bgBot: shotIndex === 1 ? [148, 163, 184] : [241, 245, 249],
+      floorY: -0.86,
+      floorColor1: [203, 213, 225],
+      floorColor2: [178, 190, 206]
+    },
+    sceneFn: (p) => {
+      const av = evalAvatarSDF(p, {
+        pos: v3(shotIndex === 3 ? 0.65 : 0, 0, -0.05),
+        yaw: 0,
+        roll: fallRoll,
+        armLPitch: shotIndex >= 2 ? 0.45 : -0.85,
+        armRPitch: -0.85,
+        expression: "smile",
+        theme: "bacon"
+      });
+      // Kitchen table + Silver tray + Charred pitch-black blocky pizza
+      const dTable = sdRoundBox(sub3(p, v3(0, -0.44, 0.48)), v3(1.15, 0.06, 0.45), 0.02);
+      const dTray = sdRoundedCylinder(sub3(p, v3(0, -0.35, 0.45)), 0.28, 0.015, 0.02);
+      const dPizza = sdRoundedCylinder(sub3(p, v3(0, -0.32, 0.45)), 0.23, 0.02, 0.032);
+      let best = av;
+      if (dTable < best.d) best = { d: dTable, color: [226, 232, 240], roughness: 0.32, id: 60 };
+      if (dTray < best.d) best = { d: dTray, color: [148, 163, 184], roughness: 0.18, id: 61 };
+      if (dPizza < best.d) best = { d: dPizza, color: [28, 25, 23], roughness: 0.65, id: 62 };
+      return best;
+    }
+  };
+}
+
+export function renderRawPanelSet(tmpDir, force = false, shardIdx = 0, shardCount = 1, onlyPrefixes = null) {
   fs.mkdirSync(tmpDir, { recursive: true });
+  let taskCounter = 0;
   const writePng = (name, w, h, computeFn) => {
+    if (onlyPrefixes && !onlyPrefixes.some((p) => name.startsWith(p + "_"))) return;
+    const myTask = taskCounter++;
+    if (myTask % shardCount !== shardIdx) return;
     const outPath = path.join(tmpDir, name);
     if (!force && fs.existsSync(outPath) && fs.statSync(outPath).size > 1000) return;
     const buf = computeFn();
     fs.writeFileSync(outPath, encodePNG(w, h, buf));
   };
 
-  // 1. 3-View Turnaround panels (420x520 each)
+  const studioCam = {
+    ro: v3(0, 0.22, 2.75),
+    ta: v3(0, 0.04, 0),
+    fov: 1.95,
+    bgTop: [219, 234, 254],
+    bgBot: [241, 245, 249],
+    floorY: -0.86,
+    floorColor1: [162, 174, 192],
+    floorColor2: [144, 158, 178]
+  };
+
   const turnAngles = [
     ["turn_front.png", 0.0, true],
     ["turn_3q.png", 0.68, true],
@@ -959,18 +1184,17 @@ export function renderRawPanelSet(tmpDir, force = false) {
       render3DViewport(
         420,
         520,
-        (p) => evalAvatarSDF(p, { yaw, hasMug: mug, theme: "momo", expression: "happy" }),
-        { ro: v3(0, 0.24, 3.05), ta: v3(0, 0.06, 0), fov: 1.9, floorY: -0.92 }
+        (p) => evalAvatarSDF(p, { yaw, hasMug: mug, theme: "theo", expression: "smile" }),
+        studioCam
       )
     );
   }
 
-  // 2. 4-Way Anti-Drift Comparison panels (320x420 each)
   const driftModes = [
     ["drift_1_fingers.png", "human-fingers", "shocked"],
     ["drift_2_lego.png", "lego-studs", "deadpan"],
     ["drift_3_voxel.png", "minecraft-voxel", "deadpan"],
-    ["drift_4_locked.png", "none", "happy"]
+    ["drift_4_locked.png", "none", "smile"]
   ];
   for (const [fname, dMode, expr] of driftModes) {
     writePng(fname, 320, 420, () =>
@@ -979,36 +1203,77 @@ export function renderRawPanelSet(tmpDir, force = false) {
         420,
         (p) =>
           evalAvatarSDF(p, {
-            yaw: 0.38,
-            headPitch: dMode === "lego-studs" ? 0.16 : 0,
-            armLPitch: -0.52,
-            armRPitch: -0.62,
+            yaw: 0.36,
+            headPitch: dMode === "lego-studs" ? 0.14 : 0,
+            armLPitch: -0.48,
+            armRPitch: -0.58,
             driftMode: dMode,
             expression: expr,
-            theme: "momo",
-            hasBeanie: dMode === "none"
+            theme: "theo"
           }),
-        { ro: v3(0, 0.30, 2.95), ta: v3(0, 0.10, 0), fov: 1.9, floorY: -0.92 }
+        { ...studioCam, ro: v3(0, 0.26, 2.68), ta: v3(0, 0.08, 0) }
       )
     );
   }
 
-  // 3. Keyframes & 24-frame animation loops for the 3 cases
+  // Classic Roblox Avatars Lineup (6 iconic characters, 260x340 each)
+  const classicAvatars = [
+    ["avatar_noob.png", "noob", "smile", false],
+    ["avatar_guest.png", "guest", "grin", false],
+    ["avatar_bacon.png", "bacon", "smile", false],
+    ["avatar_builderman.png", "builderman", "smirk", false],
+    ["avatar_obby.png", "obby", "grin", false],
+    ["avatar_theo.png", "theo", "smile", true]
+  ];
+  for (const [fname, thm, expr, mug] of classicAvatars) {
+    writePng(fname, 260, 340, () =>
+      render3DViewport(
+        260,
+        340,
+        (p) => evalAvatarSDF(p, { yaw: 0.32, armLPitch: -0.22, armRPitch: -0.42, theme: thm, expression: expr, hasMug: mug }),
+        { ...studioCam, ro: v3(0, 0.24, 2.72), ta: v3(0, 0.05, 0) }
+      )
+    );
+  }
+
+  // Classic Roblox Face Decal Atlas (8 iconic expressions close-up on Bright Yellow head, 220x220 each)
+  const classicFaces = [
+    ["face_smile.png", "smile"],
+    ["face_deadpan.png", "deadpan"],
+    ["face_smirk.png", "smirk"],
+    ["face_grin.png", "grin"],
+    ["face_shocked.png", "shocked"],
+    ["face_tears.png", "tears"],
+    ["face_angry.png", "angry"],
+    ["face_dizzy.png", "dizzy"]
+  ];
+  for (const [fname, expr] of classicFaces) {
+    writePng(fname, 220, 220, () =>
+      render3DViewport(
+        220,
+        220,
+        (p) => evalAvatarSDF(p, { yaw: 0.12, theme: "noob", expression: expr }),
+        { ...studioCam, ro: v3(0, 0.76, 1.28), ta: v3(0, 0.74, 0), floorY: null }
+      )
+    );
+  }
+
   const suites = [
     ["alarm", buildAlarmMeltdownScene],
     ["obby", buildObbySkyScene],
-    ["duo", buildDuoComedyScene]
+    ["duo", buildDuoComedyScene],
+    ["cafe", buildCozyCafeScene],
+    ["runway", buildRunwayDropScene],
+    ["pizza", buildBurntPizzaScene]
   ];
 
   for (const [prefix, builder] of suites) {
-    // 4 high-res 9:16 keyframes (360x640)
     for (let s = 0; s < 4; s++) {
       writePng(`${prefix}_shot_${s}.png`, 360, 640, () => {
         const { cam, sceneFn } = builder(s, 0.55);
         return render3DViewport(360, 640, sceneFn, cam);
       });
     }
-    // 24 animation frames (6 frames per shot, 270x480)
     let frameIdx = 0;
     for (let s = 0; s < 4; s++) {
       for (let f = 0; f < 6; f++) {
@@ -1028,7 +1293,10 @@ export function buildBoardsManifest(rawDir) {
   const alarmDir = path.join(ROOT, "examples", "monday-alarm-meltdown", "assets");
   const obbyDir = path.join(ROOT, "examples", "obby-sky-run", "assets");
   const duoDir = path.join(ROOT, "examples", "duo-bestie-contrast", "assets");
-  for (const d of [showcaseDir, alarmDir, obbyDir, duoDir]) {
+  const cafeDir = path.join(ROOT, "examples", "cozy-cafe-tycoon", "assets");
+  const runwayDir = path.join(ROOT, "examples", "runway-outfit-drop", "assets");
+  const pizzaDir = path.join(ROOT, "examples", "burnt-pizza-slapstick", "assets");
+  for (const d of [showcaseDir, alarmDir, obbyDir, duoDir, cafeDir, runwayDir, pizzaDir]) {
     fs.mkdirSync(d, { recursive: true });
   }
 
@@ -1036,249 +1304,170 @@ export function buildBoardsManifest(rawDir) {
     rootDir: ROOT,
     rawDir,
     turnaround: {
-      title: "Authentic Roblox R6/Blocky 3-View Turnaround Sheet · 角色三视图设定卡 (@Momo)",
-      subtitle:
-        "Canonical 2x2x1 Torso + Flush 1x2x1 Solid Block Limbs + 1:1 Barrel Head + 3D UGC Hair & Headphones + Roblox Studs Baseplate",
-      outPaths: [
+      outZh: path.join(showcaseDir, "momo_turnaround_sheet.zh.png"),
+      outEn: path.join(showcaseDir, "momo_turnaround_sheet.en.png"),
+      outDefault: [
         path.join(showcaseDir, "momo_turnaround_sheet.png"),
         path.join(alarmDir, "momo_turnaround_sheet.png")
       ],
       views: [
-        {
-          file: "turn_front.png",
-          label: "01 · FRONT VIEW (0° 正面视图)",
-          note: "2x2x1宽扁躯干 + 并拢齐平1x2x1方柱双腿 + 3D刘海短发与耳机"
-        },
-        {
-          file: "turn_3q.png",
-          label: "02 · 3/4 VIEW (45° 斜侧视图)",
-          note: "1x2x1实心平头方块手(无手指/无乐高C爪) + 琥珀咖啡杯 + Studs底板"
-        },
-        {
-          file: "turn_side.png",
-          label: "03 · SIDE PROFILE (90° 正侧视图)",
-          note: "1:1经典上下圆角桶状圆柱头 + 侧脸零3D鼻子凸起 + 方盒背包"
-        }
-      ],
-      swatches: [
-        { label: "Cool yellow #FDEA8D", r: 253, g: 234, b: 141 },
-        { label: "Mint #86EFAC Torso", r: 110, g: 231, b: 183 },
-        { label: "Dark grey #475569 Legs", r: 71, g: 85, b: 105 },
-        { label: "Bright red #F43F5E Tie", r: 244, g: 63, b: 94 },
-        { label: "Cyan #38BDF8 Backpack", r: 56, g: 189, b: 248 }
+        { file: "turn_front.png", labelZh: "正面 0°", labelEn: "Front 0°" },
+        { file: "turn_3q.png", labelZh: "斜侧 45°", labelEn: "3/4 View 45°" },
+        { file: "turn_side.png", labelZh: "侧面 90°", labelEn: "Profile 90°" }
       ]
     },
     drift: {
-      title: "Anti-Drift Geometry Gates · 普通提示词三大翻车重灾区 vs. 纯正 Roblox 几何锁定",
-      subtitle: "Diagnosed & repaired automatically via: node scripts/drift_check.mjs --engine kling --mode i2v",
-      outPath: path.join(showcaseDir, "drift_rescue_comparison.png"),
+      outZh: path.join(showcaseDir, "drift_rescue_comparison.zh.png"),
+      outEn: path.join(showcaseDir, "drift_rescue_comparison.en.png"),
+      outDefault: path.join(showcaseDir, "drift_rescue_comparison.png"),
       panels: [
-        {
-          file: "drift_1_fingers.png",
-          status: "FAIL · 人类化变异",
-          title: "长出真人五指与3D高鼻梁",
-          desc: "未锁 solid 1x2x1 block hands 与 flat 2D decal face",
-          r: 244,
-          g: 63,
-          b: 94
-        },
-        {
-          file: "drift_2_lego.png",
-          status: "FAIL · 乐高串味",
-          title: "头顶圆颗粒 + 乐高C型钩爪",
-          desc: "误用 C-shaped claws 变成乐高小人而非 Roblox 实心方手",
-          r: 245,
-          g: 158,
-          b: 11
-        },
-        {
-          file: "drift_3_voxel.png",
-          status: "FAIL · MC像素串味",
-          title: "锋利直角立方头与像素块",
-          desc: "未锁 1:1 barrel-cylinder head 与 SmoothPlastic",
-          r: 168,
-          g: 85,
-          b: 247
-        },
-        {
-          file: "drift_4_locked.png",
-          status: "PASS · 纯正 Roblox",
-          title: "2x2x1躯干 + 齐平1x2x1实心四肢",
-          desc: "1:1桶状圆角头 + 3D UGC发型耳机 + 实心平头方块手",
-          r: 16,
-          g: 185,
-          b: 129
-        }
+        { file: "drift_1_fingers.png", labelZh: "× 真人手指 / 鼻子", labelEn: "× Human Fingers / Nose", r: 225, g: 29, b: 72 },
+        { file: "drift_2_lego.png", labelZh: "× 乐高圆粒 / C型爪", labelEn: "× Lego Studs / C-Claw", r: 217, g: 119, b: 6 },
+        { file: "drift_3_voxel.png", labelZh: "× MC 直角像素块", labelEn: "× Voxel Cube Head", r: 124, g: 58, b: 237 },
+        { file: "drift_4_locked.png", labelZh: "✓ 标准 Roblox R6", labelEn: "✓ Roblox R6 Blocky", r: 5, g: 150, b: 105 }
+      ]
+    },
+    classicAssetSheet: {
+      avatarsOutZh: path.join(showcaseDir, "classic_avatars_lineup.zh.png"),
+      avatarsOutEn: path.join(showcaseDir, "classic_avatars_lineup.en.png"),
+      avatarsOutDefault: path.join(showcaseDir, "classic_avatars_lineup.png"),
+      facesOutZh: path.join(showcaseDir, "classic_faces_atlas.zh.png"),
+      facesOutEn: path.join(showcaseDir, "classic_faces_atlas.en.png"),
+      facesOutDefault: path.join(showcaseDir, "classic_faces_atlas.png"),
+      avatars: [
+        { file: "avatar_noob.png", labelZh: "Classic Noob · 经典新手", labelEn: "Classic Noob (2006)" },
+        { file: "avatar_guest.png", labelZh: "Classic Guest · 经典游客", labelEn: "Classic Guest (2008)" },
+        { file: "avatar_bacon.png", labelZh: "Bacon Hair · 培根头", labelEn: "Bacon Hair (2014)" },
+        { file: "avatar_builderman.png", labelZh: "Builderman · 安全帽", labelEn: "Builder's Club Hat" },
+        { file: "avatar_obby.png", labelZh: "Speedrunner · 加速弹簧", labelEn: "Obby + Speed Coil" },
+        { file: "avatar_theo.png", labelZh: "Story Hero · 连帽卫衣", labelEn: "Storytime Hoodie" }
+      ],
+      faces: [
+        { file: "face_smile.png", labelZh: "Default Smile · 默认笑脸", labelEn: "Default Smile :)" },
+        { file: "face_deadpan.png", labelZh: "Chill · 死鱼眼", labelEn: "Chill -_-" },
+        { file: "face_smirk.png", labelZh: "Check It · 挑眉坏笑", labelEn: "Check It Smirk" },
+        { file: "face_grin.png", labelZh: "Winning Grin · 露齿笑", labelEn: "Winning Grin :D" },
+        { file: "face_shocked.png", labelZh: "Shocked · 震惊大眼", labelEn: "Shocked O_O" },
+        { file: "face_tears.png", labelZh: "Crying · 瀑布流泪", labelEn: "Waterfall Tears" },
+        { file: "face_angry.png", labelZh: "Bloxxer · 愤怒皱眉", labelEn: "Angry Bloxxer" },
+        { file: "face_dizzy.png", labelZh: "KO Dizzy · 眩晕击败", labelEn: "KO Dizzy X_X" }
       ]
     },
     cases: [
       {
         prefix: "alarm",
-        title: "Case 01 · 周一早八闹钟破防记 (Monday 8 AM Alarm Meltdown · Kling 9:16 I2V)",
-        subtitle:
-          "Compiled via: node scripts/shot_compiler.mjs --template daily-meltdown --duration 15 --engine kling --rig chibi-blocky",
-        sheetPath: path.join(alarmDir, "storyboard_contact_sheet.png"),
+        sheetZh: path.join(alarmDir, "storyboard_contact_sheet.zh.png"),
+        sheetEn: path.join(alarmDir, "storyboard_contact_sheet.en.png"),
+        sheetDefault: path.join(alarmDir, "storyboard_contact_sheet.png"),
         gifPath: path.join(alarmDir, "monday_alarm_meltdown.gif"),
         mp4Path: path.join(alarmDir, "monday_alarm_meltdown.mp4"),
         shots: [
           {
-            badge: "SHOT 01 · 0.0s-3.8s",
-            role: "Hook · 黄金前3秒",
-            camera: "[Kling I2V] Extreme Close-Up Push-In",
-            action: "1:1桶状圆柱脑袋从剧烈震动的红色方块闹钟后猛地探出，头顶弹出Roblox聊天气泡",
-            caption: "早八人的痛，谁懂？",
-            chatBubble: "7:59 AM?!",
-            displayName: "@Momo",
-            bubbleX: 185,
-            bubbleY: 56,
+            labelZh: "01 · 闹钟惊醒 (0–3.5s)",
+            labelEn: "01 · 7:59 AM Hook (0–3.5s)",
+            chatZh: "7:59?!",
+            chatEn: "7:59?!",
+            bubbleX: 182,
+            bubbleY: 36,
             savePath: path.join(alarmDir, "shot_01_hook.png")
           },
           {
-            badge: "SHOT 02 · 3.8s-7.5s",
-            role: "Escalation 1 · 动作推进",
-            camera: "[Kling I2V] 50mm f/2.8 Side Macro",
-            action: "右侧1x2x1实心平头方柱手臂沿肩部Motor6D转轴挥落，一巴掌拍扁红色闹钟",
-            caption: "再睡五分钟…就五分钟",
-            chatBubble: "5 more mins...",
-            displayName: "@Momo",
+            labelZh: "02 · 拍停闹钟 (3.5–7.5s)",
+            labelEn: "02 · Snooze Slam (3.5–7.5s)",
+            chatZh: "再睡5分钟",
+            chatEn: "5 more mins",
             bubbleX: 180,
-            bubbleY: 58,
+            bubbleY: 38,
             savePath: path.join(alarmDir, "shot_02_slam.png")
           },
           {
-            badge: "SHOT 03 · 7.5s-11.3s",
-            role: "Escalation 2 · 情绪升级",
-            camera: "[Kling I2V] OTS Arc to Front Close-Up",
-            action: "僵硬坐在发光微缩电脑前，双颊浮现蓝色2D瀑布流泪贴图条",
-            caption: "打开电脑：99+ 未读消息",
-            chatBubble: "99+ pings?!",
-            displayName: "@Momo",
+            labelZh: "03 · 消息刷屏 (7.5–11.5s)",
+            labelEn: "03 · 99+ Pings (7.5–11.5s)",
+            chatZh: "99+ 未读?!",
+            chatEn: "99+ pings?!",
             bubbleX: 165,
-            bubbleY: 48,
+            bubbleY: 36,
             savePath: path.join(alarmDir, "shot_03_tears.png")
           },
           {
-            badge: "SHOT 04 · 11.3s-15.0s",
-            role: "Payoff & Loop · 反转收尾",
-            camera: "[Kling I2V] 45° Isometric Lock-Off",
-            action: "2x2x1长方体躯干沿腰部转轴前倾90度，脑袋啪地平拍在键盘上触发Oof!",
-            caption: "已老实，申请重启人生",
-            chatBubble: "oof.",
-            displayName: "@Momo [HP 1/100]",
-            bubbleX: 145,
-            bubbleY: 118,
+            labelZh: "04 · 扑倒键盘 (11.5–15s)",
+            labelEn: "04 · Faceplant Loop (11.5–15s)",
+            chatZh: "oof.",
+            chatEn: "oof.",
+            bubbleX: 152,
+            bubbleY: 88,
             savePath: path.join(alarmDir, "shot_04_faceplant.png")
           }
         ]
       },
       {
         prefix: "obby",
-        title: "Case 02 · 多巴胺天空跑酷闯关剧场 (Pastel Sky Obby Speedrun · Hailuo Director 9:16)",
-        subtitle:
-          "Compiled via: node scripts/shot_compiler.mjs --template obby-storytime --duration 15 --engine hailuo --rig r6",
-        sheetPath: path.join(obbyDir, "obby_storyboard_sheet.png"),
+        sheetZh: path.join(obbyDir, "obby_storyboard_sheet.zh.png"),
+        sheetEn: path.join(obbyDir, "obby_storyboard_sheet.en.png"),
+        sheetDefault: path.join(obbyDir, "obby_storyboard_sheet.png"),
         gifPath: path.join(obbyDir, "obby_sky_run.gif"),
         mp4Path: path.join(obbyDir, "obby_sky_run.mp4"),
         shots: [
-          {
-            badge: "SHOT 01 · 0.0s-3.8s",
-            role: "Hook · 高空起跳",
-            camera: "[Push in, Tilt up] 3rd-Person Follow",
-            action: "戴红遮阳帽与右臂红色加速弹簧(Speed Coil)的R6小人跃过马卡龙粉Studs跳台",
-            caption: "千万别往脚下看！",
-            chatBubble: "Speed Coil ON!",
-            displayName: "@SkyHop",
-            bubbleX: 155,
-            bubbleY: 58
-          },
-          {
-            badge: "SHOT 02 · 3.8s-7.5s",
-            role: "Escalation 1 · 连续闯关",
-            camera: "[Pan right] Side Tracking Shot",
-            action: "保持膝盖笔直的R6并拢1x2x1方腿姿态，在薄荷绿浮空跳台上连续干脆跳步",
-            caption: "这波操作打几分？",
-            chatBubble: "ez jumps",
-            displayName: "@SkyHop",
-            bubbleX: 160,
-            bubbleY: 62
-          },
-          {
-            badge: "SHOT 03 · 7.5s-11.3s",
-            role: "Escalation 2 · 岩浆块急停",
-            camera: "[Tilt down] High-Angle Abyss View",
-            action: "前方出现发光红色Neon死亡激光条(Killbrick)，小人急停挥动实心方臂维持平衡",
-            caption: "差点踩中红色激光块",
-            chatBubble: "WAIT KILLBRICK!",
-            displayName: "@SkyHop",
-            bubbleX: 162,
-            bubbleY: 64
-          },
-          {
-            badge: "SHOT 04 · 11.3s-15.0s",
-            role: "Payoff & Loop · 存档通关",
-            camera: "[Push in] Seamless Loop Return",
-            action: "稳稳降落蓝色存档点(Checkpoint)平台，姿态与首镜完全重合实现无缝循环",
-            caption: "丝滑通关，再来亿遍",
-            chatBubble: "Stage Cleared!",
-            displayName: "@SkyHop",
-            bubbleX: 162,
-            bubbleY: 60
-          }
+          { labelZh: "01 · 加速弹簧起跳", labelEn: "01 · Speed Coil Jump", chatZh: "加速起飞!", chatEn: "Speed Coil!", bubbleX: 155, bubbleY: 36 },
+          { labelZh: "02 · 连续方格跳台", labelEn: "02 · Rhythm Hops", chatZh: "稳住!", chatEn: "ez jumps", bubbleX: 160, bubbleY: 38 },
+          { labelZh: "03 · 激光块前急停", labelEn: "03 · Killbrick Stop", chatZh: "红砖别踩!", chatEn: "KILLBRICK!", bubbleX: 162, bubbleY: 38 },
+          { labelZh: "04 · 存档点无缝循环", labelEn: "04 · Checkpoint Loop", chatZh: "通关 GG!", chatEn: "GG!", bubbleX: 162, bubbleY: 36 }
         ]
       },
       {
         prefix: "duo",
-        title: "Case 03 · 精修潮人 vs 呆萌黄皮新手 (Y2K UGC vs Classic Noob · Seedance/即梦 9:16)",
-        subtitle:
-          "Compiled via: node scripts/shot_compiler.mjs --template duo-comedy --duration 15 --engine seedance --rig r15",
-        sheetPath: path.join(duoDir, "duo_storyboard_sheet.png"),
+        sheetZh: path.join(duoDir, "duo_storyboard_sheet.zh.png"),
+        sheetEn: path.join(duoDir, "duo_storyboard_sheet.en.png"),
+        sheetDefault: path.join(duoDir, "duo_storyboard_sheet.png"),
         gifPath: path.join(duoDir, "duo_bestie_contrast.gif"),
         mp4Path: path.join(duoDir, "duo_bestie_contrast.mp4"),
         shots: [
-          {
-            badge: "SHOT 01 · 0.0s-3.8s",
-            role: "Hook · 双人同框反差",
-            camera: "[Seedance I2V] Fast Snap-Zoom 2-Shot",
-            action: "左侧Y2K粉发潮人端咖啡摆造型，右侧经典黄头蓝衣绿腿R6新手如木板般笔直僵立",
-            caption: "出门逛街：精修闺蜜 vs 我",
-            chatBubble: "slay!!",
-            displayName: "@Nova_Y2K & @Noob_06",
-            bubbleX: 92,
-            bubbleY: 52
-          },
-          {
-            badge: "SHOT 02 · 3.8s-7.5s",
-            role: "Escalation 1 · 转身误伤",
-            camera: "[Seedance I2V] Low-Angle Tracking",
-            action: "左侧潮人原地华丽转身180度，背后紫色方盒背包不小心撞到右侧黄皮新手",
-            caption: "试图配合演出的我",
-            chatBubble: "watch out!",
-            displayName: "@Nova_Y2K & @Noob_06",
-            bubbleX: 98,
-            bubbleY: 62
-          },
-          {
-            badge: "SHOT 03 · 7.5s-11.3s",
-            role: "Escalation 2 · 刚体倒地",
-            camera: "[Seedance I2V] Static Tripod + Shake",
-            action: "右侧经典R6新手不弯膝盖不弯手肘，全身呈刚体直挺挺向侧方倾倒，头顶冒出oof",
-            caption: "物理引擎：直接罢工",
-            chatBubble: "oof",
-            displayName: "@Noob_06",
-            bubbleX: 215,
-            bubbleY: 78
-          },
-          {
-            badge: "SHOT 04 · 11.3s-15.0s",
-            role: "Payoff & Loop · 同步盯镜头",
-            camera: "[Seedance I2V] Slow Dolly Pull-Out",
-            action: "两个小人身体静止，仅1:1圆角桶状脑袋同步转正切换为沉默死鱼眼(-_-)贴图",
-            caption: "确认过眼神，是亲闺蜜",
-            chatBubble: "bruh...",
-            displayName: "@Nova_Y2K & @Noob_06",
-            bubbleX: 160,
-            bubbleY: 64
-          }
+          { labelZh: "01 · 潮人闺蜜 vs 新手", labelEn: "01 · Y2K vs. Classic Noob", chatZh: "看镜头!", chatEn: "pose!", bubbleX: 98, bubbleY: 38 },
+          { labelZh: "02 · 转身误撞新手", labelEn: "02 · 180° Spin Bump", chatZh: "哎呀!", chatEn: "oops!", bubbleX: 102, bubbleY: 38 },
+          { labelZh: "03 · R6 刚体直挺侧倒", labelEn: "03 · Rigid Plank Tilt", chatZh: "oof", chatEn: "oof", bubbleX: 215, bubbleY: 56 },
+          { labelZh: "04 · 同步死鱼眼盯镜", labelEn: "04 · Deadpan Stare", chatZh: "...", chatEn: "bruh...", bubbleX: 160, bubbleY: 40 }
+        ]
+      },
+      {
+        prefix: "cafe",
+        sheetZh: path.join(cafeDir, "cafe_storyboard_sheet.zh.png"),
+        sheetEn: path.join(cafeDir, "cafe_storyboard_sheet.en.png"),
+        sheetDefault: path.join(cafeDir, "cafe_storyboard_sheet.png"),
+        gifPath: path.join(cafeDir, "cozy_cafe_tycoon.gif"),
+        mp4Path: path.join(cafeDir, "cozy_cafe_tycoon.mp4"),
+        shots: [
+          { labelZh: "01 · 甜点柜台登场", labelEn: "01 · Counter Pop-Up", chatZh: "欢迎光临!", chatEn: "Fresh croissants!", bubbleX: 160, bubbleY: 36 },
+          { labelZh: "02 · 羊角包摆盘", labelEn: "02 · Croissant Snap", chatZh: "刚出炉!", chatEn: "Hot & crispy", bubbleX: 160, bubbleY: 38 },
+          { labelZh: "03 · 递出热拿铁", labelEn: "03 · Latte Slide", chatZh: "您的拿铁!", chatEn: "One latte!", bubbleX: 160, bubbleY: 38 },
+          { labelZh: "04 · 金币弹出循环", labelEn: "04 · +999 Coins Loop", chatZh: "+999 金币!", chatEn: "+999 Coins!", bubbleX: 160, bubbleY: 36 }
+        ]
+      },
+      {
+        prefix: "runway",
+        sheetZh: path.join(runwayDir, "runway_storyboard_sheet.zh.png"),
+        sheetEn: path.join(runwayDir, "runway_storyboard_sheet.en.png"),
+        sheetDefault: path.join(runwayDir, "runway_storyboard_sheet.png"),
+        gifPath: path.join(runwayDir, "runway_outfit_drop.gif"),
+        mp4Path: path.join(runwayDir, "runway_outfit_drop.mp4"),
+        shots: [
+          { labelZh: "01 · 灰模初始状态", labelEn: "01 · Plain Base Avatar", chatZh: "还没穿搭...", chatEn: "0 stars...", bubbleX: 160, bubbleY: 38 },
+          { labelZh: "02 · 蓄力旋转起跳", labelEn: "02 · Beat-Drop Spin", chatZh: "3, 2, 1!", chatEn: "Wait for it!", bubbleX: 160, bubbleY: 34 },
+          { labelZh: "03 · 重音落地换装", labelEn: "03 · Y2K Crown Reveal", chatZh: "全套换装!", chatEn: "5 Stars!!", bubbleX: 160, bubbleY: 38 },
+          { labelZh: "04 · T台定格循环", labelEn: "04 · Runway Pose", chatZh: "拿下全场!", chatEn: "Top Model!", bubbleX: 160, bubbleY: 38 }
+        ]
+      },
+      {
+        prefix: "pizza",
+        sheetZh: path.join(pizzaDir, "pizza_storyboard_sheet.zh.png"),
+        sheetEn: path.join(pizzaDir, "pizza_storyboard_sheet.en.png"),
+        sheetDefault: path.join(pizzaDir, "pizza_storyboard_sheet.png"),
+        gifPath: path.join(pizzaDir, "burnt_pizza_slapstick.gif"),
+        mp4Path: path.join(pizzaDir, "burnt_pizza_slapstick.mp4"),
+        shots: [
+          { labelZh: "01 · 端出焦黑披萨", labelEn: "01 · Burnt Black Pizza", chatZh: "我烤好了!", chatEn: "Dinner is ready!", bubbleX: 160, bubbleY: 38 },
+          { labelZh: "02 · 顶光呆滞微笑", labelEn: "02 · Deadpan Spotlight", chatZh: ":)", chatEn: ":)", bubbleX: 160, bubbleY: 38 },
+          { labelZh: "03 · 方柱手臂脱落", labelEn: "03 · Arm Detaches", chatZh: "胳膊掉了?", chatEn: "my arm...", bubbleX: 160, bubbleY: 38 },
+          { labelZh: "04 · 90°刚体拍地", labelEn: "04 · 90° Statue Flop", chatZh: "oof.", chatEn: "oof.", bubbleX: 160, bubbleY: 76 }
         ]
       }
     ]
@@ -1288,10 +1477,7 @@ export function buildBoardsManifest(rawDir) {
 const isMain = process.argv[1] && process.argv[1].endsWith("render_preview.mjs");
 if (isMain) {
   if (process.argv.includes("--help") || process.argv.includes("-h")) {
-    console.log(`Usage: node scripts/render_preview.mjs [--raw-dir <dir>] [--force]
-
-Render procedural 3D SDF Roblox-style character turnaround sheets, anti-drift comparison cards,
-9:16 storyboard contact sheets, and animated GIF/MP4 previews.`);
+    console.log(`Usage: node scripts/render_preview.mjs [--raw-dir <dir>] [--force]`);
     process.exit(0);
   }
   const rawIdx = process.argv.indexOf("--raw-dir");
@@ -1301,8 +1487,31 @@ Render procedural 3D SDF Roblox-style character turnaround sheets, anti-drift co
       : path.join(ROOT, "tmp", "raw_3d");
   const force = process.argv.includes("--force");
 
-  renderRawPanelSet(rawDir, force);
-  console.log(`Rendered raw 3D panel set into ${rawDir}`);
+  const onlyIdx = process.argv.indexOf("--only");
+  const onlyPrefixes = onlyIdx !== -1 && process.argv[onlyIdx + 1] ? process.argv[onlyIdx + 1].split(",") : null;
+
+  const shardArgIdx = process.argv.indexOf("--shard");
+  if (shardArgIdx !== -1 && process.argv[shardArgIdx + 1]) {
+    const [sIdx, sTotal] = process.argv[shardArgIdx + 1].split("/").map(Number);
+    renderRawPanelSet(rawDir, force, sIdx, sTotal, onlyPrefixes);
+    process.exit(0);
+  }
+
+  // Spawn 6 parallel shard workers to render all 3D panels rapidly
+  fs.mkdirSync(rawDir, { recursive: true });
+  const workers = 6;
+  await Promise.all(
+    Array.from({ length: workers }, (_, i) => {
+      return new Promise((resolve, reject) => {
+        const args = [process.argv[1], "--raw-dir", rawDir, "--shard", `${i}/${workers}`];
+        if (force) args.push("--force");
+        if (onlyPrefixes) args.push("--only", onlyPrefixes.join(","));
+        const child = spawn(process.execPath, args, { stdio: "inherit" });
+        child.on("exit", (code) => (code === 0 ? resolve() : reject(new Error(`Shard ${i} exited ${code}`))));
+      });
+    })
+  );
+  console.log(`Rendered raw 3D panel set into ${rawDir} using ${workers} parallel workers`);
 
   if (process.platform === "win32") {
     const manifestPath = path.join(ROOT, "tmp", "boards_manifest.json");

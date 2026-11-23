@@ -1,16 +1,18 @@
 {
   "$schema": "https://json.schemastore.org/claude-code-marketplace.json",
-  "name": "roblox-shorts-skill",
+  "name": "roblox-style-skill",
   "owner": {
     "name": "yuzhang-zhong",
     "url": "https://github.com/yuzhang-zhong"
   },
-  "description": "Install Roblox Shorts Skill as a Claude plugin.",
+  "description": "Install Roblox Style Skill as a Claude plugin.",
   "plugins": [
     {
-      "name": "roblox-shorts-skill",
+      "name": "roblox-style-skill",
       "source": "./",
-      "description": "Plan, prompt, render, and debug authentic Roblox-style blocky avatar AI short videos with canonical 2x2x1/1x2x1 stud geometry, viral 9:16 storyboards, model-tuned I2V/T2V prompts, and 3D preview rendering.",
+      "description": "Generate Roblox-style R6 and blocky avatar short videos with locked stud proportions, 9:16 storyboards, and model-specific prompts.",
+      "homepage": "https://github.com/yuzhang-zhong/roblox-style-skill",
+      "repository": "https://github.com/yuzhang-zhong/roblox-style-skill",
       "license": "MIT",
       "keywords": ["roblox", "ai-video", "short-video", "storyboard", "prompt-engineering"]
     }

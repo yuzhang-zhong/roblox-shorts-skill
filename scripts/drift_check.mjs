@@ -65,9 +65,18 @@ Options:
   --issue <code>     Optional observed failure code: human-fingers | lego-studs |
                      minecraft-voxels | face-morph | noodle-limbs | foot-sliding |
                      outfit-drift | overload
-  --lang <mode>      Output language: zh-en | zh | en (default: zh-en)
+  --lang <code>      Output language: en | zh | zh-tw | ja | ko | es | fr | de | pt | ru | zh-en (default: en)
   --json             Output structured JSON
   --help             Show this help message`);
+}
+
+const SUPPORTED_LANGS = new Set(["en", "zh", "zh-tw", "ja", "ko", "es", "fr", "de", "pt", "ru", "zh-en"]);
+
+export function normalizeLang(code = "en") {
+  const clean = String(code || "en").toLowerCase().trim();
+  if (clean === "zh-cn") return "zh";
+  if (clean === "pt-br") return "pt";
+  return SUPPORTED_LANGS.has(clean) ? clean : "en";
 }
 
 export function parseArgs(argv) {
@@ -76,7 +85,7 @@ export function parseArgs(argv) {
     engine: "kling",
     mode: "i2v",
     issue: "",
-    lang: "zh-en",
+    lang: "en",
     json: false,
     help: false
   };
@@ -89,7 +98,7 @@ export function parseArgs(argv) {
     else if (arg === "--engine" && argv[i + 1]) opts.engine = argv[++i].toLowerCase();
     else if (arg === "--mode" && argv[i + 1]) opts.mode = argv[++i].toLowerCase();
     else if (arg === "--issue" && argv[i + 1]) opts.issue = argv[++i].toLowerCase();
-    else if (arg === "--lang" && argv[i + 1]) opts.lang = argv[++i];
+    else if (arg === "--lang" && argv[i + 1]) opts.lang = normalizeLang(argv[++i]);
   }
   return opts;
 }
@@ -294,22 +303,24 @@ export function inspectPrompt(rawOpts = {}) {
   };
 }
 
-export function formatDriftCheckMarkdown(report, lang = "zh-en") {
+export function formatDriftCheckMarkdown(report, rawLang = "en") {
+  const lang = normalizeLang(rawLang);
+  const useZhText = lang === "zh" || lang === "zh-tw" || lang === "zh-en";
   const lines = [];
-  lines.push(`# Prompt Drift & Rescue Report / 提示词防串味体检报告: \`${report.overallStatus}\``);
+  lines.push(`# Prompt Drift & Rescue Report: \`${report.overallStatus}\` (\`lang: ${lang}\`)`);
   lines.push("");
-  lines.push(`- **Engine & Mode / 模型与路径**: \`${report.engine}\` · \`${report.mode.toUpperCase()}\``);
+  lines.push(`- **Engine & Mode**: \`${report.engine}\` · \`${report.mode.toUpperCase()}\``);
   if (report.issue) {
-    lines.push(`- **Targeted Issue / 指定救场项**: \`${report.issue}\` (${ISSUE_PATCHES[report.issue].titleZh})`);
+    lines.push(`- **Targeted Issue**: \`${report.issue}\` (${ISSUE_PATCHES[report.issue].titleZh})`);
   }
   if (report.originalPrompt) {
-    lines.push(`- **Input Prompt / 原始提示词**: \`${report.originalPrompt}\``);
+    lines.push(`- **Input Prompt**: \`${report.originalPrompt}\``);
   }
   lines.push("");
-  lines.push("| Gate / 检查项 | Status | Diagnosis & Fix / 诊断与修复建议 |");
+  lines.push("| Gate | Status | Diagnosis & Fix |");
   lines.push("| --- | :---: | --- |");
   for (const c of report.checks) {
-    const diag = lang === "en" ? c.reasonEn : lang === "zh" ? c.reasonZh : `${c.reasonZh} (${c.reasonEn})`;
+    const diag = lang === "zh" ? c.reasonZh : lang === "zh-en" || lang === "zh-tw" ? `${c.reasonZh} (${c.reasonEn})` : c.reasonEn;
     lines.push(`| ${c.gate} | **${c.status}** | ${diag} |`);
   }
   lines.push("");
@@ -323,7 +334,7 @@ export function formatDriftCheckMarkdown(report, lang = "zh-en") {
     lines.push("");
   }
 
-  if (lang !== "en") {
+  if (useZhText) {
     lines.push("## 救场重写提示词 (中文 · 已锁定几何防串味与单镜头单动作)");
     lines.push("");
     lines.push("```text");
@@ -332,7 +343,7 @@ export function formatDriftCheckMarkdown(report, lang = "zh-en") {
     lines.push("");
   }
 
-  lines.push("## Required Negative Prompt / 必配负向防漂移词");
+  lines.push("## Required Negative Prompt");
   lines.push("");
   lines.push("```text");
   lines.push(report.negativePrompt);
