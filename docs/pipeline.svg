@@ -1,0 +1,74 @@
+<svg width="960" height="220" viewBox="0 0 960 220" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="wf-title wf-desc">
+  <title id="wf-title">Roblox Shorts Skill 5-step workflow</title>
+  <desc id="wf-desc">Pipeline from Avatar DNA lock, 3-view turnaround sheet, 9:16 beat sheet, model-tuned I2V prompt compilation, to drift check and rescue.</desc>
+  <defs>
+    <linearGradient id="cardBg" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#1E293B"/>
+      <stop offset="100%" stop-color="#0F172A"/>
+    </linearGradient>
+  </defs>
+
+  <rect width="960" height="220" rx="20" fill="#0B1120"/>
+  <rect x="8" y="8" width="944" height="204" rx="16" stroke="#1E293B" stroke-width="2"/>
+
+  <!-- Step 1 -->
+  <rect x="24" y="34" width="164" height="152" rx="14" fill="url(#cardBg)" stroke="#F59E0B" stroke-width="2"/>
+  <rect x="38" y="48" width="52" height="24" rx="6" fill="#F59E0B" fill-opacity="0.18"/>
+  <text x="48" y="65" fill="#FBBF24" font-family="Segoe UI, Inter, sans-serif" font-size="13" font-weight="700">01 · DNA</text>
+  <text x="38" y="96" fill="#F8FAFC" font-family="Segoe UI, Inter, sans-serif" font-size="16" font-weight="700">捏人几何锁定</text>
+  <text x="38" y="118" fill="#94A3B8" font-family="Segoe UI, Inter, sans-serif" font-size="12">R6 / R15 / 盲盒比例</text>
+  <text x="38" y="138" fill="#94A3B8" font-family="Segoe UI, Inter, sans-serif" font-size="12">无手指C型手 · 2D贴图脸</text>
+  <text x="38" y="166" fill="#FDE68A" font-family="Consolas, monospace" font-size="11">avatar_spec.mjs</text>
+
+  <!-- Arrow 1->2 -->
+  <path d="M192 110H208" stroke="#64748B" stroke-width="2.5" stroke-linecap="round"/>
+  <path d="M203 105L210 110L203 115" stroke="#64748B" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+
+  <!-- Step 2 -->
+  <rect x="214" y="34" width="164" height="152" rx="14" fill="url(#cardBg)" stroke="#38BDF8" stroke-width="2"/>
+  <rect x="228" y="48" width="64" height="24" rx="6" fill="#38BDF8" fill-opacity="0.18"/>
+  <text x="238" y="65" fill="#38BDF8" font-family="Segoe UI, Inter, sans-serif" font-size="13" font-weight="700">02 · SHEET</text>
+  <text x="228" y="96" fill="#F8FAFC" font-family="Segoe UI, Inter, sans-serif" font-size="16" font-weight="700">首帧与三视图</text>
+  <text x="228" y="118" fill="#94A3B8" font-family="Segoe UI, Inter, sans-serif" font-size="12">正/侧/45°角色设定图</text>
+  <text x="228" y="138" fill="#94A3B8" font-family="Segoe UI, Inter, sans-serif" font-size="12">跨镜头保持衣服与材质</text>
+  <text x="228" y="166" fill="#BAE6FD" font-family="Consolas, monospace" font-size="11">I2V Anchors</text>
+
+  <!-- Arrow 2->3 -->
+  <path d="M382 110H398" stroke="#64748B" stroke-width="2.5" stroke-linecap="round"/>
+  <path d="M393 105L400 110L393 115" stroke="#64748B" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+
+  <!-- Step 3 -->
+  <rect x="404" y="34" width="164" height="152" rx="14" fill="url(#cardBg)" stroke="#A855F7" stroke-width="2"/>
+  <rect x="418" y="48" width="60" height="24" rx="6" fill="#A855F7" fill-opacity="0.18"/>
+  <text x="428" y="65" fill="#C084FC" font-family="Segoe UI, Inter, sans-serif" font-size="13" font-weight="700">03 · BEATS</text>
+  <text x="418" y="96" fill="#F8FAFC" font-family="Segoe UI, Inter, sans-serif" font-size="16" font-weight="700">9:16 黄金分镜</text>
+  <text x="418" y="118" fill="#94A3B8" font-family="Segoe UI, Inter, sans-serif" font-size="12">0-3s 钩子 · 单镜头单动作</text>
+  <text x="418" y="138" fill="#94A3B8" font-family="Segoe UI, Inter, sans-serif" font-size="12">15s/30s 反转与无缝循环</text>
+  <text x="418" y="166" fill="#E9D5FF" font-family="Consolas, monospace" font-size="11">shot_compiler.mjs</text>
+
+  <!-- Arrow 3->4 -->
+  <path d="M572 110H588" stroke="#64748B" stroke-width="2.5" stroke-linecap="round"/>
+  <path d="M583 105L590 110L583 115" stroke="#64748B" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+
+  <!-- Step 4 -->
+  <rect x="594" y="34" width="164" height="152" rx="14" fill="url(#cardBg)" stroke="#10B981" stroke-width="2"/>
+  <rect x="608" y="48" width="72" height="24" rx="6" fill="#10B981" fill-opacity="0.18"/>
+  <text x="618" y="65" fill="#34D399" font-family="Segoe UI, Inter, sans-serif" font-size="13" font-weight="700">04 · ENGINE</text>
+  <text x="608" y="96" fill="#F8FAFC" font-family="Segoe UI, Inter, sans-serif" font-size="16" font-weight="700">多模型提示词</text>
+  <text x="608" y="118" fill="#94A3B8" font-family="Segoe UI, Inter, sans-serif" font-size="12">可灵 / 即梦 / 海螺 / 万相</text>
+  <text x="608" y="138" fill="#94A3B8" font-family="Segoe UI, Inter, sans-serif" font-size="12">运镜指令 + 负向防漂移词</text>
+  <text x="608" y="166" fill="#A7F3D0" font-family="Consolas, monospace" font-size="11">Kling / Seedance / Wan</text>
+
+  <!-- Arrow 4->5 -->
+  <path d="M762 110H778" stroke="#64748B" stroke-width="2.5" stroke-linecap="round"/>
+  <path d="M773 105L780 110L773 115" stroke="#64748B" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+
+  <!-- Step 5 -->
+  <rect x="784" y="34" width="152" height="152" rx="14" fill="url(#cardBg)" stroke="#F43F5E" stroke-width="2"/>
+  <rect x="798" y="48" width="66" height="24" rx="6" fill="#F43F5E" fill-opacity="0.18"/>
+  <text x="808" y="65" fill="#FB7185" font-family="Segoe UI, Inter, sans-serif" font-size="13" font-weight="700">05 · RESCUE</text>
+  <text x="798" y="96" fill="#F8FAFC" font-family="Segoe UI, Inter, sans-serif" font-size="16" font-weight="700">防串味与救场</text>
+  <text x="798" y="118" fill="#94A3B8" font-family="Segoe UI, Inter, sans-serif" font-size="12">拦截长手指 / 乐高颗粒</text>
+  <text x="798" y="138" fill="#94A3B8" font-family="Segoe UI, Inter, sans-serif" font-size="12">修复滑步与关节软化</text>
+  <text x="798" y="166" fill="#FECDD3" font-family="Consolas, monospace" font-size="11">drift_check.mjs</text>
+</svg>

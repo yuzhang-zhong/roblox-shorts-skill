@@ -1,0 +1,7 @@
+interface:
+  display_name: "方块片场 / Roblox Shorts Skill"
+  short_description: "Roblox-style AI short video prompts & storyboards"
+  icon_small: "./assets/icon.svg"
+  icon_large: "./assets/icon.svg"
+  brand_color: "#E11D48"
+  default_prompt: "Use $roblox-shorts-skill to design a geometry-locked Roblox-style character, plan a 9:16 short-video storyboard, and compile anti-drift I2V/T2V prompts."

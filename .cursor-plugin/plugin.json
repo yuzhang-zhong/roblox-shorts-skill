@@ -1,0 +1,12 @@
+{
+  "name": "roblox-shorts-skill",
+  "description": "Plan, prompt, and debug Roblox-style blocky avatar AI short videos with locked character geometry, viral 9:16 storyboards, and model-tuned I2V/T2V prompts.",
+  "version": "1.0.0",
+  "author": {
+    "name": "yuzhang-zhong"
+  },
+  "homepage": "https://github.com/yuzhang-zhong/roblox-shorts-skill",
+  "repository": "https://github.com/yuzhang-zhong/roblox-shorts-skill",
+  "license": "MIT",
+  "keywords": ["roblox", "ai-video", "short-video", "storyboard", "prompt-engineering"]
+}

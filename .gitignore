@@ -1,0 +1,12 @@
+# OS & editor files
+.DS_Store
+Thumbs.db
+*.swp
+.idea/
+.vscode/
+
+# Node / temp artifacts
+node_modules/
+*.log
+tmp/
+.temp/
