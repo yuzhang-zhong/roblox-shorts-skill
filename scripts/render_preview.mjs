@@ -314,6 +314,21 @@ function getCastPreset(theme = "theo") {
       details: []
     };
   }
+  if (theme === "police") {
+    return {
+      skin: [252, 208, 162],
+      top: [30, 58, 138],
+      trim: [23, 37, 84],
+      accent: [250, 204, 21],
+      pants: [23, 37, 84],
+      shoes: [15, 23, 42],
+      sleeves: "long",
+      hairStyle: "bald",
+      hairColor: null,
+      hat: "cap_navy",
+      details: ["cuffs", "moon"]
+    };
+  }
   return {
     skin: [252, 208, 162],
     top: [56, 152, 242],
@@ -525,6 +540,11 @@ export function evalAvatarSDF(pWorld, cfg = {}) {
       const dBand = sdRoundedCylinder(sub3(pHeadLocal, v3(0, 0.19, 0)), 0.225, 0.02, 0.055);
       const dPuff = sdRoundedCylinder(sub3(pHeadLocal, v3(0, 0.30, 0)), 0.26, 0.075, 0.11);
       addPart(Math.min(dBand, dPuff), [255, 255, 255], 0.28, 5);
+    } else if (pal.hat === "cap_navy") {
+      const dDome = sdRoundedCylinder(sub3(pHeadLocal, v3(0, 0.16, 0)), 0.242, 0.055, 0.09);
+      const dBrim = sdRoundBox(rotX(sub3(pHeadLocal, v3(0, 0.10, 0.19)), 0.14), v3(0.18, 0.018, 0.12), 0.012);
+      addPart(dDome, [30, 58, 138], 0.32, 5);
+      addPart(dBrim, [15, 23, 42], 0.20, 5);
     }
   }
 
@@ -1150,6 +1170,276 @@ export function buildBurntPizzaScene(shotIndex, phase = 0.5) {
   };
 }
 
+export function buildTornadoTowerScene(shotIndex, phase = 0.5) {
+  const sway = shotIndex === 3 ? 0 : Math.sin(phase * Math.PI * 4) * 0.08;
+  const hopY = shotIndex === 2 ? Math.sin(phase * Math.PI) * 0.38 : 0;
+  return {
+    cam: {
+      ro: v3(shotIndex === 1 ? 0.65 : -0.35, 0.48, 2.95),
+      ta: v3(0, 0.12, 0),
+      fov: 1.9,
+      bgTop: shotIndex === 3 ? [56, 189, 248] : [71, 85, 105],
+      bgBot: shotIndex === 3 ? [224, 242, 254] : [148, 163, 184],
+      floorY: -1.25,
+      floorColor1: [74, 222, 128],
+      floorColor2: [34, 197, 94]
+    },
+    sceneFn: (p) => {
+      const av = evalAvatarSDF(p, {
+        pos: v3(sway, hopY + 0.05, 0),
+        yaw: shotIndex === 0 ? -0.35 : 0.15,
+        armLPitch: shotIndex === 3 ? -2.4 : -0.65,
+        armRPitch: shotIndex === 0 ? -1.45 : -0.85,
+        legLPitch: shotIndex === 2 ? -0.45 : 0,
+        legRPitch: shotIndex === 2 ? 0.45 : 0,
+        expression: shotIndex === 3 ? "grin" : shotIndex === 2 ? "tears" : "shocked",
+        theme: "guest"
+      });
+      // Green Disaster Survival Tower Platform + Yellow Railing + Background Spinning Tornado Funnel
+      const dTower = sdRoundBox(sub3(p, v3(sway * 0.5, -0.82, 0)), v3(0.68, 0.22, 0.62), 0.025);
+      const dRail = sdRoundBox(sub3(p, v3(sway * 0.5, -0.45, 0.52)), v3(0.62, 0.05, 0.05), 0.015);
+      let best = av;
+      if (dTower < best.d) best = { d: dTower, color: [34, 197, 94], roughness: 0.32, id: 70 };
+      if (shotIndex < 2 && dRail < best.d) best = { d: dRail, color: [250, 204, 21], roughness: 0.24, id: 71 };
+      if (shotIndex < 3) {
+        const funnelR = clamp(0.12 + (p.y + 0.9) * 0.24, 0.08, 0.58);
+        const pFunnel = sub3(p, v3(-0.95 + Math.sin(p.y * 5 + phase * 10) * 0.08, 0.25, -1.15));
+        const dTornado = sdRoundedCylinder(pFunnel, funnelR, 0.04, 1.35);
+        if (dTornado < best.d) best = { d: dTornado, color: [51, 65, 85], roughness: 0.6, id: 72 };
+      }
+      return best;
+    }
+  };
+}
+
+export function buildPoliceChaseScene(shotIndex, phase = 0.5) {
+  const runSwing = Math.sin(phase * Math.PI * 4) * 0.78;
+  const tripPitch = shotIndex === 2 ? smoothstep(0.1, 0.7, phase) * 1.15 : shotIndex === 3 ? 1.45 : 0;
+  const sirenFlash = Math.sin(phase * Math.PI * 6) > 0;
+  return {
+    cam: {
+      ro: v3(shotIndex === 1 ? 0.2 : 0, 0.34, 3.25),
+      ta: v3(0, 0.04, 0),
+      fov: 1.9,
+      bgTop: sirenFlash && shotIndex < 3 ? [96, 165, 250] : [147, 197, 253],
+      bgBot: [226, 232, 240],
+      floorY: -0.86,
+      floorColor1: [71, 85, 105],
+      floorColor2: [51, 65, 85]
+    },
+    sceneFn: (p) => {
+      // Right: Classic Noob fleeing with green cash block
+      const noob = evalAvatarSDF(p, {
+        pos: v3(0.46, shotIndex === 3 ? -0.35 : 0, 0.12),
+        yaw: shotIndex === 3 ? 0 : 0.45,
+        waistPitch: tripPitch,
+        armLPitch: shotIndex >= 2 ? -0.5 : runSwing,
+        armRPitch: -0.95,
+        legLPitch: shotIndex >= 2 ? 0 : -runSwing,
+        legRPitch: shotIndex >= 2 ? 0 : runSwing,
+        expression: shotIndex === 0 ? "smirk" : shotIndex === 3 ? "deadpan" : "shocked",
+        theme: "noob"
+      });
+      // Left: Police Officer chasing
+      const cop = evalAvatarSDF(p, {
+        pos: v3(-0.52, 0, -0.08),
+        yaw: 0.38,
+        armLPitch: shotIndex === 3 ? 0 : -runSwing,
+        armRPitch: shotIndex === 3 ? -0.4 : runSwing,
+        legLPitch: shotIndex === 3 ? 0 : runSwing,
+        legRPitch: shotIndex === 3 ? 0 : -runSwing,
+        expression: "angry",
+        theme: "police"
+      });
+      // Green cash bag block + Yellow fire hydrant in Shot 2
+      const cashY = shotIndex === 2 ? 0.55 + phase * 0.35 : 0.05;
+      const dCash = sdRoundBox(sub3(p, v3(0.66, cashY, 0.36)), v3(0.15, 0.12, 0.12), 0.025);
+      let best = noob.d < cop.d ? noob : cop;
+      if (shotIndex < 3 && dCash < best.d) best = { d: dCash, color: [34, 197, 94], roughness: 0.28, id: 80 };
+      if (shotIndex === 2) {
+        const dHydrant = sdRoundedCylinder(sub3(p, v3(0.82, -0.62, 0.25)), 0.11, 0.02, 0.22);
+        if (dHydrant < best.d) best = { d: dHydrant, color: [250, 204, 21], roughness: 0.22, id: 81 };
+      }
+      return best;
+    }
+  };
+}
+
+export function buildDoorsHallwayScene(shotIndex, phase = 0.5) {
+  const flickerDark = shotIndex === 1 && Math.sin(phase * Math.PI * 6) < 0;
+  return {
+    cam: {
+      ro: v3(0.15, 0.32, 2.72),
+      ta: v3(0, 0.12, 0),
+      fov: 1.92,
+      bgTop: flickerDark || shotIndex >= 2 ? [15, 23, 42] : [51, 38, 32],
+      bgBot: flickerDark || shotIndex >= 2 ? [30, 41, 59] : [92, 64, 51],
+      floorY: -0.86,
+      floorColor1: [120, 53, 15],
+      floorColor2: [96, 42, 12]
+    },
+    sceneFn: (p) => {
+      const av = evalAvatarSDF(p, {
+        pos: v3(shotIndex === 3 ? 0.32 : -0.12, 0, 0.08),
+        yaw: shotIndex === 3 ? 2.8 : -0.15,
+        headYaw: shotIndex === 2 ? -0.65 : 0,
+        armLPitch: -0.25,
+        armRPitch: -1.25,
+        expression: shotIndex >= 1 ? "shocked" : "deadpan",
+        theme: "theo"
+      });
+      // Wooden Door / Wardrobe in background + Glowing Flashlight Cylinder + Scary Eyes in Shot 2
+      const dDoor = sdRoundBox(sub3(p, v3(0.38, 0.05, -0.58)), v3(0.46, 0.88, 0.08), 0.02);
+      const dKnob = sdSphere(sub3(p, v3(0.68, 0.0, -0.48)), 0.05);
+      const dFlash = sdRoundedCylinder(rotX(sub3(p, v3(-0.62, 0.22, 0.42)), Math.PI / 2), 0.065, 0.01, 0.14);
+      let best = av;
+      if (dDoor < best.d) best = { d: dDoor, color: [120, 72, 42], roughness: 0.45, id: 90 };
+      if (dKnob < best.d) best = { d: dKnob, color: [250, 204, 21], roughness: 0.15, id: 91 };
+      if (shotIndex < 3 && dFlash < best.d) best = { d: dFlash, color: [253, 224, 71], roughness: 0.08, id: 92 };
+      if (shotIndex === 2) {
+        const dEyeL = sdSphere(sub3(p, v3(0.38, 0.62, -0.35)), 0.048);
+        const dEyeR = sdSphere(sub3(p, v3(0.58, 0.62, -0.35)), 0.048);
+        if (Math.min(dEyeL, dEyeR) < best.d) best = { d: Math.min(dEyeL, dEyeR), color: [255, 255, 255], roughness: 0.02, id: 93 };
+      }
+      return best;
+    }
+  };
+}
+
+export function buildSwordDuelScene(shotIndex, phase = 0.5) {
+  const jumpY = shotIndex === 1 ? Math.sin(phase * Math.PI) * 0.36 : 0;
+  const slashPitch = shotIndex === 1 ? -1.85 + Math.sin(phase * Math.PI * 2) * 0.55 : shotIndex === 3 ? -1.1 : -1.45;
+  return {
+    cam: {
+      ro: v3(0, 0.32, 3.25),
+      ta: v3(0, 0.08, 0),
+      fov: 1.9,
+      bgTop: [251, 146, 60],
+      bgBot: [254, 215, 170],
+      floorY: -0.96,
+      floorColor1: [239, 68, 68],
+      floorColor2: [249, 115, 22]
+    },
+    sceneFn: (p) => {
+      const leftX = shotIndex === 1 ? -0.34 : -0.56;
+      const rightX = shotIndex === 1 ? 0.34 : shotIndex === 2 ? 0.72 : 0.56;
+      const leftAv = evalAvatarSDF(p, {
+        pos: v3(leftX, jumpY, 0),
+        yaw: 0.65,
+        armRPitch: slashPitch,
+        expression: shotIndex === 3 ? "smile" : shotIndex === 1 ? "angry" : "smirk",
+        theme: "builderman",
+        hasMug: shotIndex === 3
+      });
+      const rightAv = evalAvatarSDF(p, {
+        pos: v3(rightX, jumpY, 0),
+        yaw: -0.65,
+        roll: shotIndex === 2 ? -0.18 : 0,
+        armLPitch: slashPitch,
+        expression: shotIndex === 2 ? "shocked" : shotIndex === 3 ? "smile" : "grin",
+        theme: "noob",
+        hasMug: shotIndex === 3
+      });
+      // Studded Stone Bridge Slab + Two Metallic Linked Swords
+      const dBridge = sdRoundBox(sub3(p, v3(0, -0.82, 0)), v3(1.15, 0.12, 0.52), 0.02);
+      let best = leftAv.d < rightAv.d ? leftAv : rightAv;
+      if (dBridge < best.d) best = { d: dBridge, color: [148, 163, 184], roughness: 0.38, id: 100 };
+      if (shotIndex < 3) {
+        const dBlade1 = sdRoundBox(rotZ(sub3(p, v3(leftX + 0.38, 0.35 + jumpY, 0.18)), -0.55), v3(0.03, 0.34, 0.015), 0.008);
+        const dBlade2 = sdRoundBox(rotZ(sub3(p, v3(rightX - 0.38, 0.35 + jumpY, 0.18)), 0.55), v3(0.03, 0.34, 0.015), 0.008);
+        const dSwords = Math.min(dBlade1, dBlade2);
+        if (dSwords < best.d) best = { d: dSwords, color: [226, 232, 240], roughness: 0.12, id: 101 };
+      }
+      return best;
+    }
+  };
+}
+
+export function buildExamPanicScene(shotIndex, phase = 0.5) {
+  const scribble = shotIndex === 2 ? Math.sin(phase * Math.PI * 8) * 0.25 : 0;
+  const slumpPitch = shotIndex === 3 ? -0.38 : 0.08;
+  return {
+    cam: {
+      ro: v3(shotIndex === 2 ? 0.65 : 0, 0.48, 2.55),
+      ta: v3(0, 0.18, 0.12),
+      fov: 1.92,
+      bgTop: [186, 230, 253],
+      bgBot: [254, 249, 195],
+      floorY: -0.86,
+      floorColor1: [203, 213, 225],
+      floorColor2: [186, 198, 214]
+    },
+    sceneFn: (p) => {
+      const av = evalAvatarSDF(p, {
+        pos: v3(0, -0.02, -0.08),
+        yaw: scribble * 0.3,
+        waistPitch: slumpPitch,
+        armLPitch: shotIndex === 1 ? -2.2 : shotIndex === 3 ? 0 : -0.85,
+        armRPitch: shotIndex === 1 ? -2.2 : shotIndex === 3 ? 0 : -0.85 + scribble,
+        expression: shotIndex === 0 ? "smile" : shotIndex === 1 ? "shocked" : shotIndex === 2 ? "angry" : "dizzy",
+        theme: "bacon"
+      });
+      const dDesk = sdRoundBox(sub3(p, v3(0, -0.40, 0.42)), v3(1.15, 0.055, 0.52), 0.02);
+      const dPaper = sdRoundBox(sub3(p, v3(0, -0.335, 0.40)), v3(0.26, 0.008, 0.32), 0.004);
+      const dClock = sdRoundedCylinder(rotX(sub3(p, v3(0.55, 0.82, -0.55)), Math.PI / 2), 0.18, 0.015, 0.03);
+      const dClockDial = sdRoundedCylinder(rotX(sub3(p, v3(0.55, 0.82, -0.53)), Math.PI / 2), 0.135, 0.01, 0.032);
+      let best = av;
+      if (dDesk < best.d) best = { d: dDesk, color: [180, 124, 78], roughness: 0.38, id: 110 };
+      if (dPaper < best.d) best = { d: dPaper, color: [255, 255, 255], roughness: 0.25, id: 111 };
+      if (dClock < best.d) best = { d: dClock, color: [239, 68, 68], roughness: 0.22, id: 112 };
+      if (dClockDial < best.d) best = { d: dClockDial, color: [255, 255, 255], roughness: 0.2, id: 113 };
+      return best;
+    }
+  };
+}
+
+export function buildRedLightScene(shotIndex, phase = 0.5) {
+  const isRed = shotIndex === 1 || shotIndex === 2;
+  const stride = isRed ? 0.68 : Math.sin(phase * Math.PI * 4) * 0.65;
+  const wobble = shotIndex === 2 ? Math.sin(phase * Math.PI * 6) * 0.09 : 0;
+  return {
+    cam: {
+      ro: v3(0, 0.32, 3.18),
+      ta: v3(0, 0.06, 0),
+      fov: 1.9,
+      bgTop: isRed ? [244, 63, 94] : [52, 211, 153],
+      bgBot: [254, 243, 199],
+      floorY: -0.86,
+      floorColor1: [234, 198, 138],
+      floorColor2: [218, 180, 118]
+    },
+    sceneFn: (p) => {
+      const runner1 = evalAvatarSDF(p, {
+        pos: v3(-0.48, isRed ? 0.14 : 0, 0),
+        yaw: 0.18,
+        waistPitch: shotIndex === 3 ? 0.45 : 0,
+        armLPitch: -stride,
+        armRPitch: stride,
+        legLPitch: stride,
+        legRPitch: -stride * 0.5,
+        expression: isRed ? "shocked" : "grin",
+        theme: "obby"
+      });
+      const runner2 = evalAvatarSDF(p, {
+        pos: v3(0.48, isRed ? 0.12 : 0, 0),
+        yaw: -0.15,
+        roll: wobble,
+        waistPitch: shotIndex === 3 ? 0.45 : 0,
+        armLPitch: stride,
+        armRPitch: -stride,
+        legLPitch: -stride * 0.5,
+        legRPitch: stride,
+        expression: isRed ? "shocked" : "grin",
+        theme: "noob"
+      });
+      const dFinish = sdRoundBox(sub3(p, v3(0, -0.84, 0.55)), v3(1.35, 0.02, 0.12), 0.008);
+      let best = runner1.d < runner2.d ? runner1 : runner2;
+      if (dFinish < best.d) best = { d: dFinish, color: [225, 29, 72], roughness: 0.22, id: 120 };
+      return best;
+    }
+  };
+}
+
 export function renderRawPanelSet(tmpDir, force = false, shardIdx = 0, shardCount = 1, onlyPrefixes = null) {
   fs.mkdirSync(tmpDir, { recursive: true });
   let taskCounter = 0;
@@ -1264,7 +1554,13 @@ export function renderRawPanelSet(tmpDir, force = false, shardIdx = 0, shardCoun
     ["duo", buildDuoComedyScene],
     ["cafe", buildCozyCafeScene],
     ["runway", buildRunwayDropScene],
-    ["pizza", buildBurntPizzaScene]
+    ["pizza", buildBurntPizzaScene],
+    ["tornado", buildTornadoTowerScene],
+    ["chase", buildPoliceChaseScene],
+    ["doors", buildDoorsHallwayScene],
+    ["sword", buildSwordDuelScene],
+    ["exam", buildExamPanicScene],
+    ["redlight", buildRedLightScene]
   ];
 
   for (const [prefix, builder] of suites) {
@@ -1296,7 +1592,13 @@ export function buildBoardsManifest(rawDir) {
   const cafeDir = path.join(ROOT, "examples", "cozy-cafe-tycoon", "assets");
   const runwayDir = path.join(ROOT, "examples", "runway-outfit-drop", "assets");
   const pizzaDir = path.join(ROOT, "examples", "burnt-pizza-slapstick", "assets");
-  for (const d of [showcaseDir, alarmDir, obbyDir, duoDir, cafeDir, runwayDir, pizzaDir]) {
+  const tornadoDir = path.join(ROOT, "examples", "disaster-tower-tornado", "assets");
+  const chaseDir = path.join(ROOT, "examples", "brookhaven-police-chase", "assets");
+  const doorsDir = path.join(ROOT, "examples", "doors-flashlight-hallway", "assets");
+  const swordDir = path.join(ROOT, "examples", "crossroads-sword-duel", "assets");
+  const examDir = path.join(ROOT, "examples", "classroom-exam-panic", "assets");
+  const redlightDir = path.join(ROOT, "examples", "red-light-freeze", "assets");
+  for (const d of [showcaseDir, alarmDir, obbyDir, duoDir, cafeDir, runwayDir, pizzaDir, tornadoDir, chaseDir, doorsDir, swordDir, examDir, redlightDir]) {
     fs.mkdirSync(d, { recursive: true });
   }
 
@@ -1468,6 +1770,90 @@ export function buildBoardsManifest(rawDir) {
           { labelZh: "02 · 顶光呆滞微笑", labelEn: "02 · Deadpan Spotlight", chatZh: ":)", chatEn: ":)", bubbleX: 160, bubbleY: 38 },
           { labelZh: "03 · 方柱手臂脱落", labelEn: "03 · Arm Detaches", chatZh: "胳膊掉了?", chatEn: "my arm...", bubbleX: 160, bubbleY: 38 },
           { labelZh: "04 · 90°刚体拍地", labelEn: "04 · 90° Statue Flop", chatZh: "oof.", chatEn: "oof.", bubbleX: 160, bubbleY: 76 }
+        ]
+      },
+      {
+        prefix: "tornado",
+        sheetZh: path.join(tornadoDir, "tornado_storyboard_sheet.zh.png"),
+        sheetEn: path.join(tornadoDir, "tornado_storyboard_sheet.en.png"),
+        sheetDefault: path.join(tornadoDir, "tornado_storyboard_sheet.png"),
+        gifPath: path.join(tornadoDir, "disaster_tower_tornado.gif"),
+        mp4Path: path.join(tornadoDir, "disaster_tower_tornado.mp4"),
+        shots: [
+          { labelZh: "01 · 龙卷风逼近", labelEn: "01 · Tornado Spotted", chatZh: "龙卷风!!", chatEn: "TORNADO!!", bubbleX: 160, bubbleY: 36 },
+          { labelZh: "02 · 抓紧护栏", labelEn: "02 · Hold the Rail", chatZh: "塔要塌了!", chatEn: "Hold on!", bubbleX: 160, bubbleY: 38 },
+          { labelZh: "03 · 极限跳柱", labelEn: "03 · Last Pillar Jump", chatZh: "救命!!", chatEn: "JUMP!!", bubbleX: 160, bubbleY: 36 },
+          { labelZh: "04 · 孤柱存活", labelEn: "04 · Survived!", chatZh: "成功存活!", chatEn: "Survived!", bubbleX: 160, bubbleY: 36 }
+        ]
+      },
+      {
+        prefix: "chase",
+        sheetZh: path.join(chaseDir, "chase_storyboard_sheet.zh.png"),
+        sheetEn: path.join(chaseDir, "chase_storyboard_sheet.en.png"),
+        sheetDefault: path.join(chaseDir, "chase_storyboard_sheet.png"),
+        gifPath: path.join(chaseDir, "brookhaven_police_chase.gif"),
+        mp4Path: path.join(chaseDir, "brookhaven_police_chase.mp4"),
+        shots: [
+          { labelZh: "01 · 抱钱袋狂奔", labelEn: "01 · Bank Heist Dash", chatZh: "溜了溜了!", chatEn: "Catch me!", bubbleX: 195, bubbleY: 38 },
+          { labelZh: "02 · 警灯追击", labelEn: "02 · Siren Pursuit", chatZh: "站住!!", chatEn: "STOP!!", bubbleX: 105, bubbleY: 38 },
+          { labelZh: "03 · 绊倒飞扑", labelEn: "03 · Hydrant Trip", chatZh: "哎哟!", chatEn: "WHOA!", bubbleX: 185, bubbleY: 38 },
+          { labelZh: "04 · 当场拿下", labelEn: "04 · Busted!", chatZh: "已老实...", chatEn: "busted...", bubbleX: 190, bubbleY: 64 }
+        ]
+      },
+      {
+        prefix: "doors",
+        sheetZh: path.join(doorsDir, "doors_storyboard_sheet.zh.png"),
+        sheetEn: path.join(doorsDir, "doors_storyboard_sheet.en.png"),
+        sheetDefault: path.join(doorsDir, "doors_storyboard_sheet.png"),
+        gifPath: path.join(doorsDir, "doors_flashlight_hallway.gif"),
+        mp4Path: path.join(doorsDir, "doors_flashlight_hallway.mp4"),
+        shots: [
+          { labelZh: "01 · 50号门探索", labelEn: "01 · Door 050 Check", chatZh: "第50号门...", chatEn: "Door 50...", bubbleX: 145, bubbleY: 38 },
+          { labelZh: "02 · 走廊闪灯", labelEn: "02 · Lights Flicker", chatZh: "灯闪了?!", chatEn: "Flicker?!", bubbleX: 145, bubbleY: 38 },
+          { labelZh: "03 · 身后白眼", labelEn: "03 · Eyes Behind", chatZh: "身后有东西!", chatEn: "BEHIND ME!", bubbleX: 145, bubbleY: 38 },
+          { labelZh: "04 · 极限躲柜", labelEn: "04 · Closet Hide", chatZh: "快躲衣柜!", chatEn: "HIDE!!", bubbleX: 175, bubbleY: 38 }
+        ]
+      },
+      {
+        prefix: "sword",
+        sheetZh: path.join(swordDir, "sword_storyboard_sheet.zh.png"),
+        sheetEn: path.join(swordDir, "sword_storyboard_sheet.en.png"),
+        sheetDefault: path.join(swordDir, "sword_storyboard_sheet.png"),
+        gifPath: path.join(swordDir, "crossroads_sword_duel.gif"),
+        mp4Path: path.join(swordDir, "crossroads_sword_duel.mp4"),
+        shots: [
+          { labelZh: "01 · 石桥拔剑", labelEn: "01 · Bridge Standoff", chatZh: "来1v1!", chatEn: "1v1 SFOTH!", bubbleX: 110, bubbleY: 38 },
+          { labelZh: "02 · 空中拼刀", labelEn: "02 · Mid-Air Clash", chatZh: "当!!", chatEn: "CLANG!!", bubbleX: 160, bubbleY: 32 },
+          { labelZh: "03 · 悬崖险情", labelEn: "03 · Ledge Knockback", chatZh: "要掉岩浆了!", chatEn: "WHOA!", bubbleX: 215, bubbleY: 38 },
+          { labelZh: "04 · 可乐言和", labelEn: "04 · Bloxy Cola Truce", chatZh: "干杯 GG!", chatEn: "GG Truce!", bubbleX: 160, bubbleY: 38 }
+        ]
+      },
+      {
+        prefix: "exam",
+        sheetZh: path.join(examDir, "exam_storyboard_sheet.zh.png"),
+        sheetEn: path.join(examDir, "exam_storyboard_sheet.en.png"),
+        sheetDefault: path.join(examDir, "exam_storyboard_sheet.png"),
+        gifPath: path.join(examDir, "classroom_exam_panic.gif"),
+        mp4Path: path.join(examDir, "classroom_exam_panic.mp4"),
+        shots: [
+          { labelZh: "01 · 自信接卷", labelEn: "01 · Confident Start", chatZh: "稳拿满分!", chatEn: "Easy A+!", bubbleX: 160, bubbleY: 38 },
+          { labelZh: "02 · 看题傻眼", labelEn: "02 · Question 1 Shock", chatZh: "这考的啥?!", chatEn: "WHAT IS THIS?!", bubbleX: 160, bubbleY: 36 },
+          { labelZh: "03 · 疯狂疾书", labelEn: "03 · 2x Speed Scribble", chatZh: "先写个解!", chatEn: "2 mins left!", bubbleX: 160, bubbleY: 38 },
+          { labelZh: "04 · 交卷宕机", labelEn: "04 · Brain KO", chatZh: "大脑已空...", chatEn: "brain empty", bubbleX: 160, bubbleY: 42 }
+        ]
+      },
+      {
+        prefix: "redlight",
+        sheetZh: path.join(redlightDir, "redlight_storyboard_sheet.zh.png"),
+        sheetEn: path.join(redlightDir, "redlight_storyboard_sheet.en.png"),
+        sheetDefault: path.join(redlightDir, "redlight_storyboard_sheet.png"),
+        gifPath: path.join(redlightDir, "red_light_freeze.gif"),
+        mp4Path: path.join(redlightDir, "red_light_freeze.mp4"),
+        shots: [
+          { labelZh: "01 · 绿灯冲刺", labelEn: "01 · Green Light Sprint", chatZh: "绿灯快冲!", chatEn: "Green Light!", bubbleX: 160, bubbleY: 38 },
+          { labelZh: "02 · 红灯急停", labelEn: "02 · Red Light Freeze", chatZh: "别动!!", chatEn: "RED LIGHT!!", bubbleX: 160, bubbleY: 34 },
+          { labelZh: "03 · 单腿摇晃", labelEn: "03 · One-Leg Wobble", chatZh: "你别晃啊!", chatEn: "don't move...", bubbleX: 195, bubbleY: 36 },
+          { labelZh: "04 · 飞扑过线", labelEn: "04 · Finish Dive", chatZh: "压线过关!", chatEn: "SAFE!!", bubbleX: 160, bubbleY: 42 }
         ]
       }
     ]

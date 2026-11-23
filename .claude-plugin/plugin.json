@@ -1,7 +1,7 @@
 {
   "name": "roblox-style-video",
   "description": "Generate Roblox-style R6 and blocky avatar short videos with locked stud proportions, 9:16 storyboards, and model-specific prompts.",
-  "version": "1.3.0",
+  "version": "1.4.0",
   "author": {
     "name": "yuzhang-zhong",
     "url": "https://github.com/yuzhang-zhong"

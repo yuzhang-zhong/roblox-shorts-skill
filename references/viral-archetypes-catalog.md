@@ -61,3 +61,57 @@ Use these six proven short-video archetypes when the user wants a high-retention
   2. **3.5s–7.5s (Escalation 1)**: Instant lighting cut to dramatic film-noir top spotlight; the camera crash-zooms into the unchanging painted smile.
   3. **7.5s–11.5s (Escalation 2)**: A tiny wisp of stylized blocky smoke rises from the pizza while the avatar's left arm block detaches and clatters onto the table.
   4. **11.5s–15.0s (Payoff)**: Locked-off wide shot as the entire avatar tips sideways at 90 degrees onto the floor without bending a single joint.
+
+## 7. `disaster-survival` · 自然灾害模拟器：高塔龙卷风
+
+- **Recommended Rig & Shader**: `r6` + `smooth-plastic`
+- **4-Shot 15s Beat Structure**:
+  1. **0.0s–3.5s (Hook)**: Classic Guest atop a green studded observation tower points at a dark blocky tornado funnel approaching across the island.
+  2. **3.5s–7.5s (Escalation 1)**: Clings to the yellow guardrail as green roof bricks rip off and whirl upward.
+  3. **7.5s–11.5s (Escalation 2)**: Hops desperately onto the last remaining central pillar block as floor plates fall away.
+  4. **11.5s–15.0s (Payoff)**: Sky clears instantly; Guest celebrates on the lone surviving pillar (`examples/disaster-tower-tornado/`).
+
+## 8. `brookhaven-chase` · 小镇街头警匪追逐
+
+- **Recommended Rig & Shader**: `r6` + `smooth-plastic`
+- **4-Shot 15s Beat Structure**:
+  1. **0.0s–3.5s (Hook)**: Classic Noob bursts onto a striped asphalt street clutching a green cash block under red/blue siren lights.
+  2. **3.5s–7.5s (Escalation 1)**: Navy-cap R6 Police Officer sprints in high-speed pursuit with stiff swinging `1x2x1` limbs.
+  3. **7.5s–11.5s (Escalation 2)**: Noob trips over a yellow fire hydrant block and launches into a stiff horizontal R6 dive.
+  4. **11.5s–15.0s (Payoff)**: Officer stands calmly beside the toppled Noob with a deadpan `Chill (-_-)` decal (`examples/brookhaven-police-chase/`).
+
+## 9. `doors-horror` · 惊悚酒店手电筒闪灯走廊
+
+- **Recommended Rig & Shader**: `r6` + `smooth-plastic`
+- **4-Shot 15s Beat Structure**:
+  1. **0.0s–3.5s (Hook)**: R6 protagonist in a blue hoodie sweeps a bright yellow flashlight cone toward wooden Door `050`.
+  2. **3.5s–7.5s (Escalation 1)**: Overhead wall lamps violently flicker twice and plunge the corridor into deep blue shadow.
+  3. **7.5s–11.5s (Escalation 2)**: Avatar rotates its `1:1` barrel head backward as two glowing white eyes appear in the dark doorway.
+  4. **11.5s–15.0s (Payoff)**: Pivots 180 degrees and dives stiffly into a wooden wardrobe closet (`examples/doors-flashlight-hallway/`).
+
+## 10. `sword-duel` · 十字路口经典长剑 1v1 对决
+
+- **Recommended Rig & Shader**: `r6` + `smooth-plastic`
+- **4-Shot 15s Beat Structure**:
+  1. **0.0s–3.5s (Hook)**: Builderman and Classic Noob raise metallic Linked Swords on opposite ends of a studded bridge over lava.
+  2. **3.5s–7.5s (Escalation 1)**: Mid-air R6 double-jump sword clash with bright yellow blocky sparks.
+  3. **7.5s–11.5s (Escalation 2)**: Spin-slash knocks the Noob sliding to the very edge of the bridge ledge.
+  4. **11.5s–15.0s (Payoff)**: Both fighters call a truce and toast with red Bloxy Cola cans (`examples/crossroads-sword-duel/`).
+
+## 11. `school-panic` · 考场发卷大脑宕机记
+
+- **Recommended Rig & Shader**: `r6` + `smooth-plastic`
+- **4-Shot 15s Beat Structure**:
+  1. **0.0s–3.5s (Hook)**: Bacon Hair student smiles confidently as a white exam paper lands on the wooden classroom desk.
+  2. **3.5s–7.5s (Escalation 1)**: Reads Question 1 and grabs both sides of its head with `O_O` shocked ring eyes.
+  3. **7.5s–11.5s (Escalation 2)**: Scribbles frantically at 2x speed as the red wall clock ticks down.
+  4. **11.5s–15.0s (Payoff)**: Bell rings; slumps stiffly backward with `X_X` KO dizzy eyes (`examples/classroom-exam-panic/`).
+
+## 12. `red-light-game` · 一二三木头人极限急停
+
+- **Recommended Rig & Shader**: `r6` + `smooth-plastic`
+- **4-Shot 15s Beat Structure**:
+  1. **0.0s–3.5s (Hook)**: Two R6 runners sprint joyfully across a sandy court on Green Light.
+  2. **3.5s–7.5s (Escalation 1)**: Arena flashes crimson red; both freeze instantly mid-stride on one `1x2x1` leg.
+  3. **7.5s–11.5s (Escalation 2)**: Noob wobbles 5 degrees sideways while the partner side-eyes in panic.
+  4. **11.5s–15.0s (Payoff)**: Green light returns and both dive stiffly across the red finish line (`examples/red-light-freeze/`).

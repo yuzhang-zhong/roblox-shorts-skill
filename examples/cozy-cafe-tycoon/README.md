@@ -1,26 +1,21 @@
-# Example 4: Cozy Miniature Cafe Tycoon / 微缩甜品店经营剧场
+# 04 · Cozy Miniature Cafe Tycoon / 微缩羊角包甜品店经营
 
-This folder contains a 15-second (`9:16` vertical, 4 shots) miniature bakery tycoon short-video package compiled for Wan (`wan`) with a `chibi-blocky` clay-soft chef avatar (`"Coco"`).
+15-second (`9:16`, 4-shot) Roblox-style short-video package compiled with `--template mini-tycoon --engine wan --rig chibi-blocky`.
 
-![Cozy Cafe Tycoon Storyboard Contact Sheet (ZH)](assets/cafe_storyboard_sheet.zh.png)
+| 9:16 Animated Preview | 4-Shot Storyboard Contact Sheet |
+| :---: | :---: |
+| <img src="assets/cozy_cafe_tycoon.gif" width="185" alt="Cozy Miniature Cafe Tycoon 9:16 preview" /> | <img src="assets/cafe_storyboard_sheet.en.png" width="520" alt="Cozy Miniature Cafe Tycoon 4-shot contact sheet" /> |
 
-## Files in this package
+## Package contents
 
-| File | Description |
-| --- | --- |
-| [`assets/cozy_cafe_tycoon.gif`](assets/cozy_cafe_tycoon.gif) | 4-shot 9:16 vertical animation loop |
-| [`assets/cozy_cafe_tycoon.mp4`](assets/cozy_cafe_tycoon.mp4) | H.264 `.mp4` with oven ding, tray clack, and cash register audio |
-| [`assets/cafe_storyboard_sheet.zh.png`](assets/cafe_storyboard_sheet.zh.png) · [`en`](assets/cafe_storyboard_sheet.en.png) | 4-shot contact sheet with timecodes and Wan I2V prompts |
-| [`character_card.md`](character_card.md) | `"Coco"` (`cozy-chef`, `chibi-blocky`, `clay-soft`) |
-| [`storyboard.md`](storyboard.md) · [`prompts.json`](prompts.json) | Bilingual first-frame and Wan motion prompts |
+- [`assets/cozy_cafe_tycoon.mp4`](assets/cozy_cafe_tycoon.mp4): offline 3D preview video (`H.264 MP4`)
+- [`assets/cafe_storyboard_sheet.en.png`](assets/cafe_storyboard_sheet.en.png) · [`zh`](assets/cafe_storyboard_sheet.zh.png): English and Chinese 4-shot contact sheets
+- [`character_card.md`](character_card.md): Character DNA card and 3-view turnaround prompt (`cozy-chef`)
+- [`storyboard.md`](storyboard.md) · [`prompts.json`](prompts.json): shot-by-shot first-frame and `wan` motion prompts
 
-<p align="center">
-  <img src="assets/cozy_cafe_tycoon.gif" alt="Cozy Cafe Tycoon 9:16 preview" width="240" />
-</p>
-
-## Reproduce from the repository root
+## Reproduce
 
 ```bash
-node scripts/avatar_spec.mjs --archetype cozy-chef --rig chibi-blocky --material clay-soft --name "Coco" --lang zh-en > examples/cozy-cafe-tycoon/character_card.md
-node scripts/shot_compiler.mjs --template mini-tycoon --duration 15 --engine wan --rig chibi-blocky --lang zh-en > examples/cozy-cafe-tycoon/storyboard.md
+node scripts/avatar_spec.mjs --archetype cozy-chef --rig chibi-blocky --material clay-soft --name "Coco" --lang en > examples/cozy-cafe-tycoon/character_card.md
+node scripts/shot_compiler.mjs --template mini-tycoon --duration 15 --engine wan --rig chibi-blocky --lang en > examples/cozy-cafe-tycoon/storyboard.md
 ```

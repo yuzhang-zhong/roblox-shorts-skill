@@ -1,26 +1,21 @@
-# Example 6: Burnt Pizza Kitchen Slapstick / 烤焦披萨厨房翻车
+# 06 · Burnt Pizza R6 Slapstick / 焦黑披萨厨房刚体翻车
 
-This folder contains a 15-second (`9:16` vertical, 4 shots) R6 slapstick comedy short-video package compiled for Runway (`runway`) featuring a classic Bacon Hair avatar (`"Baco"`).
+15-second (`9:16`, 4-shot) Roblox-style short-video package compiled with `--template meme-slapstick --engine runway --rig r6`.
 
-![Burnt Pizza Slapstick Storyboard Contact Sheet (ZH)](assets/pizza_storyboard_sheet.zh.png)
+| 9:16 Animated Preview | 4-Shot Storyboard Contact Sheet |
+| :---: | :---: |
+| <img src="assets/burnt_pizza_slapstick.gif" width="185" alt="Burnt Pizza R6 Slapstick 9:16 preview" /> | <img src="assets/pizza_storyboard_sheet.en.png" width="520" alt="Burnt Pizza R6 Slapstick 4-shot contact sheet" /> |
 
-## Files in this package
+## Package contents
 
-| File | Description |
-| --- | --- |
-| [`assets/burnt_pizza_slapstick.gif`](assets/burnt_pizza_slapstick.gif) | 4-shot 9:16 vertical animation loop |
-| [`assets/burnt_pizza_slapstick.mp4`](assets/burnt_pizza_slapstick.mp4) | H.264 `.mp4` with smoke alarm, fire extinguisher, and `"Oof!"` audio |
-| [`assets/pizza_storyboard_sheet.zh.png`](assets/pizza_storyboard_sheet.zh.png) · [`en`](assets/pizza_storyboard_sheet.en.png) | 4-shot contact sheet with timecodes and Runway I2V prompts |
-| [`character_card.md`](character_card.md) | `"Baco"` (`bacon-hair`, `r6`, `smooth-plastic`) |
-| [`storyboard.md`](storyboard.md) · [`prompts.json`](prompts.json) | Bilingual first-frame and Runway motion prompts |
+- [`assets/burnt_pizza_slapstick.mp4`](assets/burnt_pizza_slapstick.mp4): offline 3D preview video (`H.264 MP4`)
+- [`assets/pizza_storyboard_sheet.en.png`](assets/pizza_storyboard_sheet.en.png) · [`zh`](assets/pizza_storyboard_sheet.zh.png): English and Chinese 4-shot contact sheets
+- [`character_card.md`](character_card.md): Character DNA card and 3-view turnaround prompt (`bacon-hair`)
+- [`storyboard.md`](storyboard.md) · [`prompts.json`](prompts.json): shot-by-shot first-frame and `runway` motion prompts
 
-<p align="center">
-  <img src="assets/burnt_pizza_slapstick.gif" alt="Burnt Pizza Slapstick 9:16 preview" width="240" />
-</p>
-
-## Reproduce from the repository root
+## Reproduce
 
 ```bash
-node scripts/avatar_spec.mjs --archetype bacon-hair --rig r6 --material smooth-plastic --name "Baco" --lang zh-en > examples/burnt-pizza-slapstick/character_card.md
-node scripts/shot_compiler.mjs --template meme-slapstick --duration 15 --engine runway --rig r6 --lang zh-en > examples/burnt-pizza-slapstick/storyboard.md
+node scripts/avatar_spec.mjs --archetype bacon-hair --rig r6 --material smooth-plastic --name "Baco" --lang en > examples/burnt-pizza-slapstick/character_card.md
+node scripts/shot_compiler.mjs --template meme-slapstick --duration 15 --engine runway --rig r6 --lang en > examples/burnt-pizza-slapstick/storyboard.md
 ```

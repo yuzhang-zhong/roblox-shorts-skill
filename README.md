@@ -1,43 +1,67 @@
 <div align="center">
 
-<img src="assets/icon.svg" width="104" height="104" alt="" />
-
 # Roblox Style Video
 
-Plan a 9:16 short: lock your avatar's proportions, write prompts for each shot, and preview the cut locally.
+Plan a 9:16 Roblox-style short: lock R6/blocky proportions, compile prompts for each shot, and preview the cut locally.
 
 [![Node.js 18+ for the CLI](https://img.shields.io/badge/Node.js-18%2B-268354?style=flat-square)](#quick-start)
 [![MIT license](https://img.shields.io/badge/License-MIT-2563eb?style=flat-square)](LICENSE)
 
-**[Watch examples](#video-examples)** · [Quick start](#quick-start) · [Skill guide](SKILL.md)
+**[Video examples](#video-examples)** · [Scene boards](#scene-boards-and-shot-pacing) · [Quick start](#quick-start) · [Skill guide](SKILL.md)
 
 **English** · [简体中文](README.zh-CN.md) · [More languages](#languages)
 
 </div>
 
-[![Four storyboard frames: a Y2K streetwear avatar poses beside a Classic Noob, bumps them, and both end with a deadpan stare](examples/duo-bestie-contrast/assets/duo_storyboard_sheet.en.png)](examples/duo-bestie-contrast/)
-
 <a name="examples-and-local-3d-previews"></a>
 
 ## Video examples
 
-Each storyboard plans a 15-second, four-shot short. The **4-second MP4s** and GIFs are local 3D previews for checking framing, avatar proportions, and `BillboardGui` chat bubbles. The model names indicate the prompt format. To generate finished clips, run those prompts in a separate video model.
+Each package plans a 15-second, four-shot vertical (`9:16`) short across 12 classic Roblox story formats. The **4-second MP4s** and GIFs below are offline 3D animatics rendered by `scripts/render_preview.mjs` to verify R6 proportions, camera moves, and overhead `BillboardGui` chat bubbles before spending credits in an external video model.
 
 <p align="center">
-  <a href="examples/monday-alarm-meltdown/assets/monday_alarm_meltdown.mp4"><img src="examples/monday-alarm-meltdown/assets/monday_alarm_meltdown.gif" width="90" alt="Play Monday Alarm: Momo slaps the alarm clock" /></a>
-  <a href="examples/obby-sky-run/assets/obby_sky_run.mp4"><img src="examples/obby-sky-run/assets/obby_sky_run.gif" width="90" alt="Play Sky Obby: a runner jumps between floating platforms" /></a>
-  <a href="examples/runway-outfit-drop/assets/runway_outfit_drop.mp4"><img src="examples/runway-outfit-drop/assets/runway_outfit_drop.gif" width="90" alt="Play Runway Drop: an avatar changes outfits on the beat" /></a>
+  <a href="examples/monday-alarm-meltdown/assets/monday_alarm_meltdown.mp4"><img src="examples/monday-alarm-meltdown/assets/monday_alarm_meltdown.gif" width="134" alt="Monday Alarm 9:16 animated preview" /></a>
+  <a href="examples/obby-sky-run/assets/obby_sky_run.mp4"><img src="examples/obby-sky-run/assets/obby_sky_run.gif" width="134" alt="Sky Obby 9:16 animated preview" /></a>
+  <a href="examples/duo-bestie-contrast/assets/duo_bestie_contrast.mp4"><img src="examples/duo-bestie-contrast/assets/duo_bestie_contrast.gif" width="134" alt="Y2K vs. Noob 9:16 animated preview" /></a>
+  <a href="examples/cozy-cafe-tycoon/assets/cozy_cafe_tycoon.mp4"><img src="examples/cozy-cafe-tycoon/assets/cozy_cafe_tycoon.gif" width="134" alt="Cozy Cafe 9:16 animated preview" /></a>
+  <a href="examples/runway-outfit-drop/assets/runway_outfit_drop.mp4"><img src="examples/runway-outfit-drop/assets/runway_outfit_drop.gif" width="134" alt="Runway Drop 9:16 animated preview" /></a>
+  <a href="examples/burnt-pizza-slapstick/assets/burnt_pizza_slapstick.mp4"><img src="examples/burnt-pizza-slapstick/assets/burnt_pizza_slapstick.gif" width="134" alt="Burnt Pizza 9:16 animated preview" /></a>
+  <br />
+  <a href="examples/disaster-tower-tornado/assets/disaster_tower_tornado.mp4"><img src="examples/disaster-tower-tornado/assets/disaster_tower_tornado.gif" width="134" alt="Tornado Tower 9:16 animated preview" /></a>
+  <a href="examples/brookhaven-police-chase/assets/brookhaven_police_chase.mp4"><img src="examples/brookhaven-police-chase/assets/brookhaven_police_chase.gif" width="134" alt="Police Chase 9:16 animated preview" /></a>
+  <a href="examples/doors-flashlight-hallway/assets/doors_flashlight_hallway.mp4"><img src="examples/doors-flashlight-hallway/assets/doors_flashlight_hallway.gif" width="134" alt="Doors Hallway 9:16 animated preview" /></a>
+  <a href="examples/crossroads-sword-duel/assets/crossroads_sword_duel.mp4"><img src="examples/crossroads-sword-duel/assets/crossroads_sword_duel.gif" width="134" alt="Sword Duel 9:16 animated preview" /></a>
+  <a href="examples/classroom-exam-panic/assets/classroom_exam_panic.mp4"><img src="examples/classroom-exam-panic/assets/classroom_exam_panic.gif" width="134" alt="Exam Panic 9:16 animated preview" /></a>
+  <a href="examples/red-light-freeze/assets/red_light_freeze.mp4"><img src="examples/red-light-freeze/assets/red_light_freeze.gif" width="134" alt="Red Light Freeze 9:16 animated preview" /></a>
 </p>
-<p align="center">Select a clip to open its MP4.</p>
+<p align="center"><sub>Select any animated clip above to open its H.264 MP4 preview.</sub></p>
 
-| Short and prompt format | What to watch for |
-| --- | --- |
-| [Monday Alarm](examples/monday-alarm-meltdown/) · Kling<br>[MP4](examples/monday-alarm-meltdown/assets/monday_alarm_meltdown.mp4) · [Storyboard](examples/monday-alarm-meltdown/assets/storyboard_contact_sheet.en.png) | Momo slaps an alarm clock. The last shot returns to the opening desk framing. |
-| [Sky Obby](examples/obby-sky-run/) · Hailuo<br>[MP4](examples/obby-sky-run/assets/obby_sky_run.mp4) · [Storyboard](examples/obby-sky-run/assets/obby_storyboard_sheet.en.png) | A runner crosses floating platforms. Compare the camera angles at the jump and checkpoint landing. |
-| [Y2K vs. Noob](examples/duo-bestie-contrast/) · Seedance<br>[MP4](examples/duo-bestie-contrast/assets/duo_bestie_contrast.mp4) · [Storyboard](examples/duo-bestie-contrast/assets/duo_storyboard_sheet.en.png) | A streetwear avatar's spin knocks their rigid R6 friend off balance. |
-| [Cozy Cafe](examples/cozy-cafe-tycoon/) · Wan<br>[MP4](examples/cozy-cafe-tycoon/assets/cozy_cafe_tycoon.mp4) · [Storyboard](examples/cozy-cafe-tycoon/assets/cafe_storyboard_sheet.en.png) | A miniature bakery goes from a croissant close-up to a latte sliding across the counter. |
-| [Runway Drop](examples/runway-outfit-drop/) · Sora<br>[MP4](examples/runway-outfit-drop/assets/runway_outfit_drop.mp4) · [Storyboard](examples/runway-outfit-drop/assets/runway_storyboard_sheet.en.png) | An outfit changes from plain gray to neon pink on the landing beat. |
-| [Burnt Pizza](examples/burnt-pizza-slapstick/) · Runway<br>[MP4](examples/burnt-pizza-slapstick/assets/burnt_pizza_slapstick.mp4) · [Storyboard](examples/burnt-pizza-slapstick/assets/pizza_storyboard_sheet.en.png) | A burnt pizza reveal ends with a stiff sideways fall. |
+| Short & prompt format | What happens | Short & prompt format | What happens |
+| --- | --- | --- | --- |
+| **[01 · Monday Alarm](examples/monday-alarm-meltdown/)** · Kling<br>[MP4](examples/monday-alarm-meltdown/assets/monday_alarm_meltdown.mp4) · [Storyboard](examples/monday-alarm-meltdown/assets/storyboard_contact_sheet.en.png) | Slaps a ringing alarm clock, cries at 99+ pings, and face-plants onto the keyboard. | **[07 · Tornado Tower](examples/disaster-tower-tornado/)** · Kling<br>[MP4](examples/disaster-tower-tornado/assets/disaster_tower_tornado.mp4) · [Storyboard](examples/disaster-tower-tornado/assets/tornado_storyboard_sheet.en.png) | A Classic Guest clings to a green tower as a dark tornado funnel tears blocks away. |
+| **[02 · Sky Obby](examples/obby-sky-run/)** · Hailuo<br>[MP4](examples/obby-sky-run/assets/obby_sky_run.mp4) · [Storyboard](examples/obby-sky-run/assets/obby_storyboard_sheet.en.png) | Speed Coil jumps across floating pads, stops short of a red Killbrick, and lands on the checkpoint. | **[08 · Police Chase](examples/brookhaven-police-chase/)** · Hailuo<br>[MP4](examples/brookhaven-police-chase/assets/brookhaven_police_chase.mp4) · [Storyboard](examples/brookhaven-police-chase/assets/chase_storyboard_sheet.en.png) | Siren pursuit down an asphalt street ends when the fleeing Noob trips over a yellow hydrant. |
+| **[03 · Y2K vs. Noob](examples/duo-bestie-contrast/)** · Seedance<br>[MP4](examples/duo-bestie-contrast/assets/duo_bestie_contrast.mp4) · [Storyboard](examples/duo-bestie-contrast/assets/duo_storyboard_sheet.en.png) | A Y2K avatar's 180-degree spin bumps a rigid yellow R6 Noob sideways. | **[09 · Doors Hallway](examples/doors-flashlight-hallway/)** · Sora<br>[MP4](examples/doors-flashlight-hallway/assets/doors_flashlight_hallway.mp4) · [Storyboard](examples/doors-flashlight-hallway/assets/doors_storyboard_sheet.en.png) | Flashlight check at Door 050, corridor lights flicker out, glowing eyes appear behind, closet hide. |
+| **[04 · Cozy Cafe](examples/cozy-cafe-tycoon/)** · Wan<br>[MP4](examples/cozy-cafe-tycoon/assets/cozy_cafe_tycoon.mp4) · [Storyboard](examples/cozy-cafe-tycoon/assets/cafe_storyboard_sheet.en.png) | Snaps a golden croissant onto a pastel tray, slides a hot latte, and pops +999 coins. | **[10 · Sword Duel](examples/crossroads-sword-duel/)** · Seedance<br>[MP4](examples/crossroads-sword-duel/assets/crossroads_sword_duel.mp4) · [Storyboard](examples/crossroads-sword-duel/assets/sword_storyboard_sheet.en.png) | Builderman and Noob clash Linked Swords mid-air over lava before calling a Bloxy Cola truce. |
+| **[05 · Runway Drop](examples/runway-outfit-drop/)** · Sora<br>[MP4](examples/runway-outfit-drop/assets/runway_outfit_drop.mp4) · [Storyboard](examples/runway-outfit-drop/assets/runway_storyboard_sheet.en.png) | Jumps from a plain gray base rig and lands on the beat in neon pink Y2K streetwear. | **[11 · Exam Panic](examples/classroom-exam-panic/)** · Wan<br>[MP4](examples/classroom-exam-panic/assets/classroom_exam_panic.mp4) · [Storyboard](examples/classroom-exam-panic/assets/exam_storyboard_sheet.en.png) | Confident smile turns to head-grab shock on Question 1, 2x scribbling, and X_X brain KO. |
+| **[06 · Burnt Pizza](examples/burnt-pizza-slapstick/)** · Runway<br>[MP4](examples/burnt-pizza-slapstick/assets/burnt_pizza_slapstick.mp4) · [Storyboard](examples/burnt-pizza-slapstick/assets/pizza_storyboard_sheet.en.png) | Presents a pitch-black pizza under a spotlight before tipping 90 degrees onto the floor. | **[12 · Red Light Freeze](examples/red-light-freeze/)** · Runway<br>[MP4](examples/red-light-freeze/assets/red_light_freeze.mp4) · [Storyboard](examples/red-light-freeze/assets/redlight_storyboard_sheet.en.png) | Two runners sprint on Green Light, freeze on one blocky leg on Red Light, and dive across the line. |
+
+## Scene boards and shot pacing
+
+Video models break rigid blocky limbs when a single 4–5 second prompt stacks three or four sequential verbs. Each short splits the story into four single-action beats (`0–3.5s` hook, two escalation shots, and a `11.5–15s` payoff or loop return):
+
+| Shot 01 · Hook (`0–3.5s`) | Shot 02 · Action (`3.5–7.5s`) | Shot 03 · Twist (`7.5–11.5s`) | Shot 04 · Loop (`11.5–15s`) |
+| :---: | :---: | :---: | :---: |
+| <img src="examples/monday-alarm-meltdown/assets/shot_01_hook.png" width="196" alt="Shot 01: alarm clock rings beside shocked R6 head" /> | <img src="examples/monday-alarm-meltdown/assets/shot_02_slam.png" width="196" alt="Shot 02: right block arm slams the red clock" /> | <img src="examples/monday-alarm-meltdown/assets/shot_03_tears.png" width="196" alt="Shot 03: waterfall tears before laptop screen" /> | <img src="examples/monday-alarm-meltdown/assets/shot_04_faceplant.png" width="196" alt="Shot 04: 90-degree rigid waist flop onto keyboard" /> |
+
+Four-shot contact sheets across six game genres, pairing camera angle changes with overhead speech bubbles:
+
+| 02 · Sky Obby (`Hailuo` · Speed Coil & Killbrick) | 08 · Brookhaven Police Chase (`Hailuo` · Street Pursuit) |
+| :---: | :---: |
+| <a href="examples/obby-sky-run/"><img src="examples/obby-sky-run/assets/obby_storyboard_sheet.en.png" width="410" alt="Sky Obby 4-shot storyboard sheet" /></a> | <a href="examples/brookhaven-police-chase/"><img src="examples/brookhaven-police-chase/assets/chase_storyboard_sheet.en.png" width="410" alt="Brookhaven Police Chase 4-shot storyboard sheet" /></a> |
+| **07 · Natural Disaster Tower (`Kling` · Tornado Survival)** | **09 · Doors Hotel Hallway (`Sora` · Flashlight Flicker)** |
+| <a href="examples/disaster-tower-tornado/"><img src="examples/disaster-tower-tornado/assets/tornado_storyboard_sheet.en.png" width="410" alt="Natural Disaster Tornado Tower 4-shot storyboard sheet" /></a> | <a href="examples/doors-flashlight-hallway/"><img src="examples/doors-flashlight-hallway/assets/doors_storyboard_sheet.en.png" width="410" alt="Doors Hotel Hallway 4-shot storyboard sheet" /></a> |
+| **10 · Crossroads Sword Duel (`Seedance` · Linked Sword 1v1)** | **12 · Red Light Freeze (`Runway` · Arena Sprint & Freeze)** |
+| <a href="examples/crossroads-sword-duel/"><img src="examples/crossroads-sword-duel/assets/sword_storyboard_sheet.en.png" width="410" alt="Crossroads Sword Duel 4-shot storyboard sheet" /></a> | <a href="examples/red-light-freeze/"><img src="examples/red-light-freeze/assets/redlight_storyboard_sheet.en.png" width="410" alt="Red Light Freeze 4-shot storyboard sheet" /></a> |
 
 ## Quick start
 
@@ -49,38 +73,40 @@ Clone into your agent host's skills directory. This path is for Codex; for GitHu
 git clone https://github.com/yuzhang-zhong/roblox-style-video.git ~/.codex/skills/roblox-style-video
 ```
 
-Ask your agent to use `roblox-style-video`. In Codex, for example:
+Ask your agent to use `roblox-style-video`:
 
 ```text
-Use $roblox-style-video to plan a 15-second 9:16 short about two friends shopping:
-a Y2K streetwear avatar and a yellow Classic Noob. Give me the character cards,
-3-view turnaround prompts, and a 4-shot Kling I2V storyboard.
+Use $roblox-style-video to plan a 15-second 9:16 short set in a dim hotel corridor (doors-horror):
+an R6 avatar in a blue hoodie sweeps a flashlight past Door 050 when the lights flicker.
+Give me the character geometry lock, a 4-shot storyboard, and Sora / Kling I2V prompts.
 ```
 
 ### Use the CLI
 
-From a regular checkout, run these from the repository root. The three commands use Node.js 18+ and need neither `npm install` nor API keys.
+From a regular checkout, run these from the repository root. The scripts require Node.js 18+ and use only the standard library (no `npm install` or API keys).
 
 ```bash
-node scripts/avatar_spec.mjs --archetype corporate-worker --rig chibi-blocky --material smooth-plastic --name "Momo" --lang en
-node scripts/shot_compiler.mjs --template daily-meltdown --duration 15 --engine kling --rig chibi-blocky --lang en
+node scripts/shot_compiler.mjs --template brookhaven-chase --duration 15 --engine hailuo --rig r6 --lang en
 node scripts/drift_check.mjs --prompt "A cute Roblox girl with C-shaped claw hands drinks coffee with five fingers" --engine kling --mode t2v --lang en
+node scripts/render_preview.mjs --only tornado,chase,doors
 ```
 
-The commands produce a character card and turnaround prompt, a four-shot storyboard, and a corrected prompt for the intentionally flawed hand description.
+## CLI scripts, geometry checks, and references
 
-## CLI scripts, limits, and references
+Generic prompts often produce human fingers, Lego C-claws/head studs, or Minecraft voxel cubes instead of standard Roblox R6 geometry (`2x2x1` torso, flush `1x2x1` legs, solid block hands, and `1:1` barrel head on a studded baseplate). `drift_check.mjs` flags these failure modes before generation:
 
-For R6, lock the `2x2x1` torso, flush `1x2x1` legs, solid block hands, and `1:1` barrel head with a flat face decal. Use studded baseplates for the scene, not studs on the avatar's head. Start multi-shot image-to-video (I2V) with a [three-view turnaround](assets/showcase/momo_turnaround_sheet.en.png) and give each 4–5 second clip one main action. The [drift comparison](assets/showcase/drift_rescue_comparison.en.png) shows what goes wrong with human fingers, C-shaped claws, and voxel heads.
+<p align="center">
+  <img src="assets/showcase/drift_rescue_comparison.en.png" width="760" alt="Geometry check comparing human fingers, Lego C-claws, and voxel heads against locked Roblox R6 proportions" />
+</p>
 
 | Script | Output |
 | --- | --- |
-| [`avatar_spec.mjs`](scripts/avatar_spec.mjs) | Character card with a `BrickColor` palette, stud proportions, and a three-view prompt. |
-| [`shot_compiler.mjs`](scripts/shot_compiler.mjs) | A 9:16 beat sheet and image-to-video (I2V) or text-to-video (T2V) prompts for Kling, Seedance, Hailuo, Wan, Sora, and Runway. |
-| [`drift_check.mjs`](scripts/drift_check.mjs) | A report and prompt patch for geometry drift or too many actions in a shot. |
-| [`render_preview.mjs`](scripts/render_preview.mjs) | Local turnarounds, comparison boards, contact sheets, GIFs, and MP4s. Windows composition uses PowerShell `System.Drawing` and `ffmpeg`. |
+| [`shot_compiler.mjs`](scripts/shot_compiler.mjs) | 9:16 beat sheet and I2V/T2V prompts across 12 templates (`daily-meltdown`, `obby-storytime`, `duo-comedy`, `mini-tycoon`, `outfit-drop`, `meme-slapstick`, `disaster-survival`, `brookhaven-chase`, `doors-horror`, `sword-duel`, `school-panic`, `red-light-game`) for Kling, Seedance, Hailuo, Wan, Sora, and Runway. |
+| [`avatar_spec.mjs`](scripts/avatar_spec.mjs) | Character DNA card with `BrickColor` codes, stud proportions, and a [three-view turnaround](assets/showcase/momo_turnaround_sheet.en.png) prompt. |
+| [`drift_check.mjs`](scripts/drift_check.mjs) | Diagnostic report and patched prompt when a draft triggers finger growth, Lego claws, or multi-verb overload. |
+| [`render_preview.mjs`](scripts/render_preview.mjs) | Offline 3D contact sheets, GIFs, and MP4 animatics (Windows board composition uses PowerShell `System.Drawing` and `ffmpeg`). |
 
-[Avatar geometry and materials](references/avatar-geometry-and-materials.md) · [Model prompt playbook](references/model-prompt-playbook.md) · [Drift fixes](references/rescue-and-anti-drift.md) · [Pacing and audio](references/short-video-beats-and-audio.md) · [Story templates](references/viral-archetypes-catalog.md)
+[Avatar geometry and materials](references/avatar-geometry-and-materials.md) · [Classic gear and props](references/classic-roblox-catalog.md) · [Model prompt playbook](references/model-prompt-playbook.md) · [Drift fixes](references/rescue-and-anti-drift.md) · [Pacing and audio](references/short-video-beats-and-audio.md) · [12 story templates](references/viral-archetypes-catalog.md)
 
 ## Languages
 

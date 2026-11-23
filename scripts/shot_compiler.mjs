@@ -353,14 +353,362 @@ const TEMPLATES = {
         caption: "厨神生涯，到此为止"
       }
     ]
+  },
+  "disaster-survival": {
+    titleZh: "自然灾害模拟器：高塔龙卷风",
+    titleEn: "Natural Disaster Survival: Tornado Tower",
+    defaultRig: "r6",
+    defaultMaterial: "smooth-plastic",
+    subjectEn: "an authentic Roblox R6 Classic Guest avatar wearing a red Roblox cap and black [R] jacket with flush 1x2x1 blocky legs",
+    subjectZh: "头戴红色Roblox棒球帽、身穿黑色R标2x2x1夹克与并拢1x2x1方柱长裤的经典R6游客小人",
+    shots: [
+      {
+        role: "Hook / 黄金前3秒",
+        actionEn: "stands atop a bright green studded observation tower pointing rigidly at a spinning dark-gray blocky tornado funnel approaching across the island",
+        actionZh: "站在绿色方格Studs高塔顶端，抬起右侧1x2x1实心方柱手指向远处席卷而来的深灰方块龙卷风漏斗",
+        faceEn: "wide white shocked ring eyes and open gasp mouth decal",
+        faceZh: "震惊白圈眼与张嘴倒吸凉气2D贴图",
+        cameraEn: "Low-angle dramatic push-in with wind camera shake",
+        cameraZh: "低角度仰拍极速推近，伴随狂风镜头震动",
+        hailuoTag: "[Push in, Shake]",
+        sfx: "警报蜂鸣声 + 呼啸风声",
+        caption: "警报：黑色龙卷风来袭！"
+      },
+      {
+        role: "Escalation 1 / 动作推进",
+        actionEn: "clings stiffly to a yellow guardrail block as loose green roof bricks rip away and whirl upward around the tower",
+        actionZh: "用实心平头方块手死死抵住黄色方块护栏，头顶绿色屋顶积木块被狂风掀飞在空中旋转",
+        faceEn: "upturned panicked brows and clenched teeth decal",
+        faceZh: "慌张八字眉与咬牙2D贴图",
+        cameraEn: "Medium tracking shot orbiting the swaying tower top",
+        cameraZh: "围绕摇晃塔顶的中景环绕跟拍",
+        hailuoTag: "[Pan right, Shake]",
+        sfx: "积木崩裂清脆声 + 强风音",
+        caption: "塔顶要塌了！抓紧！"
+      },
+      {
+        role: "Escalation 2 / 情绪升级",
+        actionEn: "hops desperately from a falling green floor plate onto the last remaining central pillar block",
+        actionZh: "在脚下绿色底板坠落瞬间，保持R6直腿姿态猛地跳向中间最后一根幸存方柱",
+        faceEn: "streaming cyan waterfall tear bands decal",
+        faceZh: "双颊蓝色瀑布流泪2D贴图",
+        cameraEn: "High-angle crane shot looking down at falling blocks",
+        cameraZh: "高角度俯拍坠落的方块碎片",
+        hailuoTag: "[Tilt down]",
+        sfx: "连续弹簧跳跃声",
+        caption: "只剩最后一块砖了！"
+      },
+      {
+        role: "Payoff & Loop / 反转收尾",
+        actionEn: "stands victorious under sudden clear blue sky on the lone pillar as a green survival popup badge appears overhead",
+        actionZh: "天空瞬间放晴，小人孤零零站在唯一一根柱子顶端高举单侧方柱手臂庆祝存活",
+        faceEn: "classic Winning Grin (:D) decal",
+        faceZh: "经典露齿大笑(:D)贴图",
+        cameraEn: "Smooth pull-back to wide island framing",
+        cameraZh: "平稳拉远展示荒诞孤柱全景",
+        hailuoTag: "[Pull out]",
+        sfx: "通关胜利欢呼音效",
+        caption: "成功存活！毫发无损"
+      }
+    ]
+  },
+  "brookhaven-chase": {
+    titleZh: "小镇警匪街头追逐",
+    titleEn: "Brookhaven Street Police Chase",
+    defaultRig: "r6",
+    defaultMaterial: "smooth-plastic",
+    subjectEn: "two authentic Roblox R6 avatars on an asphalt street: a Classic Noob sprinting ahead with a green money bag and an R6 Police Officer in a navy cap chasing behind",
+    subjectZh: "小镇柏油路上的双人Roblox R6追逐：前方经典黄皮新手抱绿色钱袋狂奔，后方深蓝警帽R6警官紧追不舍",
+    shots: [
+      {
+        role: "Hook / 黄金前3秒",
+        actionEn: "the yellow R6 Noob bursts out onto the striped asphalt street clutching a green cash block while red and blue siren lights flash behind",
+        actionZh: "经典黄皮R6新手抱着绿色钞票方块冲上白线马路，身后红蓝警灯交替爆闪",
+        faceEn: "mischievous Check-It smirk decal on the Noob",
+        faceZh: "黄皮新手脸上印着挑眉坏笑(Check It)贴图",
+        cameraEn: "Low front tracking shot pulling backward ahead of the runner",
+        cameraZh: "贴地正前方倒退跟拍奔跑镜头",
+        hailuoTag: "[Pull out, Shake]",
+        sfx: "急促警笛声 (Wee-Woo!)",
+        caption: "刚抢完小镇银行就遇熟人"
+      },
+      {
+        role: "Escalation 1 / 动作推进",
+        actionEn: "the navy-uniformed R6 Police Officer swings stiff 1x2x1 arms rapidly in high-speed pursuit under flashing siren rim lights",
+        actionZh: "身穿深蓝制服戴警帽的R6警官迈着高速摆动的1x2x1笔直方腿全力追赶",
+        faceEn: "angry Bloxxer scowling brow decal on the officer",
+        faceZh: "警官满脸严肃的愤怒皱眉2D贴图",
+        cameraEn: "Side-profile parallel speed pan along the street",
+        cameraZh: "沿街道侧面高速平行横移跟拍",
+        hailuoTag: "[Pan left]",
+        sfx: "密集塑料脚步声 + 哨声",
+        caption: "前面那个黄方块站住！"
+      },
+      {
+        role: "Escalation 2 / 情绪升级",
+        actionEn: "the Noob trips over a yellow fire hydrant block and launches into a stiff horizontal R6 dive",
+        actionZh: "黄皮新手脚下绊到路边黄色方块消防栓，整个人保持笔直刚体呈水平飞扑出去",
+        faceEn: "wide shocked O_O eyes decal",
+        faceZh: "瞬间切换为震惊圆圈眼贴图",
+        cameraEn: "Medium close-up with impact shake as the cash block flies upward",
+        cameraZh: "中近景碰撞震动，绿色钱袋高高抛起",
+        hailuoTag: "[Shake]",
+        sfx: "滑稽绊倒弹簧音 + Oof!",
+        caption: "平地摔触发物理起飞"
+      },
+      {
+        role: "Payoff & Loop / 反转收尾",
+        actionEn: "the officer stands calmly next to the sideways-toppled Noob as gray prison bar blocks drop into frame",
+        actionZh: "警官淡定站在侧翻倒地的新手旁，画面前景落下灰色方块铁栏杆",
+        faceEn: "deadpan Chill (-_-) face decal on the Noob",
+        faceZh: "倒地新手切换为安详死鱼眼(-_-)贴图",
+        cameraEn: "Locked-off frontal two-shot",
+        cameraZh: "正面双人定格固定镜头",
+        hailuoTag: "[Static shot]",
+        sfx: "铁门咔嚓落锁声",
+        caption: "小镇一日游到此结束"
+      }
+    ]
+  },
+  "doors-horror": {
+    titleZh: "惊悚酒店手电筒走廊",
+    titleEn: "Doors Hotel Flashlight Hallway",
+    defaultRig: "r6",
+    defaultMaterial: "smooth-plastic",
+    subjectEn: "an authentic Roblox R6 avatar in a sky-blue hoodie holding a glowing cylindrical flashlight inside a dim wooden hotel hallway",
+    subjectZh: "身穿天蓝连帽卫衣的Roblox R6主角在昏暗木质酒店走廊中举着发光圆筒手电筒",
+    shots: [
+      {
+        role: "Hook / 黄金前3秒",
+        actionEn: "steps cautiously toward a numbered wooden hotel door (050) while sweeping a bright yellow flashlight cone forward",
+        actionZh: "举着亮黄色光束手电筒，迈着僵硬小步小心翼翼靠近标号050的木质房门",
+        faceEn: "nervous worried brows and tiny sweat drop decal",
+        faceZh: "紧张八字眉配额角汗珠2D贴图",
+        cameraEn: "Over-the-shoulder eerie slow push-in down the dark corridor",
+        cameraZh: "越肩机位顺着幽暗走廊缓慢推近",
+        hailuoTag: "[Push in]",
+        sfx: "木地板吱呀声 + 低频心跳",
+        caption: "第50号门…千万别闪灯"
+      },
+      {
+        role: "Escalation 1 / 动作推进",
+        actionEn: "freezes mid-step as the warm wall lamps overhead violently flicker twice and plunge the room into deep blue shadow",
+        actionZh: "头顶暖色壁灯突然滋啦闪烁两下骤然熄灭，小人全身僵直停在半步姿态",
+        faceEn: "wide white ring eyes shrinking in terror",
+        faceZh: "瞳孔骤缩的惊恐白圈眼贴图",
+        cameraEn: "Frontal medium close-up lit only by the upward flashlight bounce",
+        cameraZh: "仅靠手电筒反光照亮的正面中近景特写",
+        hailuoTag: "[Static shot]",
+        sfx: "灯泡电流滋啦爆闪声",
+        caption: "完了，灯真的闪了？！"
+      },
+      {
+        role: "Escalation 2 / 情绪升级",
+        actionEn: "rotates only its 1:1 barrel head 90 degrees backward as two glowing white eyes materialize in the dark hallway behind",
+        actionZh: "身体不敢动，仅1:1桶状圆角脑袋缓慢向后转头，身后黑暗深处亮起两颗惨白发光眼睛",
+        faceEn: "open silent scream mouth decal",
+        faceZh: "无声张嘴呐喊2D贴图",
+        cameraEn: "Rack-focus dolly zoom revealing the glowing eyes in the background",
+        cameraZh: "背景浮现发光白眼的希区柯克变焦镜头",
+        hailuoTag: "[Zoom in, Shake]",
+        sfx: "深渊低吼渐强音效",
+        caption: "别回头！快找柜子！"
+      },
+      {
+        role: "Payoff & Loop / 反转收尾",
+        actionEn: "pivots 180 degrees and dives stiffly into a brown wooden wardrobe closet, slamming the slatted doors shut",
+        actionZh: "180度原地干脆转身，直挺挺扎进棕色木质衣柜并啪地合上百叶柜门",
+        faceEn: "eyes peeking through wardrobe slats",
+        faceZh: "透过百叶门缝惊恐偷看的墨点眼",
+        cameraEn: "Fast whip-pan to the rattling wooden closet",
+        cameraZh: "快速摇镜对准剧烈震动的木衣柜",
+        hailuoTag: "[Pan right, Shake]",
+        sfx: "衣柜砰地关门声 + 怪物呼啸掠过",
+        caption: "极限躲柜，差点重开"
+      }
+    ]
+  },
+  "sword-duel": {
+    titleZh: "十字路口经典长剑对决",
+    titleEn: "Crossroads Linked Sword 1v1 Duel",
+    defaultRig: "r6",
+    defaultMaterial: "smooth-plastic",
+    subjectEn: "two classic Roblox R6 fighters on a stone bridge: Builderman in a yellow hard hat and orange hoodie vs. a Classic Noob, both wielding metallic Linked Swords",
+    subjectZh: "石桥上的双人经典Roblox R6对决：戴黄色安全帽穿橙卫衣的建造者 vs 经典黄皮新手，均手持金属十字长剑(Linked Sword)",
+    shots: [
+      {
+        role: "Hook / 黄金前3秒",
+        actionEn: "both R6 fighters raise their metallic Linked Swords upright on opposite ends of a studded stone bridge over glowing orange lava",
+        actionZh: "岩浆池上方的方格石桥两端，两名R6剑客同时高举经典金属十字长剑摆出迎战姿态",
+        faceEn: "confident smirk on Builderman; determined grin on the Noob",
+        faceZh: "安全帽小人挑眉自信笑，黄皮新手露齿战意贴图",
+        cameraEn: "Wide side-profile arcade fighting framing pushing in",
+        cameraZh: "横版格斗式侧面全景推镜",
+        hailuoTag: "[Push in]",
+        sfx: "经典Roblox拔剑清脆金属音 (Unsheathe!)",
+        caption: "经典十字剑1v1，谁赢？"
+      },
+      {
+        role: "Escalation 1 / 动作推进",
+        actionEn: "both avatars lunge forward in a stiff R6 double-jump and clash swords mid-air with bright yellow blocky sparks",
+        actionZh: "两人同时跃起使出经典R6空中劈砍，两把十字长剑在半空碰撞迸出亮黄色方块火花",
+        faceEn: "intense angry Bloxxer brows on both fighters",
+        faceZh: "双方同步切换为用力皱眉2D贴图",
+        cameraEn: "Low-angle hero shot tilting upward into the mid-air clash",
+        cameraZh: "低角度仰拍定格半空交剑瞬间",
+        hailuoTag: "[Tilt up, Shake]",
+        sfx: "清脆金属交击声 (Clang!)",
+        caption: "空中拼刀！火花拉满"
+      },
+      {
+        role: "Escalation 2 / 情绪升级",
+        actionEn: "Builderman lands a clean lunge Spin-slash that knocks the Noob sliding backward to the very edge of the stone bridge",
+        actionZh: "安全帽小人落地顺势一记转身横劈，将黄皮新手击退滑行至石桥悬崖最边缘",
+        faceEn: "shocked O_O decal on the Noob teetering on one leg",
+        faceZh: "黄皮新手单腿悬空呈现震惊圆圈眼贴图",
+        cameraEn: "Dynamic tracking shot following the knockback to the ledge",
+        cameraZh: "高速跟拍新手滑向石桥边缘",
+        hailuoTag: "[Pan right]",
+        sfx: "重击音效 + 悬崖碎石掉落",
+        caption: "差一毫米掉岩浆！"
+      },
+      {
+        role: "Payoff & Loop / 反转收尾",
+        actionEn: "both avatars stop fighting and raise Bloxy Cola cans together in a friendly truce pose",
+        actionZh: "两人突然收剑停手，默契举起红色Bloxy Cola可乐罐碰杯言和",
+        faceEn: "synchronized cheerful Default Smile :) decals",
+        faceZh: "两人同步恢复经典默认微笑(:))贴图",
+        cameraEn: "Pull-out to balanced two-shot on the bridge",
+        cameraZh: "拉远定格在石桥友谊双人构图",
+        hailuoTag: "[Pull out]",
+        sfx: "可乐开罐嗤啦声 (Tss-Ahhh!)",
+        caption: "打累了，先干一罐可乐"
+      }
+    ]
+  },
+  "school-panic": {
+    titleZh: "考场发卷大脑宕机记",
+    titleEn: "Classroom Pop-Quiz Brain Meltdown",
+    defaultRig: "r6",
+    defaultMaterial: "smooth-plastic",
+    subjectEn: "an authentic Roblox R6 Bacon Hair student avatar seated at a sunlit wooden classroom desk with a white exam sheet",
+    subjectZh: "坐在洒满阳光的木质课桌前、头顶3D棕色培根发型的Roblox R6学生小人",
+    shots: [
+      {
+        role: "Hook / 黄金前3秒",
+        actionEn: "stares down at a crisp white exam sheet landing flat on the wooden desk while a red wall clock ticks behind",
+        actionZh: "低头盯向啪地拍在木课桌上的白色试卷，背景墙上的红框圆挂钟滴答走字",
+        faceEn: "confident Default Smile :) decal before reading Question 1",
+        faceZh: "看题前信心满满的默认微笑贴图",
+        cameraEn: "High-angle close-up tilting from the exam sheet up to the avatar's face",
+        cameraZh: "从桌面试卷快速上摇至脸部特写",
+        hailuoTag: "[Tilt up]",
+        sfx: "试卷拍桌声 + 秒针滴答声",
+        caption: "考前：这把稳拿满分"
+      },
+      {
+        role: "Escalation 1 / 动作推进",
+        actionEn: "raises both solid 1x2x1 blocky hands to the sides of its barrel head as floating question-mark blocks pop up around it",
+        actionZh: "看清第一题瞬间，双侧1x2x1实心方柱手猛地抱住桶状脑袋，头顶冒出三个立体问号方块",
+        faceEn: "wide white shocked ring eyes and wavy mouth decal",
+        faceZh: "瞳孔地震的白圈震惊眼与波浪嘴贴图",
+        cameraEn: "Fast crash-zoom into the panicked 2D decal face",
+        cameraZh: "极速推镜聚焦慌张2D贴图脸",
+        hailuoTag: "[Push in, Shake]",
+        sfx: "系统报错叮咚声 (Windows Error vibe)",
+        caption: "第一题：完全没见过？！"
+      },
+      {
+        role: "Escalation 2 / 情绪升级",
+        actionEn: "scribbles frantically across the exam paper with a yellow blocky pencil at 2x speed while sweat drops fly",
+        actionZh: "右手吸附黄色方块铅笔在试卷上疯狂左右疾书，额角汗珠贴图狂飙",
+        faceEn: "gritted teeth and squinted eyes decal",
+        faceZh: "咬牙切齿奋笔疾书贴图",
+        cameraEn: "Side desk macro shot with frantic handheld vibration",
+        cameraZh: "课桌侧面微距镜头配合紧张高频微震",
+        hailuoTag: "[Shake]",
+        sfx: "高速沙沙写字声 + 急促倒计时铃",
+        caption: "不管了，先把解字写满"
+      },
+      {
+        role: "Payoff & Loop / 反转收尾",
+        actionEn: "slumps flat backward against the classroom chair with both arms hanging straight down as the bell rings",
+        actionZh: "下课铃响，小人全身僵直向后靠倒在椅背上，两条方柱手臂笔直垂落进入放空状态",
+        faceEn: "crossed KO dizzy eyes (X_X) decal",
+        faceZh: "大脑宕机的叉叉眼(X_X)贴图",
+        cameraEn: "Slow overhead pull-back above the desk",
+        cameraZh: "课桌正上方俯拍缓慢拉远",
+        hailuoTag: "[Pull out]",
+        sfx: "下课铃声 + 灵魂出窍风声",
+        caption: "交卷那一刻，重获平静"
+      }
+    ]
+  },
+  "red-light-game": {
+    titleZh: "一二三木头人极限急停",
+    titleEn: "Red Light Green Light Freeze Challenge",
+    defaultRig: "r6",
+    defaultMaterial: "smooth-plastic",
+    subjectEn: "two authentic Roblox R6 runners (Cyan Obby Speedrunner and Classic Yellow Noob) racing across a sandy arena toward a red finish line",
+    subjectZh: "沙地赛场上的两名Roblox R6参赛者（青色跑酷手与经典黄皮新手）冲向红色终点线",
+    shots: [
+      {
+        role: "Hook / 黄金前3秒",
+        actionEn: "both R6 avatars sprint joyfully forward across the bright sandy court under a glowing green traffic sign",
+        actionZh: "绿灯亮起，两名R6方块小人在明亮沙地赛场上迈着大步欢快向前冲刺",
+        faceEn: "excited Winning Grin (:D) decals on both runners",
+        faceZh: "两人脸上均印着兴奋露齿笑(:D)贴图",
+        cameraEn: "Low-angle tracking shot running alongside both avatars",
+        cameraZh: "低角度侧面跟拍双人冲刺步伐",
+        hailuoTag: "[Pan right]",
+        sfx: "轻快口令声 + 沙地踏步音",
+        caption: "绿灯冲刺！终点就在眼前"
+      },
+      {
+        role: "Escalation 1 / 动作推进",
+        actionEn: "the arena light abruptly flashes crimson red; both avatars freeze instantly mid-air on one 1x2x1 blocky leg",
+        actionZh: "赛场骤然亮起红光警报，两个小人瞬间在半步金鸡独立姿态死死定格一动不动",
+        faceEn: "wide frozen shocked O_O eyes with a single sweat drop",
+        faceZh: "不敢眨眼的震惊圆圈眼配冷汗贴图",
+        cameraEn: "Snap-zoom freeze-frame into the absurd one-legged R6 pose",
+        cameraZh: "急推镜头定格滑稽的单腿僵直造型",
+        hailuoTag: "[Push in]",
+        sfx: "刺耳红灯急停蜂鸣声 (BZZT!)",
+        caption: "红灯！！连呼吸都停了"
+      },
+      {
+        role: "Escalation 2 / 情绪升级",
+        actionEn: "the Classic Noob wobbles 5 degrees sideways while trying to hold the pose as the Cyan runner side-eyes it nervously",
+        actionZh: "右侧黄皮新手单腿重心不稳轻微晃动了5度，左侧青衣小人眼珠斜瞥吓得冷汗直冒",
+        faceEn: "side-eye panic decal on Cyan runner; clenched nervous smile on Noob",
+        faceZh: "左侧惊恐斜眼贴图，右侧强装镇定僵笑贴图",
+        cameraEn: "Extreme close-up two-shot under tense red rim light",
+        cameraZh: "红色轮廓光下的双脸近景紧张对峙",
+        hailuoTag: "[Static shot]",
+        sfx: "紧绷弦乐拔高 + 塑料嘎吱微响",
+        caption: "兄弟你别晃啊！会连坐的！"
+      },
+      {
+        role: "Payoff & Loop / 反转收尾",
+        actionEn: "the light switches back to bright green and both avatars dive stiffly across the red checkered finish pad together",
+        actionZh: "绿灯重新亮起，两人同时向前刚体飞扑压过红白格子终点线",
+        faceEn: "cheerful victory grin decals",
+        faceZh: "劫后余生的胜利大笑贴图",
+        cameraEn: "High-angle finish-line celebration shot",
+        cameraZh: "终点线高角度俯拍庆祝镜头",
+        hailuoTag: "[Tilt down]",
+        sfx: "通关礼花砰响声 + 欢呼声",
+        caption: "压线过关！全员存活"
+      }
+    ]
   }
 };
 
 const NEGATIVE_GUARD =
-  "human fingers, five-fingered hand, Lego solid 1x2x1 rectangular block hands, Lego hook hands, Lego top head studs, Minecraft sharp voxel cube head, separated thin legs with thigh gap, protruding human sneakers, realistic human face, 3D protruding nose, skin pores, rubbery noodle limbs, foot sliding, morphing clothes, watermark";
+  "human fingers, five-fingered hand, Lego C-shaped claw hands, Lego hook hands, Lego top head studs, Minecraft sharp voxel cube head, separated thin legs with thigh gap, protruding human sneakers, realistic human face, 3D protruding nose, skin pores, rubbery noodle limbs, foot sliding, morphing clothes, watermark";
 
 const NEGATIVE_GUARD_ZH =
-  "人类五指，真实人手，乐高1x2x1实心平头方柱手，乐高钩子手，乐高头顶圆柱凸起颗粒，我的世界直角像素方块头，双腿分叉有空隙，外凸真人运动鞋，真实人类面部骨骼，3D凸起高鼻梁，皮肤毛孔，橡胶面条状弯曲四肢，脚底打滑，服装中途变形，水印文字";
+  "人类五指，真实人手，乐高C型夹爪手，乐高钩子手，乐高头顶圆柱凸起颗粒，我的世界直角像素方块头，双腿分叉有空隙，外凸真人运动鞋，真实人类面部骨骼，3D凸起高鼻梁，皮肤毛孔，橡胶面条状弯曲四肢，脚底打滑，服装中途变形，水印文字";
 
 function printHelp() {
   console.log(`Usage: node scripts/shot_compiler.mjs [options]
@@ -369,7 +717,9 @@ Compile a 9:16 Roblox-style short-video storyboard and engine-tuned I2V/T2V prom
 
 Options:
   --template <id>    Template: daily-meltdown | duo-comedy | obby-storytime |
-                     mini-tycoon | outfit-drop | meme-slapstick (default: daily-meltdown)
+                     mini-tycoon | outfit-drop | meme-slapstick | disaster-survival |
+                     brookhaven-chase | doors-horror | sword-duel | school-panic |
+                     red-light-game (default: daily-meltdown)
   --duration <sec>   Target duration: 15 | 30 | 45 (default: 15)
   --engine <id>      Target engine: kling | seedance | hailuo | wan | sora | runway (default: kling)
   --rig <id>         Override rig: chibi-blocky | r6 | r15

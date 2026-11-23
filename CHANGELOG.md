@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.4.0
+
+- Added 6 new Roblox short-video story templates and 3D animated scene packages (`disaster-survival`, `brookhaven-chase`, `doors-horror`, `sword-duel`, `school-panic`, `red-light-game`), bringing the showcase to 12 animated 9:16 examples.
+- Updated all 10 language READMEs to remove static character/face grids and top banners, featuring a dense 6x2 animated video gallery and concrete scene-by-scene shot strips.
+
 ## 1.3.0
 
 - Renamed repository and skill identifier to `roblox-style-video`.

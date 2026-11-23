@@ -1,26 +1,21 @@
-# Example 3: Y2K Streetwear vs. Classic Noob / 潮人搭子与黄皮新手
+# 03 · Y2K Streetwear vs. Classic Noob / Y2K 潮人搭子与黄皮新手
 
-This folder contains a 15-second (`9:16` vertical, 4 shots) two-character short compiled for Seedance / Jimeng (即梦视频), pairing an `R15` Y2K streetwear avatar (`"Nova"`) with a rigid `R6` yellow, blue, and green Classic Noob.
+15-second (`9:16`, 4-shot) Roblox-style short-video package compiled with `--template duo-comedy --engine seedance --rig r15`.
 
-![Duo Bestie Contrast Storyboard Contact Sheet (ZH)](assets/duo_storyboard_sheet.zh.png)
+| 9:16 Animated Preview | 4-Shot Storyboard Contact Sheet |
+| :---: | :---: |
+| <img src="assets/duo_bestie_contrast.gif" width="185" alt="Y2K Streetwear vs. Classic Noob 9:16 preview" /> | <img src="assets/duo_storyboard_sheet.en.png" width="520" alt="Y2K Streetwear vs. Classic Noob 4-shot contact sheet" /> |
 
-## Files in this package
+## Package contents
 
-| File | Description |
-| --- | --- |
-| [`assets/duo_bestie_contrast.gif`](assets/duo_bestie_contrast.gif) | 4-shot 9:16 vertical animation loop |
-| [`assets/duo_bestie_contrast.mp4`](assets/duo_bestie_contrast.mp4) | H.264 `.mp4` with camera shutter, plastic bonk, and plank-fall audio |
-| [`assets/duo_storyboard_sheet.zh.png`](assets/duo_storyboard_sheet.zh.png) · [`en`](assets/duo_storyboard_sheet.en.png) | 4-shot contact sheet showing two-character framing and R6 ragdoll physics |
-| [`character_card.md`](character_card.md) | `"Nova"` (`ugc-streetwear`, `r15`, `glossy-vinyl`) + Classic Noob partner specification |
-| [`storyboard.md`](storyboard.md) · [`prompts.json`](prompts.json) | Bilingual first-frame and Seedance/Jimeng motion prompts |
+- [`assets/duo_bestie_contrast.mp4`](assets/duo_bestie_contrast.mp4): offline 3D preview video (`H.264 MP4`)
+- [`assets/duo_storyboard_sheet.en.png`](assets/duo_storyboard_sheet.en.png) · [`zh`](assets/duo_storyboard_sheet.zh.png): English and Chinese 4-shot contact sheets
+- [`character_card.md`](character_card.md): Character DNA card and 3-view turnaround prompt (`ugc-streetwear`)
+- [`storyboard.md`](storyboard.md) · [`prompts.json`](prompts.json): shot-by-shot first-frame and `seedance` motion prompts
 
-<p align="center">
-  <img src="assets/duo_bestie_contrast.gif" alt="Y2K vs Classic Noob 9:16 preview" width="300" />
-</p>
-
-## Reproduce from the repository root
+## Reproduce
 
 ```bash
-node scripts/avatar_spec.mjs --archetype ugc-streetwear --rig r15 --material glossy-vinyl --name "Nova" --lang zh-en > examples/duo-bestie-contrast/character_card.md
-node scripts/shot_compiler.mjs --template duo-comedy --duration 15 --engine seedance --rig r15 --lang zh-en > examples/duo-bestie-contrast/storyboard.md
+node scripts/avatar_spec.mjs --archetype ugc-streetwear --rig r15 --material glossy-vinyl --name "Nova" --lang en > examples/duo-bestie-contrast/character_card.md
+node scripts/shot_compiler.mjs --template duo-comedy --duration 15 --engine seedance --rig r15 --lang en > examples/duo-bestie-contrast/storyboard.md
 ```

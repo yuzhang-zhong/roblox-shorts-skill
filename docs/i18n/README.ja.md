@@ -1,63 +1,72 @@
-<p><img src="../../assets/icon.svg" width="80" height="80" alt="" /></p>
+<div align="center">
 
-# roblox-style-video
+# Roblox Style Video
+
+9:16 Roblox 風ショート動画の比率固定・カット別プロンプト生成・ローカル 3D プレビュー。
 
 [English](../../README.md) · [简体中文](../../README.zh-CN.md) · [繁體中文](README.zh-TW.md) · **日本語** · [한국어](README.ko.md) · [Español](README.es.md) · [Français](README.fr.md) · [Deutsch](README.de.md) · [Português](README.pt-BR.md) · [Русский](README.ru.md)
 
-9:16 縦型 Roblox 風ショート動画向けの Agent Skill と Node.js CLI ツールです。動画生成 AI に漠然と「Roblox キャラ」と指示したり `C-shaped claw hands` と書いたりすると、人間の5本指、レゴのC字爪や頭頂ポッチ、Minecraft のボクセル頭、隙間のある細い脚になりがちです。`roblox-style-video` は Roblox Studio の標準比率（`2x2x1` 胴体、隙間なく並ぶ `1x2x1` 脚、指や爪のないブロック手、`1:1` 円筒ヘッドと平面 2D デカール顔、`Studs` ベースプレート）を固定し、Kling・Seedance・Hailuo・Wan・Sora・Runway 向けプロンプトとローカル 3D プレビューを生成します。
+</div>
+
+## 動画サンプル（9:16 アニメーション 12 例）
+
+<p align="center">
+  <a href="../../examples/monday-alarm-meltdown/assets/monday_alarm_meltdown.mp4"><img src="../../examples/monday-alarm-meltdown/assets/monday_alarm_meltdown.gif" width="134" alt="Monday Alarm 9:16 animated preview" /></a>
+  <a href="../../examples/obby-sky-run/assets/obby_sky_run.mp4"><img src="../../examples/obby-sky-run/assets/obby_sky_run.gif" width="134" alt="Sky Obby 9:16 animated preview" /></a>
+  <a href="../../examples/duo-bestie-contrast/assets/duo_bestie_contrast.mp4"><img src="../../examples/duo-bestie-contrast/assets/duo_bestie_contrast.gif" width="134" alt="Y2K vs. Noob 9:16 animated preview" /></a>
+  <a href="../../examples/cozy-cafe-tycoon/assets/cozy_cafe_tycoon.mp4"><img src="../../examples/cozy-cafe-tycoon/assets/cozy_cafe_tycoon.gif" width="134" alt="Cozy Cafe 9:16 animated preview" /></a>
+  <a href="../../examples/runway-outfit-drop/assets/runway_outfit_drop.mp4"><img src="../../examples/runway-outfit-drop/assets/runway_outfit_drop.gif" width="134" alt="Runway Drop 9:16 animated preview" /></a>
+  <a href="../../examples/burnt-pizza-slapstick/assets/burnt_pizza_slapstick.mp4"><img src="../../examples/burnt-pizza-slapstick/assets/burnt_pizza_slapstick.gif" width="134" alt="Burnt Pizza 9:16 animated preview" /></a>
+  <br />
+  <a href="../../examples/disaster-tower-tornado/assets/disaster_tower_tornado.mp4"><img src="../../examples/disaster-tower-tornado/assets/disaster_tower_tornado.gif" width="134" alt="Tornado Tower 9:16 animated preview" /></a>
+  <a href="../../examples/brookhaven-police-chase/assets/brookhaven_police_chase.mp4"><img src="../../examples/brookhaven-police-chase/assets/brookhaven_police_chase.gif" width="134" alt="Police Chase 9:16 animated preview" /></a>
+  <a href="../../examples/doors-flashlight-hallway/assets/doors_flashlight_hallway.mp4"><img src="../../examples/doors-flashlight-hallway/assets/doors_flashlight_hallway.gif" width="134" alt="Doors Hallway 9:16 animated preview" /></a>
+  <a href="../../examples/crossroads-sword-duel/assets/crossroads_sword_duel.mp4"><img src="../../examples/crossroads-sword-duel/assets/crossroads_sword_duel.gif" width="134" alt="Sword Duel 9:16 animated preview" /></a>
+  <a href="../../examples/classroom-exam-panic/assets/classroom_exam_panic.mp4"><img src="../../examples/classroom-exam-panic/assets/classroom_exam_panic.gif" width="134" alt="Exam Panic 9:16 animated preview" /></a>
+  <a href="../../examples/red-light-freeze/assets/red_light_freeze.mp4"><img src="../../examples/red-light-freeze/assets/red_light_freeze.gif" width="134" alt="Red Light Freeze 9:16 animated preview" /></a>
+</p>
+<p align="center"><sub>クリップをクリックすると MP4 プレビューが開きます。</sub></p>
+
+| Short & prompt format | What happens | Short & prompt format | What happens |
+| --- | --- | --- | --- |
+| **[01 · Monday Alarm](../../examples/monday-alarm-meltdown/)** · Kling<br>[MP4](../../examples/monday-alarm-meltdown/assets/monday_alarm_meltdown.mp4) · [絵コンテ](../../examples/monday-alarm-meltdown/assets/storyboard_contact_sheet.en.png) | Slaps a ringing alarm clock, cries at 99+ pings, and face-plants onto the keyboard. | **[07 · Tornado Tower](../../examples/disaster-tower-tornado/)** · Kling<br>[MP4](../../examples/disaster-tower-tornado/assets/disaster_tower_tornado.mp4) · [絵コンテ](../../examples/disaster-tower-tornado/assets/tornado_storyboard_sheet.en.png) | A Classic Guest clings to a green tower as a dark tornado funnel tears blocks away. |
+| **[02 · Sky Obby](../../examples/obby-sky-run/)** · Hailuo<br>[MP4](../../examples/obby-sky-run/assets/obby_sky_run.mp4) · [絵コンテ](../../examples/obby-sky-run/assets/obby_storyboard_sheet.en.png) | Speed Coil jumps across floating pads, stops short of a red Killbrick, and lands on the checkpoint. | **[08 · Police Chase](../../examples/brookhaven-police-chase/)** · Hailuo<br>[MP4](../../examples/brookhaven-police-chase/assets/brookhaven_police_chase.mp4) · [絵コンテ](../../examples/brookhaven-police-chase/assets/chase_storyboard_sheet.en.png) | Siren pursuit down an asphalt street ends when the fleeing Noob trips over a yellow hydrant. |
+| **[03 · Y2K vs. Noob](../../examples/duo-bestie-contrast/)** · Seedance<br>[MP4](../../examples/duo-bestie-contrast/assets/duo_bestie_contrast.mp4) · [絵コンテ](../../examples/duo-bestie-contrast/assets/duo_storyboard_sheet.en.png) | A Y2K avatar's 180-degree spin bumps a rigid yellow R6 Noob sideways. | **[09 · Doors Hallway](../../examples/doors-flashlight-hallway/)** · Sora<br>[MP4](../../examples/doors-flashlight-hallway/assets/doors_flashlight_hallway.mp4) · [絵コンテ](../../examples/doors-flashlight-hallway/assets/doors_storyboard_sheet.en.png) | Flashlight check at Door 050, corridor lights flicker out, glowing eyes appear behind, closet hide. |
+| **[04 · Cozy Cafe](../../examples/cozy-cafe-tycoon/)** · Wan<br>[MP4](../../examples/cozy-cafe-tycoon/assets/cozy_cafe_tycoon.mp4) · [絵コンテ](../../examples/cozy-cafe-tycoon/assets/cafe_storyboard_sheet.en.png) | Snaps a golden croissant onto a pastel tray, slides a hot latte, and pops +999 coins. | **[10 · Sword Duel](../../examples/crossroads-sword-duel/)** · Seedance<br>[MP4](../../examples/crossroads-sword-duel/assets/crossroads_sword_duel.mp4) · [絵コンテ](../../examples/crossroads-sword-duel/assets/sword_storyboard_sheet.en.png) | Builderman and Noob clash Linked Swords mid-air over lava before calling a Bloxy Cola truce. |
+| **[05 · Runway Drop](../../examples/runway-outfit-drop/)** · Sora<br>[MP4](../../examples/runway-outfit-drop/assets/runway_outfit_drop.mp4) · [絵コンテ](../../examples/runway-outfit-drop/assets/runway_storyboard_sheet.en.png) | Jumps from a plain gray base rig and lands on the beat in neon pink Y2K streetwear. | **[11 · Exam Panic](../../examples/classroom-exam-panic/)** · Wan<br>[MP4](../../examples/classroom-exam-panic/assets/classroom_exam_panic.mp4) · [絵コンテ](../../examples/classroom-exam-panic/assets/exam_storyboard_sheet.en.png) | Confident smile turns to head-grab shock on Question 1, 2x scribbling, and X_X brain KO. |
+| **[06 · Burnt Pizza](../../examples/burnt-pizza-slapstick/)** · Runway<br>[MP4](../../examples/burnt-pizza-slapstick/assets/burnt_pizza_slapstick.mp4) · [絵コンテ](../../examples/burnt-pizza-slapstick/assets/pizza_storyboard_sheet.en.png) | Presents a pitch-black pizza under a spotlight before tipping 90 degrees onto the floor. | **[12 · Red Light Freeze](../../examples/red-light-freeze/)** · Runway<br>[MP4](../../examples/red-light-freeze/assets/red_light_freeze.mp4) · [絵コンテ](../../examples/red-light-freeze/assets/redlight_storyboard_sheet.en.png) | Two runners sprint on Green Light, freeze on one blocky leg on Red Light, and dive across the line. |
+
+## カット割り分解とジャンル別シーンボード
+
+| Shot 01 (`0–3.5s`) | Shot 02 (`3.5–7.5s`) | Shot 03 (`7.5–11.5s`) | Shot 04 (`11.5–15s`) |
+| :---: | :---: | :---: | :---: |
+| <img src="../../examples/monday-alarm-meltdown/assets/shot_01_hook.png" width="196" alt="Shot 01" /> | <img src="../../examples/monday-alarm-meltdown/assets/shot_02_slam.png" width="196" alt="Shot 02" /> | <img src="../../examples/monday-alarm-meltdown/assets/shot_03_tears.png" width="196" alt="Shot 03" /> | <img src="../../examples/monday-alarm-meltdown/assets/shot_04_faceplant.png" width="196" alt="Shot 04" /> |
+
+| 02 · Sky Obby (`Hailuo`) | 08 · Brookhaven Police Chase (`Hailuo`) |
+| :---: | :---: |
+| <a href="../../examples/obby-sky-run/"><img src="../../examples/obby-sky-run/assets/obby_storyboard_sheet.en.png" width="410" alt="Sky Obby" /></a> | <a href="../../examples/brookhaven-police-chase/"><img src="../../examples/brookhaven-police-chase/assets/chase_storyboard_sheet.en.png" width="410" alt="Police Chase" /></a> |
+| **07 · Natural Disaster Tower (`Kling`)** | **09 · Doors Hotel Hallway (`Sora`)** |
+| <a href="../../examples/disaster-tower-tornado/"><img src="../../examples/disaster-tower-tornado/assets/tornado_storyboard_sheet.en.png" width="410" alt="Tornado Tower" /></a> | <a href="../../examples/doors-flashlight-hallway/"><img src="../../examples/doors-flashlight-hallway/assets/doors_storyboard_sheet.en.png" width="410" alt="Doors Hallway" /></a> |
+| **10 · Crossroads Sword Duel (`Seedance`)** | **12 · Red Light Freeze (`Runway`)** |
+| <a href="../../examples/crossroads-sword-duel/"><img src="../../examples/crossroads-sword-duel/assets/sword_storyboard_sheet.en.png" width="410" alt="Sword Duel" /></a> | <a href="../../examples/red-light-freeze/"><img src="../../examples/red-light-freeze/assets/redlight_storyboard_sheet.en.png" width="410" alt="Red Light Freeze" /></a> |
 
 ## クイックスタート
-
-ローカルの Skills ディレクトリにクローンします（Codex、Claude Code、Cursor、GitHub Copilot 対応）：
 
 ```bash
 git clone https://github.com/yuzhang-zhong/roblox-style-video.git ~/.codex/skills/roblox-style-video
 ```
 
-エージェントで `$roblox-style-video` を指定して実行：
-
-```text
-$roblox-style-video を使って、Y2K ストリート系アバターと黄色い Classic Noob が買い物に行く
-15秒の 9:16 ショート動画を企画して。キャラ設定カード、三面図プロンプト、Kling I2V 用の4カット絵コンテを出して。
-```
-
-単体スクリプトとして直接実行することもできます（Node.js 18+ 標準ライブラリのみ、`npm install`・APIキー不要）：
-
 ```bash
-node scripts/avatar_spec.mjs --archetype corporate-worker --rig chibi-blocky --material smooth-plastic --name "Momo" --lang ja
-node scripts/shot_compiler.mjs --template daily-meltdown --duration 15 --engine kling --rig chibi-blocky --lang ja
+node scripts/shot_compiler.mjs --template brookhaven-chase --duration 15 --engine hailuo --rig r6 --lang ja
 node scripts/drift_check.mjs --prompt "A cute Roblox girl with C-shaped claw hands drinks coffee with five fingers" --engine kling --mode t2v --lang ja
+node scripts/render_preview.mjs --only tornado,chase,doors
 ```
 
-## サンプルとローカル 3D プレビュー
+## CLI スクリプト・形状チェック・リファレンス
 
-リポジトリ内の `.png`・`.gif`・`.mp4` は外部の動画生成クレジットを消費する前に比率・構図・頭上チャット吹き出しを確認するため `scripts/render_preview.mjs` でオフライン描画した 3D プレビューです。最終動画は各動画生成モデルでレンダリングします。
+<p align="center">
+  <img src="../../assets/showcase/drift_rescue_comparison.en.png" width="760" alt="Geometry drift check" />
+</p>
 
-| 3面図リファレンス (`0° / 45° / 90°`) | 形状崩れチェック (`FAIL` vs. `PASS`) |
-| :---: | :---: |
-| <img src="../../assets/showcase/momo_turnaround_sheet.en.png" width="380" alt="Turnaround sheet" /> | <img src="../../assets/showcase/drift_rescue_comparison.en.png" width="380" alt="Geometry drift check" /> |
-
-6つのテンプレートと動画エンジンに対応するサンプルです。絵コンテは15秒（`9:16`・4カット）構成で、各MP4は4秒のローカルプレビューです。
-
-| 01 · 月曜アラーム (`Kling`) | 02 · スカイアスレ (`Hailuo`) | 03 · Y2K vs. Noob (`Seedance`) |
-| :---: | :---: | :---: |
-| <img src="../../examples/monday-alarm-meltdown/assets/monday_alarm_meltdown.gif" width="155" alt="Case 01" /> | <img src="../../examples/obby-sky-run/assets/obby_sky_run.gif" width="155" alt="Case 02" /> | <img src="../../examples/duo-bestie-contrast/assets/duo_bestie_contrast.gif" width="155" alt="Case 03" /> |
-| [絵コンテ](../../examples/monday-alarm-meltdown/assets/storyboard_contact_sheet.en.png) · [MP4](../../examples/monday-alarm-meltdown/assets/monday_alarm_meltdown.mp4) · [ファイル](../../examples/monday-alarm-meltdown/) | [絵コンテ](../../examples/obby-sky-run/assets/obby_storyboard_sheet.en.png) · [MP4](../../examples/obby-sky-run/assets/obby_sky_run.mp4) · [ファイル](../../examples/obby-sky-run/) | [絵コンテ](../../examples/duo-bestie-contrast/assets/duo_storyboard_sheet.en.png) · [MP4](../../examples/duo-bestie-contrast/assets/duo_bestie_contrast.mp4) · [ファイル](../../examples/duo-bestie-contrast/) |
-| **04 · カフェ経営 (`Wan`)** | **05 · ランウェイ変身 (`Sora`)** | **06 · 黒焦げピザ (`Runway`)** |
-| <img src="../../examples/cozy-cafe-tycoon/assets/cozy_cafe_tycoon.gif" width="155" alt="Case 04" /> | <img src="../../examples/runway-outfit-drop/assets/runway_outfit_drop.gif" width="155" alt="Case 05" /> | <img src="../../examples/burnt-pizza-slapstick/assets/burnt_pizza_slapstick.gif" width="155" alt="Case 06" /> |
-| [絵コンテ](../../examples/cozy-cafe-tycoon/assets/cafe_storyboard_sheet.en.png) · [MP4](../../examples/cozy-cafe-tycoon/assets/cozy_cafe_tycoon.mp4) · [ファイル](../../examples/cozy-cafe-tycoon/) | [絵コンテ](../../examples/runway-outfit-drop/assets/runway_storyboard_sheet.en.png) · [MP4](../../examples/runway-outfit-drop/assets/runway_outfit_drop.mp4) · [ファイル](../../examples/runway-outfit-drop/) | [絵コンテ](../../examples/burnt-pizza-slapstick/assets/pizza_storyboard_sheet.en.png) · [MP4](../../examples/burnt-pizza-slapstick/assets/burnt_pizza_slapstick.mp4) · [ファイル](../../examples/burnt-pizza-slapstick/) |
-
-## CLI スクリプト・制約事項・リファレンス
-
-- [`scripts/avatar_spec.mjs`](../../scripts/avatar_spec.mjs)：キャラクター DNA カード（`BrickColor`、`2x2x1` / `1x2x1` 比率）と三面図プロンプトを生成。
-- [`scripts/shot_compiler.mjs`](../../scripts/shot_compiler.mjs)：`kling`・`seedance`・`hailuo`・`wan`・`sora`・`runway` 向けの 9:16 絵コンテと I2V/T2V プロンプトを出力。
-- [`scripts/drift_check.mjs`](../../scripts/drift_check.mjs)：人間の指、レゴC字爪、ボクセル頭、1カット内の動作過多を検査して修正プロンプトを生成。
-- [`scripts/render_preview.mjs`](../../scripts/render_preview.mjs)：三面図、比較ボード、絵コンテシート、`.gif` / `.mp4` プレビューをローカル描画。
-
-4〜5秒のクリップごとに主要アクションは1つに絞り、マルチショット制作時は三面図から開始フレームを固定してください。応答と `--lang` は10言語（`en`, `zh`, `zh-tw`, `ja`, `ko`, `es`, `fr`, `de`, `pt`, `ru`）に対応。[MIT License](../../LICENSE) の独立したオープンソースであり、Roblox Corporation とは無関係です。
-
-- [`SKILL.md`](../../SKILL.md)
-- [`references/avatar-geometry-and-materials.md`](../../references/avatar-geometry-and-materials.md)
-- [`references/model-prompt-playbook.md`](../../references/model-prompt-playbook.md)
-- [`references/rescue-and-anti-drift.md`](../../references/rescue-and-anti-drift.md)
-- [`references/short-video-beats-and-audio.md`](../../references/short-video-beats-and-audio.md) · [`references/viral-archetypes-catalog.md`](../../references/viral-archetypes-catalog.md)
+- [`SKILL.md`](../../SKILL.md) · [`scripts/shot_compiler.mjs`](../../scripts/shot_compiler.mjs) · [`scripts/avatar_spec.mjs`](../../scripts/avatar_spec.mjs) · [`scripts/drift_check.mjs`](../../scripts/drift_check.mjs) · [`scripts/render_preview.mjs`](../../scripts/render_preview.mjs)
+- [`references/avatar-geometry-and-materials.md`](../../references/avatar-geometry-and-materials.md) · [`references/model-prompt-playbook.md`](../../references/model-prompt-playbook.md) · [`references/rescue-and-anti-drift.md`](../../references/rescue-and-anti-drift.md) · [`references/viral-archetypes-catalog.md`](../../references/viral-archetypes-catalog.md) · [`LICENSE`](../../LICENSE)
