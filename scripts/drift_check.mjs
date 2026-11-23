@@ -8,33 +8,38 @@
 const ISSUE_PATCHES = {
   "human-fingers": {
     titleZh: "长出人类五指 (Human Finger Growth)",
-    fixEn: "fingerless C-shaped plastic claw hands, solid blocky mittens, zero human fingers, no knuckles",
-    fixZh: "无手指C型塑料夹爪手，一体式倒角方柱手部，严禁出现人类五指或手部关节纹"
+    fixEn: "fingerless and clawless solid 1x2x1 beveled rectangular block hands, zero human fingers, no knuckles",
+    fixZh: "平头倒角1x2x1实心方块手部，严禁出现人类五指或手部关节纹"
   },
   "lego-studs": {
-    titleZh: "出现乐高顶部凸起圆颗粒 (Lego Stud Contamination)",
-    fixEn: "smooth studless cylindrical top head, non-Lego chamfered ABS plastic blocks, zero brick pegs",
-    fixZh: "头顶与地面完全平滑无乐高凸起颗粒，Roblox圆润倒角方块几何，严禁积木凸点"
+    titleZh: "出现乐高头顶圆颗粒或乐高C型夹爪手 (Lego Stud & C-Claw Contamination)",
+    fixEn: "smooth studless 1:1 barrel-beveled Roblox head, solid 1x2x1 rectangular block hands (no Lego C-shaped hook claws, no cylindrical brick pegs)",
+    fixZh: "头顶完全平滑的1:1桶状圆角Roblox头部，1x2x1实心平头方柱手（严禁乐高C型钩子爪与头顶凸起颗粒）"
   },
   "minecraft-voxels": {
     titleZh: "串味成我的世界像素方块 (Minecraft Voxel Drift)",
-    fixEn: "2mm rounded chamfered edges, smooth glossy vinyl/ABS surface shader, cylindrical head, non-voxel, no pixel texture",
-    fixZh: "2毫米圆润边缘倒角，平滑高光盲盒PVC表面材质，圆柱体头部，非像素马赛克方块"
+    fixEn: "classic Roblox 1:1 barrel-cylinder head with deep curved top/bottom bevels, SmoothPlastic shader, non-voxel, no pixel texture",
+    fixZh: "经典Roblox 1:1上下大圆角桶状圆柱头，SmoothPlastic平滑塑料材质，非像素马赛克方块"
+  },
+  "limb-gap": {
+    titleZh: "双腿分叉有空隙或穿分体运动鞋，不像Roblox方腿 (Non-Roblox Separated Legs)",
+    fixEn: "canonical Roblox 2x2x1 rectangular torso with two 1x2x1 rectangular leg blocks sitting flush side-by-side matching exact torso width, zero thigh gap",
+    fixZh: "标准Roblox 2x2x1宽扁长方体躯干配两条并拢齐平的1x2x1方柱双腿（与躯干完全同宽，无腿缝、无外凸真人鞋头）"
   },
   "face-morph": {
     titleZh: "五官突起长出真人鼻子/嘴唇 (3D Human Face Morphing)",
-    fixEn: "flat 2D screen-printed face decal on smooth cylindrical surface, painted ink eyes and mouth, zero 3D nose protrusion",
+    fixEn: "flat 2D screen-printed Roblox face decal on smooth cylindrical surface, painted ink eyes and mouth, zero 3D nose protrusion",
     fixZh: "纯平2D丝网印刷五官贴图，绘制墨点眼与平面嘴型，零3D鼻子凸起，无真实皮肤纹理"
   },
   "noodle-limbs": {
     titleZh: "四肢像面条一样弯曲软化 (Rubbery Noodle Limbs)",
-    fixEn: "rigid rectangular blocky arms and legs, strict mechanical hinge rotation at shoulders and hips only, no rubbery bending",
-    fixZh: "刚性长方体四肢，仅在肩部与髋部做机械转轴摆动，严禁橡胶面条状弯曲形变"
+    fixEn: "rigid 1x2x1 rectangular blocky arms and legs, strict Motor6D mechanical hinge rotation at shoulders and hips only, no rubbery bending",
+    fixZh: "刚性1x2x1长方体四肢，仅在肩部与髋部做Motor6D机械转轴摆动，严禁橡胶面条状弯曲形变"
   },
   "foot-sliding": {
     titleZh: "走路脚底打滑/太空步 (Foot Skating / Sliding)",
-    fixEn: "medium three-quarter framing, crisp bouncy two-foot hop landing firmly on a textured floor grid",
-    fixZh: "改用中景或七分景机位，将连续碎步走改为干脆的双脚微跳落地，强化鞋底与桌面/地面接触"
+    fixEn: "medium three-quarter framing, crisp bouncy R6 hop landing firmly on a classic Roblox 1x1 studded baseplate grid",
+    fixZh: "改用中景或七分景机位，将连续碎步走改为干脆的R6方块跳步落地，强化与Roblox方格底板的接触"
   },
   "outfit-drift": {
     titleZh: "切镜头后衣服与配饰变形 (Cross-Shot Outfit Drift)",
@@ -98,31 +103,43 @@ export function inspectPrompt(rawOpts = {}) {
 
   const checks = [];
 
-  // 1. Hand geometry check
+  // 1. Hand geometry check (block BOTH human fingers AND Lego C-claws unless negated)
   const hasHandLock =
-    /fingerless|c-shaped|claw hand|blocky hand|无手指|c型手|c型夹爪|方柱手/.test(lower);
-  const mentionsRiskyHands = /\b(fingers|five fingers|human hands|手指|五指)\b/.test(lower) && !/no human fingers|zero human fingers|无手指|严禁.*手指/.test(lower);
+    /fingerless|solid.*block hand|1x2x1.*arm|blocky hand|无手指|实心方块手|实心方柱手|方柱手/.test(lower);
+  const mentionsRiskyHands =
+    /\b(fingers|five fingers|human hands|手指|五指)\b/.test(lower) &&
+    !/no human fingers|zero human fingers|无手指|严禁.*手指/.test(lower);
+  const mentionsLegoClaws =
+    /\b(c-shaped|claw hand|lego claw|c型手|c型夹爪)\b/.test(lower) &&
+    !/no lego c-shaped|zero lego|clawless|无乐高c型|严禁.*c型/.test(lower);
 
   if (mentionsRiskyHands || issue === "human-fingers") {
     checks.push({
-      gate: "Hand Geometry Lock / 手部防长手指锁",
+      gate: "Hand Geometry Lock / 手部防长手指与防乐高爪锁",
       status: "FAIL",
-      reasonEn: "Prompt triggers human finger generation without a fingerless C-shaped claw hand lock.",
-      reasonZh: "提示词易触发真人五指生成，缺少「无手指C型夹爪手」几何锁定。"
+      reasonEn: "Prompt triggers human finger generation without a fingerless solid 1x2x1 rectangular block hand lock.",
+      reasonZh: "提示词易触发真人五指生成，缺少「无手指1x2x1实心平头方块手」几何锁定。"
+    });
+  } else if (mentionsLegoClaws) {
+    checks.push({
+      gate: "Hand Geometry Lock / 手部防长手指与防乐高爪锁",
+      status: "WARN",
+      reasonEn: "C-shaped claw hooks belong to Lego minifigures; authentic Roblox R6/Blocky avatars use `fingerless and clawless solid 1x2x1 beveled rectangular block hands`.",
+      reasonZh: "C型夹爪属于乐高小人特征；纯正Roblox方块小人应使用「无手指且无乐高C型爪的1x2x1实心平头倒角方柱手」。"
     });
   } else if (!hasHandLock) {
     checks.push({
-      gate: "Hand Geometry Lock / 手部防长手指锁",
+      gate: "Hand Geometry Lock / 手部防长手指与防乐高爪锁",
       status: "WARN",
-      reasonEn: "Missing explicit `fingerless C-shaped claw hands` token; video models may invent human fingers during motion.",
-      reasonZh: "未显式声明「无手指C型夹爪手 (fingerless C-shaped claw hands)」，大幅度动作时容易长出人类手指。"
+      reasonEn: "Missing explicit `fingerless and clawless solid 1x2x1 rectangular block hands` token; models may invent human fingers or Lego hooks.",
+      reasonZh: "未显式声明「1x2x1实心平头方块手 (solid 1x2x1 rectangular block hands)」，运动时易长出人类手指或乐高钩爪。"
     });
   } else {
     checks.push({
-      gate: "Hand Geometry Lock / 手部防长手指锁",
+      gate: "Hand Geometry Lock / 手部防长手指与防乐高爪锁",
       status: "PASS",
-      reasonEn: "Fingerless C-shaped or blocky hand lock detected.",
-      reasonZh: "已包含无手指C型手或方柱手锁定。"
+      reasonEn: "Solid fingerless Roblox blocky hand lock detected.",
+      reasonZh: "已包含纯正Roblox实心平头方块手锁定。"
     });
   }
 
@@ -257,12 +274,12 @@ export function inspectPrompt(rawOpts = {}) {
 
   const enginePrefixEn =
     engine === "hailuo" ? "[Push in] " : `[${engine.toUpperCase()} I2V · 9:16] `;
-  const rescuedPromptEn = `${enginePrefixEn}A 3D blind-box Roblox-style blocky figure with a smooth studless cylindrical head, flat 2D screen-printed decal face, fingerless C-shaped plastic claw hands, and 2mm chamfered rectangular limbs. Single action: ${cleanedSubject}. Rigid mechanical hinge joints at shoulders and hips, glossy vinyl/ABS toy shader, Octane miniature studio lighting, zero human fingers, zero Lego studs, non-voxel.`;
+  const rescuedPromptEn = `${enginePrefixEn}An authentic Roblox R6/Blocky figure built on canonical stud proportions (1:1 barrel-beveled cylindrical head, flat 2D screen-printed Roblox decal face, 2x2x1 SmoothPlastic rectangular torso, two 1x2x1 rectangular leg blocks sitting flush side-by-side matching torso width, and two 1x2x1 solid rectangular arm blocks with fingerless and clawless flat beveled block hands). Single action: ${cleanedSubject}. Rigid Motor6D mechanical hinge joints at shoulders and hips, classic Roblox studded baseplate, zero human fingers, zero Lego C-claws or top studs, non-voxel.`;
 
-  const rescuedPromptZh = `【${engine.toUpperCase()} 首帧I2V · 9:16竖屏】3D盲盒高光PVC材质的Roblox方块小人，顶部平滑无乐高颗粒的圆柱体头部，纯平2D丝网印刷五官贴图，无手指C型塑料夹爪手，2毫米圆角倒角长方体四肢，刚性机械转轴关节。单一核心动作：${cleanedSubject}。微距摄影棚三点布光，严禁出现人类五指、3D真人鼻子或像素方块。`;
+  const rescuedPromptZh = `【${engine.toUpperCase()} 首帧I2V · 9:16竖屏】纯正Roblox Studio SmoothPlastic材质的方块小人（1:1上下大圆角桶状圆柱头、纯平2D丝网印刷五官贴图、2x2x1宽扁长方体躯干、两条并拢齐平与躯干同宽的1x2x1方柱腿、两条紧贴两侧的1x2x1实心平头倒角方柱手臂，Motor6D刚性转轴关节）。单一核心动作：${cleanedSubject}。配合经典Roblox方格Studs底板，严禁出现人类五指、乐高C型钩爪、乐高头顶圆颗粒或3D真人鼻子。`;
 
   const negativePrompt =
-    "human fingers, five-fingered hand, realistic human face, 3D protruding nose, skin pores, Lego top studs, Minecraft voxel cubes, rubbery noodle limbs, foot sliding, morphing clothes, watermark / 人类五指，真实人脸，3D高鼻梁，乐高顶部圆颗粒，我的世界像素块，面条状弯曲手臂，脚底打滑";
+    "human fingers, five-fingered hand, Lego C-shaped claw hands, Lego hook hands, Lego top head studs, Minecraft sharp voxel cube head, separated thin legs with thigh gap, protruding human sneakers, realistic human face, 3D protruding nose, skin pores, rubbery noodle limbs, foot sliding, morphing clothes, watermark / 人类五指，真实人脸，乐高C型夹爪手，乐高头顶圆颗粒，我的世界直角像素块，双腿分叉穿真人运动鞋，3D高鼻梁，面条状弯曲手臂，脚底打滑";
 
   return {
     overallStatus,

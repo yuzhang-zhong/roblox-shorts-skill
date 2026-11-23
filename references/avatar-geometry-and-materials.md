@@ -1,32 +1,38 @@
-# Avatar Geometry and Materials / 角色几何与材质规范
+# Avatar Geometry, BrickColors, and Roblox World Signatures / 角色几何、官方色号与 Roblox 标志性视觉锚点
 
-Short-form Roblox-style videos succeed when the character looks like a tangible, well-lit 3D collectible figure with consistent blocky geometry. When a prompt only says "Roblox character," image and video models blend human anatomy, Lego bricks, and Minecraft blocks. Use the exact geometric and material tokens below to lock the aesthetic.
+Short-form Roblox-style videos immediately read as **"authentic Roblox"** when they lock three things at once:
+1. **Canonical Roblox Stud Proportions (`2×2×1` torso + four flush `1×2×1` limbs + `1.2×1.2×1.2` barrel-beveled head)**
+2. **Solid Rectangular Block Hands (NOT Lego C-shaped claw hooks and NOT 5 human fingers)**
+3. **Roblox World & UI Signatures (`SmoothPlastic` avatar + `Studs` baseplate + `BillboardGui` overhead chat bubble + UGC hair/coils)**
 
-## 1. Three Core Rig Proportions / 三种核心骨架比例
+When a prompt vaguely says "blocky toy character" or adds "C-shaped claw hands," diffusion models drift into **Lego minifigures** instead of Roblox. Use the exact geometric and material tokens below to lock the aesthetic.
 
-| Rig ID | Proportions | Joint Behavior | Best Short-Video Use Case |
+## 1. Canonical Roblox Stud Anatomy (`R6` / `R15` / `Chibi-Blocky`)
+
+| Body Part | Canonical Stud Size | Aspect Ratio | Geometry & Seam Rule |
 | --- | --- | --- | --- |
-| `chibi-blocky` | 2.2 to 2.5 heads tall, slightly rounded trapezoidal torso, stubby rectangular limbs, 3mm bevel radius | Stiff shoulder/hip hinge with subtle bouncy head bob | Xiaohongshu / Douyin viral blind-box skits, cozy miniature life, relatable student/worker meltdowns |
-| `r6` | Classic 6-part rig: cylindrical head, flat rectangular torso, 2 rigid arm blocks, 2 rigid leg blocks | Strict mechanical hinge rotation at shoulders and hips only; zero elbow or knee bend | Retro obby parkour, deadpan slapstick memes, ragdoll comedy, nostalgic Roblox humor |
-| `r15` | 15-part segmented blocky rig with upper/lower arm and leg blocks | Hinged elbow, knee, and waist bends while keeping rectangular limb cross-sections | Outfit transition reels, dance sync, fast-paced duo action skits |
+| **Head (`SpecialMesh`)** | `1.2 × 1.2 × 1.2` studs | `1 : 1 : 1` | Classic Roblox barrel-cylinder with generous curved top and bottom fillets (`0.22` bevel radius); studless flat top; never a tall narrow tube |
+| **Torso (`R6` / `R15`)** | `2.0 × 2.0 × 1.0` studs | `2 : 2 : 1` | Wide, flat-chested rectangular block with crisp `SmoothPlastic` chamfered edges (`0.06` stud bevel) |
+| **Left & Right Arms** | `1.0 × 2.0 × 1.0` studs each | `1 : 2 : 1` | Solid rectangular blocks hanging **flush** against the left and right sides of the torso (`4.0` studs total shoulder span); bottom of the block IS the hand |
+| **Left & Right Legs** | `1.0 × 2.0 × 1.0` studs each | `1 : 2 : 1` | Solid rectangular blocks sitting **flush side-by-side** directly beneath the `2.0`-stud torso (`1.0 + 1.0 = 2.0` studs total width, zero thigh gap, zero protruding shoe toes) |
 
 ## 2. Anatomy Lock Tokens / 核心部位防变形锁
 
 ### Head and Face Decal / 头部与2D面部贴图
 
-- **Positive tokens (English)**: `smooth cylindrical head with rounded top bevel, flat 2D screen-printed decal face, glossy black ink eyes, simple painted mouth line, zero 3D facial protrusion, no nose`
-- **正向词 (中文)**: `顶部圆角倒角的圆柱体平滑头部，纯平2D丝网印刷贴图五官，高光墨点眼睛，简约绘制嘴型，无3D突起鼻子，无真实皮肤纹理`
+- **Positive tokens (English)**: `1:1 classic Roblox barrel-cylinder head with deep rounded top and bottom bevels, smooth studless top, flat 2D screen-printed Roblox decal face, glossy black ink eyes, simple painted mouth line, zero 3D facial protrusion, no nose`
+- **正向词 (中文)**: `1:1经典Roblox上下大圆角桶状圆柱头（头顶完全平滑无乐高颗粒），纯平2D丝网印刷贴图五官，高光墨点眼睛，简约绘制嘴型，无3D突起鼻子，无真实皮肤纹理`
 - **Expression swaps (单镜头表情词)**:
+  - `classic smile`: iconic Roblox `:)` two oval black eyes and curved smile line.
   - `shocked decal`: wide hollow ring eyes, open rectangular gasp mouth, painted sweat drop on temple.
   - `deadpan decal`: flat horizontal line eyes (`-_-`), tiny straight mouth line, zero emotion.
   - `crying decal`: streaming 2D blue waterfall tear strips painted on cheeks, wavy wailing mouth.
-  - `smug decal`: asymmetrical raised brow line, sideways cat-like grin (`:3` or smirk).
-  - `sparkle decal`: oversized star-shaped white eye highlights, cheerful curved smile.
+  - `smug / check-it decal`: asymmetrical raised brow line, sideways confident smirk.
 
-### Hands and Limbs / 手部与四肢锁定
+### Hands and Limbs / 手部与四肢锁定（关键：区分 Roblox 实心方手与乐高 C 型钩爪）
 
-- **Positive tokens (English)**: `fingerless C-shaped claw hands, solid chamfered rectangular block arms, no human fingers, no thumbs, clean mechanical seam at shoulder socket`
-- **正向词 (中文)**: `无手指C型夹爪手部（或一体式倒角方柱手），严禁出现人类五指，肩部机械转轴接缝清晰`
+- **Positive tokens (English)**: `canonical Roblox 2x2x1 rectangular torso, two 1x2x1 solid rectangular arm blocks flush at shoulders, two 1x2x1 rectangular leg blocks sitting flush side-by-side matching exact torso width, fingerless and clawless solid beveled rectangular block hands, no human fingers, no Lego C-shaped hook claws`
+- **正向词 (中文)**: `纯正Roblox标准2x2x1倒角长方体躯干，两条1x2x1长方体方腿并拢紧贴且总宽度与躯干完全齐平，两条1x2x1一体式实心倒角方柱手臂紧贴躯干两侧，末端为平头倒角实心方块手部（严禁人类五指、严禁乐高C型钩子手），肩髋Motor6D机械转轴接缝清晰`
 
 ## 3. Four Surface Shaders / 四种高赞表面材质
 

@@ -6,12 +6,12 @@ When an AI video clip ruins the Roblox aesthetic, the cause is almost always one
 
 | Issue Code | Symptom / 翻车表现 | Root Cause / 根本原因 | Immediate Fix / 核心修复手段 |
 | --- | --- | --- | --- |
-| `human-fingers` | 小人长出人类五指或关节纹 | 模型将 "hands" 默认映射为真人手部 | 强制替换 `hands` 为 `fingerless C-shaped claw hands` 并加入负向词 `five fingers, human hands` |
-| `lego-studs` | 头顶或地面出现乐高圆柱凸起颗粒 | 模型混淆了 "blocky plastic toy" 与 Lego | 正向声明 `smooth studless top head, non-Lego bevels`，负向排除 `Lego top studs, brick pegs` |
-| `minecraft-voxels` | 身体变成直角锋利方块且带像素马赛克贴图 | 模型混淆了 Roblox 与 Minecraft | 正向声明 `2mm chamfered rounded edges, smooth PVC shader, cylindrical head`，负向排除 `Minecraft voxel, pixel art` |
+| `human-fingers` | 小人手臂末端长出人类五指或关节纹 | 模型将 "hands" 默认映射为真人手部 | 强制替换 `hands` 为 `fingerless and clawless solid 1x2x1 beveled rectangular block hands`，负向排除 `five fingers, human hands` |
+| `lego-studs` | 头顶长出乐高圆颗粒，或手部变成乐高C型钩爪 | 误用了 "C-shaped claw hands" 或 "brick toy" 触发乐高先验 | **严禁使用乐高C型爪！** 正向声明 `solid 1x2x1 rectangular block arms, smooth studless barrel-beveled Roblox head`，负向排除 `Lego top studs, Lego C-shaped claw hands` |
+| `minecraft-voxels` | 头部与身体变成直角锋利方块且带像素马赛克贴图 | 模型混淆了 Roblox 与 Minecraft | 正向声明 `classic Roblox 1:1 barrel-cylinder head with deep curved top/bottom bevels, SmoothPlastic shader`，负向排除 `Minecraft voxel, pixel art` |
+| `limb-gap` | 双腿之间有明显空隙、穿了分体运动鞋，不像 Roblox 方腿 | 未声明 Roblox 标志性的 `2×2×1` 躯干与并拢 `1×2×1` 双腿比例 | 正向声明 `canonical Roblox 2x2x1 rectangular torso with two 1x2x1 rectangular leg blocks sitting flush side-by-side matching exact torso width` |
 | `face-morph` | 说话或做表情时五官凸起长出真人鼻子与牙齿 | 动态幅度过大触发真人面部骨骼先验 | 正向锁定 `flat 2D screen-printed decal face, painted ink eyes and mouth, zero 3D nose`，调低运动幅度 |
-| `noodle-limbs` | 走路或挥手时手臂像橡胶面条一样弯曲 | 视频模型默认使用软体连续骨骼形变 | 声明 `rigid mechanical hinge joints at shoulders and hips only, stiff rectangular limbs, no rubbery bending` |
-| `foot-sliding` | 角色原地踏步但地面乱飘（滑步/太空步） | 全身远景下 T2V 难以计算短腿方块与地面的接触摩擦 | 改用中景/七分景，或把连续走路改为单次跳跃 (`bouncy two-foot hop landing firmly on floor grid`) |
+| `noodle-limbs` | 走路或挥手时手臂像橡胶面条一样弯曲 | 视频模型默认使用软体连续骨骼形变 | 声明 `rigid Motor6D mechanical hinge joints at shoulders and hips only, stiff 1x2x1 rectangular limbs, no rubbery bending` |
 | `outfit-drift` | 切镜头后衣服颜色、帽子或发型变了 | 直接使用 T2V 文生视频，缺少视觉锚点 | 切换为 **首帧 I2V 工作流**：先用三视图固定角色参考，生成每个镜头的首帧图再转视频 |
 | `overload` | 5秒内动作混乱、穿模或后半段静止卡死 | 单条提示词塞入了 3 个以上连续动词 | 遵循 **单镜头单动作铁律**：将 `走过去->坐下->喝咖啡->哭泣` 拆分为 3 个独立 3.5 秒分镜 |
 

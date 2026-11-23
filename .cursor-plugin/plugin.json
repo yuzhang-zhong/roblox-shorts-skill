@@ -1,7 +1,7 @@
 {
   "name": "roblox-shorts-skill",
-  "description": "Plan, prompt, and debug Roblox-style blocky avatar AI short videos with locked character geometry, viral 9:16 storyboards, and model-tuned I2V/T2V prompts.",
-  "version": "1.0.0",
+  "description": "Plan, prompt, render, and debug authentic Roblox-style blocky avatar AI short videos with canonical 2x2x1/1x2x1 stud geometry, viral 9:16 storyboards, model-tuned I2V/T2V prompts, and 3D preview rendering.",
+  "version": "1.1.0",
   "author": {
     "name": "yuzhang-zhong"
   },

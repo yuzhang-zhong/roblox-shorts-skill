@@ -11,7 +11,7 @@ import { inspectPrompt } from "../scripts/drift_check.mjs";
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(__dirname, "..");
 
-test("avatar_spec locks fingerless C-shaped hands, 2D decal face, and studless geometry", () => {
+test("avatar_spec locks canonical 2x2x1/1x2x1 stud geometry, solid block hands, and 2D decal face", () => {
   const spec = buildAvatarSpec({
     archetype: "chibi-plush",
     rig: "chibi-blocky",
@@ -21,11 +21,11 @@ test("avatar_spec locks fingerless C-shaped hands, 2D decal face, and studless g
   assert.equal(spec.name, "Momo");
   assert.equal(spec.rig, "chibi-blocky");
   assert.equal(spec.material, "glossy-vinyl");
-  assert.match(spec.turnaroundPromptEn, /fingerless C-shaped claw hands/);
-  assert.match(spec.turnaroundPromptEn, /flat 2D screen-printed decal face/);
-  assert.match(spec.turnaroundPromptEn, /studless/);
-  assert.match(spec.negativePromptEn, /Lego top studs/);
-  assert.match(spec.negativePromptEn, /Minecraft voxel/);
+  assert.match(spec.turnaroundPromptEn, /2x2x1 rectangular torso/);
+  assert.match(spec.turnaroundPromptEn, /fingerless and clawless solid beveled rectangular block hands/);
+  assert.match(spec.turnaroundPromptEn, /flat 2D screen-printed Roblox decal face/);
+  assert.match(spec.negativePromptEn, /Lego C-shaped claw hands/);
+  assert.match(spec.negativePromptEn, /Minecraft sharp voxel/);
 });
 
 test("shot_compiler generates 4 shots for 15s and 8 shots for 30s with engine tags", () => {
@@ -63,7 +63,7 @@ test("drift_check flags human fingers and multi-verb overload as FAIL, and passe
 
   const goodReport = inspectPrompt({
     prompt:
-      "A Roblox chibi-blocky figure with a smooth studless cylindrical head, flat 2D screen-printed face decal, fingerless C-shaped claw hands, and 2mm chamfered rectangular limbs pivots its rigid shoulder hinge to wave.",
+      "An authentic Roblox chibi-blocky figure with a smooth studless cylindrical head, flat 2D screen-printed face decal, fingerless and clawless solid 1x2x1 beveled rectangular block hands, and 2x2x1 torso pivots its rigid shoulder hinge to wave.",
     engine: "kling",
     mode: "i2v"
   });
@@ -75,5 +75,5 @@ test("validate_skill CLI verifies repository files, versions, and manifests", ()
     cwd: ROOT,
     encoding: "utf8"
   });
-  assert.match(out, /roblox-shorts-skill v1\.0\.0 package is valid/);
+  assert.match(out, /roblox-shorts-skill v1\.1\.0 package is valid/);
 });

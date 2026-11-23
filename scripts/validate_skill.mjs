@@ -48,10 +48,31 @@ const requiredFiles = [
   "scripts/avatar_spec.mjs",
   "scripts/shot_compiler.mjs",
   "scripts/drift_check.mjs",
+  "scripts/render_preview.mjs",
+  "assets/showcase/momo_turnaround_sheet.png",
+  "assets/showcase/drift_rescue_comparison.png",
   "examples/monday-alarm-meltdown/README.md",
   "examples/monday-alarm-meltdown/character_card.md",
   "examples/monday-alarm-meltdown/storyboard.md",
-  "examples/monday-alarm-meltdown/prompts.json"
+  "examples/monday-alarm-meltdown/prompts.json",
+  "examples/monday-alarm-meltdown/drift_report.md",
+  "examples/monday-alarm-meltdown/assets/storyboard_contact_sheet.png",
+  "examples/monday-alarm-meltdown/assets/monday_alarm_meltdown.gif",
+  "examples/monday-alarm-meltdown/assets/monday_alarm_meltdown.mp4",
+  "examples/obby-sky-run/README.md",
+  "examples/obby-sky-run/character_card.md",
+  "examples/obby-sky-run/storyboard.md",
+  "examples/obby-sky-run/prompts.json",
+  "examples/obby-sky-run/assets/obby_storyboard_sheet.png",
+  "examples/obby-sky-run/assets/obby_sky_run.gif",
+  "examples/obby-sky-run/assets/obby_sky_run.mp4",
+  "examples/duo-bestie-contrast/README.md",
+  "examples/duo-bestie-contrast/character_card.md",
+  "examples/duo-bestie-contrast/storyboard.md",
+  "examples/duo-bestie-contrast/prompts.json",
+  "examples/duo-bestie-contrast/assets/duo_storyboard_sheet.png",
+  "examples/duo-bestie-contrast/assets/duo_bestie_contrast.gif",
+  "examples/duo-bestie-contrast/assets/duo_bestie_contrast.mp4"
 ];
 
 for (const rel of requiredFiles) {
@@ -97,7 +118,7 @@ if (versions.size !== 1) {
 }
 
 const firstSentence =
-  "Plan, prompt, and debug Roblox-style blocky avatar AI short videos with locked character geometry, viral 9:16 storyboards, and model-tuned I2V/T2V prompts.";
+  "Plan, prompt, render, and debug authentic Roblox-style blocky avatar AI short videos with canonical 2x2x1/1x2x1 stud geometry, viral 9:16 storyboards, model-tuned I2V/T2V prompts, and 3D preview rendering.";
 for (const [label, desc] of [
   ["package.json", pkg.description],
   [".claude-plugin/plugin.json", claudePlugin.description],

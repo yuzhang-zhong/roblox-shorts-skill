@@ -7,149 +7,186 @@
 
 const ARCHETYPES = {
   "chibi-plush": {
-    labelZh: "盲盒潮玩风小人",
-    labelEn: "Chibi Blind-Box Blocky Avatar",
+    labelZh: "小红书爆款Plushie盲盒风小人",
+    labelEn: "Roblox Plushie / Chibi-Blocky Avatar",
     defaultRig: "chibi-blocky",
     defaultMaterial: "glossy-vinyl",
-    headColor: "#FEF3C7 (Warm Cream)",
-    primaryColor: "#FDA4AF (Pastel Rose)",
-    secondaryColor: "#F8FAFC (Milk White)",
-    accentColor: "#38BDF8 (Sky Blue)",
-    outfitEn: "oversized pastel rose hoodie with chamfered blocky sleeves, milk-white blocky shorts, chunky miniature sneakers",
-    outfitZh: "奶油蜜桃粉倒角方柱连帽卫衣、奶白色方柱短裤、微缩厚底方块运动鞋",
-    accessoriesEn: "oversized cream matte headphones around neck, fluffy white cat-ear beanie, mini boxy sky-blue backpack",
-    accessoriesZh: "颈挂大号奶油白哑光耳机、白色毛绒猫耳针织帽、天蓝色微缩方盒双肩包",
-    faceEn: "flat 2D screen-printed decal face with big glossy ink eyes, star highlights, and a tiny painted cat smile (:3)",
-    faceZh: "纯平2D丝网印刷五官贴图，带星光高点的大号墨点眼睛与小巧绘制猫猫嘴(:3)"
+    headColor: "Cool yellow #FDEA8D",
+    primaryColor: "Pastel Pink #F4A2B8",
+    secondaryColor: "Institutional white #F8F8F8",
+    accentColor: "Cyan #00AAE4",
+    outfitEn: "oversized pastel-pink blocky sweater on a 2x2x1 torso, flush 1x2x1 milk-white blocky legs with zero thigh gap",
+    outfitZh: "蜜桃粉倒角方柱卫衣（2x2x1宽扁躯干）、并拢齐平的奶白色1x2x1方柱双腿（无分叉间隙）",
+    accessoriesEn: "3D UGC fluffy bob hair with side bangs, cream cat-ear headphones on head, sky-blue boxy backpack",
+    accessoriesZh: "3D立体刘海波波头UGC发型、头戴奶油白猫耳大耳机、天蓝色方盒双肩包",
+    faceEn: "flat 2D screen-printed Roblox decal face with glossy ink eyes, star highlights, blush ovals, and a tiny cat smile (:3)",
+    faceZh: "纯平2D丝网印刷五官贴图，带星光高点的墨点眼、椭圆粉腮红与猫猫嘴(:3)"
   },
   "classic-noob": {
-    labelZh: "经典复古黄皮新手",
-    labelEn: "Classic Retro Yellow Noob",
+    labelZh: "经典复古黄皮新手 (Official Noob)",
+    labelEn: "Authentic Classic Roblox Noob (R6)",
     defaultRig: "r6",
-    defaultMaterial: "matte-abs",
-    headColor: "#FACC15 (Classic Yellow)",
-    primaryColor: "#2563EB (Royal Blue)",
-    secondaryColor: "#65A30D (Leaf Green)",
-    accentColor: "#F43F5E (Bloxy Cola Red)",
-    outfitEn: "untextured royal-blue rectangular torso block, bright yellow arm blocks, leaf-green rectangular leg blocks",
-    outfitZh: "经典宝蓝色倒角长方体躯干、亮黄色方柱双臂、草绿色长方体双腿",
-    accessoriesEn: "miniature red cylindrical Bloxy Cola can clamped in right C-shaped claw hand",
-    accessoriesZh: "右手C型夹爪中卡着一罐红色微缩方块可乐罐",
-    faceEn: "iconic classic 2D painted decal face with two simple black oval eyes and a curved black line smile",
-    faceZh: "标志性2D简约印刷笑脸贴图（两个黑色椭圆墨点眼与单线条上扬嘴角）"
+    defaultMaterial: "smooth-plastic",
+    headColor: "Bright yellow #F5CD30",
+    primaryColor: "Bright blue #0D69AC",
+    secondaryColor: "Br. yellowish green #A4BD47",
+    accentColor: "Bright red #C4281C (Bloxy Cola)",
+    outfitEn: "untextured Bright blue (#0D69AC) 2x2x1 rectangular torso block, Bright yellow (#F5CD30) 1x2x1 solid rectangular arm blocks flush at sides, Br. yellowish green (#A4BD47) 1x2x1 rectangular leg blocks flush side-by-side",
+    outfitZh: "经典亮蓝色(#0D69AC) 2x2x1长方体躯干、亮黄色(#F5CD30) 1x2x1实心方柱双臂紧贴两侧、黄绿色(#A4BD47) 1x2x1方柱双腿并拢齐平",
+    accessoriesEn: "red cylindrical Bloxy Cola can attached to right flat rectangular block hand, standing on a classic Roblox SpawnLocation pad",
+    accessoriesZh: "右侧平头实心方块手吸附一罐红色Bloxy Cola可乐罐，脚踩经典Roblox重生点(SpawnLocation)底板",
+    faceEn: "iconic classic Roblox Default Smile 2D decal face with two black oval eyes and a curved black line smile",
+    faceZh: "标志性Roblox经典默认笑脸2D贴图（两个黑色椭圆眼点与上扬弧线嘴）"
+  },
+  "bacon-hair": {
+    labelZh: "经典培根头新手 (Pal Hair / Bacon)",
+    labelEn: "Iconic Roblox Bacon Hair Avatar",
+    defaultRig: "r6",
+    defaultMaterial: "smooth-plastic",
+    headColor: "Light stone grey #E5E4DF",
+    primaryColor: "Dark stone grey #635F62",
+    secondaryColor: "Black #1B2A35",
+    accentColor: "Bright blue #0D69AC",
+    outfitEn: "dark stone grey open blocky moto jacket over a bright blue inner shirt on a 2x2x1 torso, black 1x2x1 flush blocky jeans legs with white bottom trim",
+    outfitZh: "深灰开襟机车方块夹克内搭蓝T恤（2x2x1躯干）、纯黑并拢齐平1x2x1方柱牛仔裤腿",
+    accessoriesEn: "iconic brown strip-textured 3D Pal Hair (Bacon Hair) on top of the barrel-cylinder head",
+    accessoriesZh: "头顶标志性棕褐色条状3D培根发型（Pal Hair / Bacon Hair）",
+    faceEn: "classic Roblox 2D Default Smile decal printed flat on the light grey barrel-cylinder head",
+    faceZh: "浅灰桶状圆角圆柱头正面印有经典Roblox 2D默认微笑贴图"
   },
   "ugc-streetwear": {
-    labelZh: "Y2K千禧穿搭潮人",
-    labelEn: "Y2K UGC Streetwear Avatar",
+    labelZh: "Y2K千禧穿搭潮人 (Dress-to-Impress)",
+    labelEn: "Y2K UGC Streetwear Blocky Avatar",
     defaultRig: "r15",
     defaultMaterial: "glossy-vinyl",
-    headColor: "#FDE68A (Light Gold)",
-    primaryColor: "#1E293B (Charcoal Black)",
-    secondaryColor: "#93C5FD (Washed Denim Blue)",
-    accentColor: "#A855F7 (Electric Purple)",
-    outfitEn: "cropped charcoal glossy puffer jacket with blocky baffles, wide-leg washed-denim blocky cargo pants",
-    outfitZh: "炭黑色高光充气感方块短款羽绒服、水洗牛仔蓝宽腿方柱工装裤",
-    accessoriesEn: "silver star-shaped frame sunglasses on forehead, purple crossbody boxy cassette bag, chunky blocky boots",
-    accessoriesZh: "额头银色五角星框墨镜、电光紫方盒斜挎包、厚底方头潮靴",
-    faceEn: "flat 2D painted decal face with half-lidded cool eyes, asymmetrical raised brow, and confident smirk",
-    faceZh: "纯平2D印刷酷感半眯眼贴图、单侧挑眉与自信歪嘴笑"
+    headColor: "Warm yellowish orange #F8D96D",
+    primaryColor: "Really black #111827",
+    secondaryColor: "Pastel blue #93C5FD",
+    accentColor: "Alder / Electric Purple #A855F7",
+    outfitEn: "cropped charcoal-black glossy puffer jacket with purple graphic badge on a 2x2x1 torso, washed-denim 1x2x1 blocky legs sitting flush side-by-side",
+    outfitZh: "炭黑高光短款方块羽绒服配紫色胸章（2x2x1躯干）、水洗牛仔蓝并拢齐平1x2x1方柱裤腿",
+    accessoriesEn: "3D pastel-pink layered UGC hair with cat-ear beanie, silver star sunglasses, purple boxy backpack",
+    accessoriesZh: "3D粉色层次感UGC长发配猫耳针织帽、银色五角星墨镜、电光紫方盒双肩包",
+    faceEn: "flat 2D painted Roblox Check-It / Smirk decal face with asymmetrical raised brow and confident sideways grin",
+    faceZh: "纯平2D印刷Roblox经典挑眉坏笑(Check It / Smirk)贴图"
   },
   "corporate-worker": {
     labelZh: "破防早八打工人",
-    labelEn: "Exhausted Office Worker Blocky",
+    labelEn: "Exhausted Office Worker Roblox Blocky",
     defaultRig: "chibi-blocky",
-    defaultMaterial: "matte-abs",
-    headColor: "#FEF9C3 (Pale Ivory)",
-    primaryColor: "#86EFAC (Matcha Cardigan)",
-    secondaryColor: "#475569 (Slate Trousers)",
-    accentColor: "#F59E0B (Amber Coffee Mug)",
-    outfitEn: "wrinkle-free matcha-green blocky cardigan over white collar shirt, neat red pixel-free tie, slate-gray blocky trousers",
-    outfitZh: "抹茶绿倒角方柱针织开衫内搭白衬衫、简约红领带、深灰方柱西裤",
-    accessoriesEn: "blue ID lanyard printed flat on torso, miniature amber coffee mug in C-shaped hand, dark-circle eye decal",
-    accessoriesZh: "胸前平整贴合的蓝色工牌挂绳、C型手握琥珀色微缩咖啡杯、眼下淡淡印刷黑眼圈",
-    faceEn: "flat 2D screen-printed decal face with tired horizontal line eyes (-_-) and a tiny flat mouth",
-    faceZh: "纯平2D印刷疲惫死鱼眼(-_-)贴图与平直小嘴线"
+    defaultMaterial: "smooth-plastic",
+    headColor: "Cool yellow #FDEA8D",
+    primaryColor: "Mint #86EFAC (Matcha Cardigan)",
+    secondaryColor: "Dark stone grey #475569",
+    accentColor: "Bright red #F43F5E (Tie & Alarm)",
+    outfitEn: "matcha-green blocky cardigan over white shirt collar and red tie decal on a 2x2x1 torso, slate-grey 1x2x1 blocky trousers sitting flush side-by-side",
+    outfitZh: "抹茶绿2x2x1方柱开衫内搭白衬衫领与红领带贴图、深灰并拢齐平1x2x1方柱西裤",
+    accessoriesEn: "3D brown side-parted blocky hair, white headphones around neck, blue ID badge decal, amber coffee mug attached to right flat block hand",
+    accessoriesZh: "3D深棕偏分方块短发、头戴/颈挂白色方块耳机、胸前蓝色工牌贴图、右侧实心平头方块手吸附琥珀咖啡杯",
+    faceEn: "flat 2D screen-printed Roblox decal face with tired horizontal line eyes (-_-) or shocked hollow ring eyes",
+    faceZh: "纯平2D印刷疲惫死鱼眼(-_-)或震惊圆圈眼贴图"
   },
   "cozy-chef": {
     labelZh: "治愈系微缩甜点师",
-    labelEn: "Cozy Miniature Bakery Chef",
+    labelEn: "Cozy Miniature Bakery Chef Blocky",
     defaultRig: "chibi-blocky",
     defaultMaterial: "clay-soft",
-    headColor: "#FEF3C7 (Warm Cream)",
-    primaryColor: "#FFFBEB (Butter White)",
-    secondaryColor: "#D97706 (Caramel Apron)",
-    accentColor: "#FB7185 (Strawberry Pink)",
-    outfitEn: "butter-white blocky double-breasted chef coat, caramel-brown rectangular apron, strawberry-pink neckerchief",
-    outfitZh: "奶油白双排扣方柱厨师服、焦糖棕长方体围裙、草莓粉三角领巾",
-    accessoriesEn: "puffy rounded-blocky white chef toque hat, miniature wooden whisk in C-shaped hand",
-    accessoriesZh: "饱满圆角方块白色厨师高帽、C型夹爪手握微缩木质打蛋器",
-    faceEn: "flat 2D painted decal face with warm curved happy eyes (^^) and rosy oval cheek decals",
+    headColor: "Cool yellow #FDEA8D",
+    primaryColor: "Institutional white #FFFBEB",
+    secondaryColor: "CGA brown #D97706 (Apron)",
+    accentColor: "Carnation pink #FB7185",
+    outfitEn: "butter-white blocky double-breasted chef coat on a 2x2x1 torso, caramel apron decal, flush 1x2x1 blocky legs",
+    outfitZh: "奶油白双排扣2x2x1方柱厨师服、焦糖围裙贴图、并拢齐平1x2x1方柱双腿",
+    accessoriesEn: "puffy rounded-blocky white chef toque hat, golden blocky croissant on tray",
+    accessoriesZh: "饱满圆角方块白色厨师高帽、托盘上的金黄方块可颂",
+    faceEn: "flat 2D painted Roblox decal face with warm curved happy eyes (^^) and rosy oval cheek decals",
     faceZh: "纯平2D印刷弯弯笑眼(^^)与暖粉椭圆腮红贴图"
   },
   "obby-runner": {
-    labelZh: "多巴胺跑酷闯关手",
-    labelEn: "Pastel Obby Parkour Runner",
+    labelZh: "多巴胺跑酷闯关手 (Speedrunner)",
+    labelEn: "Pastel Obby Parkour Speedrunner (R6)",
     defaultRig: "r6",
-    defaultMaterial: "matte-abs",
-    headColor: "#FDE047 (Bright Yellow)",
-    primaryColor: "#38BDF8 (Cyan Jersey)",
-    secondaryColor: "#F472B6 (Magenta Shorts)",
-    accentColor: "#A3E635 (Lime Visor)",
-    outfitEn: "sporty cyan blocky track jersey with white stripe, magenta rectangular shorts, lime-green blocky sneakers",
-    outfitZh: "亮青色运动条纹方柱球衣、品红长方体短裤、青柠绿方块跑鞋",
-    accessoriesEn: "translucent lime-green sport visor on cylindrical head, white sweatband, twin blocky jetpack",
-    accessoriesZh: "圆柱头佩戴半透明青柠绿遮阳帽檐、白色发带、背后双联装微缩方块喷气背包",
-    faceEn: "flat 2D screen-printed decal face with determined wide eyes and an energetic open grin",
-    faceZh: "纯平2D印刷专注大眼与充满活力的露齿笑贴图（纯平面无3D牙齿深度）"
+    defaultMaterial: "smooth-plastic",
+    headColor: "Bright yellow #F5CD30",
+    primaryColor: "Cyan #00AAE4",
+    secondaryColor: "Hot pink #FF55A3",
+    accentColor: "Bright red #EF4444 (Speed Coil)",
+    outfitEn: "sporty cyan 2x2x1 blocky jersey with classic white Roblox R emblem, hot-pink 1x2x1 rectangular leg blocks sitting flush side-by-side",
+    outfitZh: "亮青色2x2x1运动方柱球衣（胸前经典白色R字徽标）、亮粉色并拢齐平1x2x1长方体双腿",
+    accessoriesEn: "classic red Roblox sport visor cap on head, glowing red Speed Coil wrapped around the right 1x2x1 solid rectangular arm block, twin white blocky jetpack",
+    accessoriesZh: "头戴经典红色Roblox运动遮阳帽、右侧1x2x1实心方柱手臂缠绕发光红色加速弹簧(Speed Coil)、背后白色双联方块喷气包",
+    faceEn: "flat 2D screen-printed Roblox Winning/Energetic grin decal with determined wide eyes",
+    faceZh: "纯平2D印刷专注大眼与活力露齿笑贴图（纯平面无3D深度）"
   }
 };
 
 const RIGS = {
   "chibi-blocky": {
-    label: "Chibi-Blocky (2.4-head miniature blind-box rig / 2.4头身微缩盲盒方块骨架)",
-    geometryEn: "2.4-heads-tall chibi blocky proportions, smooth cylindrical head with rounded top bevel, stubby chamfered rectangular limbs, 3mm edge bevels, fingerless C-shaped claw hands",
-    geometryZh: "2.4头身微缩盲盒方块比例，顶部圆润倒角的平滑圆柱头，短粗倒角长方体四肢，3毫米圆润边缘倒角，无手指C型夹爪手"
+    label: "Chibi-Blocky / Plushie UGC (Canonical flush blocky limbs + 3D UGC hair / 萌系Plushie齐平方块骨架)",
+    geometryEn:
+      "canonical Roblox blocky proportions (1:1 classic Roblox barrel-cylinder head with deep curved top and bottom bevels, 2x2x1 rectangular torso block, two 1x2x1 rectangular leg blocks sitting flush side-by-side matching exact torso width with zero thigh gap, two 1x2x1 solid rectangular arm blocks flush at shoulders, fingerless and clawless solid beveled rectangular block hands)",
+    geometryZh:
+      "纯正Roblox标准方块比例（1:1上下大圆角桶状圆柱头，2x2x1宽扁倒角长方体躯干，两条1x2x1方柱腿并拢紧贴且总宽度与躯干完全齐平无分叉，两条1x2x1一体式实心方柱手臂紧贴肩侧，平头倒角实心方块手部【严禁人类五指、严禁乐高C型钩爪】）"
   },
   "r6": {
-    label: "Classic R6 (6-part rigid blocky rig / 经典6部件刚性直臂直腿骨架)",
-    geometryEn: "classic Roblox R6 6-part rigid blocky rig, cylindrical yellow/pastel head, solid rectangular torso, unsegmented straight rectangular arms and legs, strict shoulder/hip hinge pivots only, fingerless C-shaped hands",
-    geometryZh: "经典Roblox R6六部件刚性方块骨架，平滑圆柱头，一体式长方体躯干，无肘膝分段的笔直长方体四肢，仅肩髋机械转轴可动，无手指C型夹爪手"
+    label: "Classic R6 (6-part canonical 2x2x1 & 1x2x1 stud rig / 经典R6六部件标准Stud比例骨架)",
+    geometryEn:
+      "authentic Roblox R6 6-part rigid blocky rig built on exact stud ratios (1.2x1.2x1.2 barrel-beveled cylindrical head, 2x2x1 rectangular torso, two 1x2x1 unsegmented straight rectangular arm blocks flush at sides, two 1x2x1 unsegmented straight rectangular leg blocks flush side-by-side matching torso width, strict Motor6D shoulder/hip hinge pivots only, fingerless and clawless solid flat block hands)",
+    geometryZh:
+      "正统Roblox R6六部件刚性Stud比例骨架（1.2x1.2x1.2上下圆角桶状圆柱头，2x2x1长方体躯干，两条1x2x1无肘膝分段的笔直实心方柱手臂紧贴两侧，两条1x2x1笔直方柱双腿并拢齐平与躯干同宽，仅肩髋Motor6D机械转轴可动，平头实心方块手【无人类手指、无乐高C型爪】）"
   },
   "r15": {
-    label: "Expressive R15 (15-part segmented blocky rig / 15部件分段可动方块骨架)",
-    geometryEn: "Roblox R15 15-part segmented blocky rig, chamfered rectangular upper and lower limbs with clean mechanical elbow and knee hinges, smooth cylindrical head, fingerless C-shaped claw hands",
-    geometryZh: "Roblox R15十五部件分段方块骨架，带清晰机械肘膝铰链的倒角长方体上下肢，平滑圆柱头，无手指C型夹爪手"
+    label: "Expressive R15 (15-part segmented blocky rig / R15分段可动标准方块骨架)",
+    geometryEn:
+      "Roblox R15 segmented blocky rig retaining canonical 2x2x1 torso and flush 1x2x1 rectangular limb silhouette with clean mechanical elbow and knee hinges, 1:1 barrel-beveled cylindrical head, fingerless and clawless solid rectangular block hands",
+    geometryZh:
+      "Roblox R15分段方块骨架（保持2x2x1躯干与并拢齐平1x2x1方柱四肢轮廓，带清晰机械肘膝铰链，1:1桶状圆角圆柱头，无手指且无乐高C型爪的实心平头方块手）"
   }
 };
 
 const MATERIALS = {
+  "smooth-plastic": {
+    label: "Roblox SmoothPlastic + Studs Baseplate (官方SmoothPlastic塑料与方格Studs底板)",
+    shaderEn:
+      "authentic Roblox Studio SmoothPlastic shader with crisp 2mm edge bevels on the avatar, standing on a classic Roblox 1x1 square tile baseplate with raised square studs, clean ambient occlusion and bright skybox lighting",
+    shaderZh:
+      "纯正Roblox Studio SmoothPlastic平滑塑料材质（角色身体带2毫米利落倒角高光），脚踩带1x1方格凸起纹理的经典Roblox Studs底板，清晰环境光遮蔽与明亮天空盒布光"
+  },
   "glossy-vinyl": {
-    label: "Glossy Blind-Box Vinyl (高光潮玩PVC/盲盒材质)",
-    shaderEn: "glossy blind-box PVC vinyl toy material, smooth studless surface, crisp oval specular highlights, subtle subsurface scattering, Octane render studio three-point lighting",
-    shaderZh: "高光潮玩盲盒PVC材质，无凸起颗粒的平滑表面，清脆椭圆高光反射，柔和次表面散射，Octane渲染级三点摄影棚布光"
+    label: "Glossy Blind-Box SmoothPlastic (高光潮玩级SmoothPlastic材质)",
+    shaderEn:
+      "glossy collectible Roblox SmoothPlastic & PVC shader, smooth studless character surfaces, crisp specular highlights, subtle subsurface scattering, standing on a Roblox studded baseplate under three-point studio lighting",
+    shaderZh:
+      "高光潮玩级Roblox SmoothPlastic材质，角色表面平滑无凸起颗粒，清脆高光反射与次表面散射，配合经典Roblox方格底板与三点摄影棚布光"
   },
   "matte-abs": {
-    label: "Satin Matte ABS Plastic (哑光精密ABS塑料材质)",
-    shaderEn: "satin matte injection-molded ABS plastic, smooth studless blocky surfaces, 2mm chamfered edges, soft ambient occlusion in joint seams, clean studio lighting",
-    shaderZh: "绸感哑光注塑ABS塑料材质，无乐高颗粒的平滑方块表面，2毫米精密倒角边缘，关节接缝柔和环境光遮蔽"
+    label: "Satin Matte SmoothPlastic (绸感哑光SmoothPlastic材质)",
+    shaderEn:
+      "satin matte Roblox SmoothPlastic blocks, 2mm chamfered edges, studless character body, clean ambient occlusion in Motor6D joint seams, studio lighting",
+    shaderZh:
+      "绸感哑光Roblox SmoothPlastic方块材质，2毫米精密倒角边缘，Motor6D关节接缝柔和环境光遮蔽"
   },
   "clay-soft": {
-    label: "Soft-Touch Clay-Plastic (微缩柔感黏土塑料材质)",
-    shaderEn: "soft-touch matte polymer clay-plastic shader over rigid blocky geometry, warm miniature tabletop diorama lighting, 50mm macro f/2.8 shallow depth of field",
-    shaderZh: "刚性方块几何体表面覆盖柔感哑光微缩黏土涂层，暖调桌面微缩模型布光，50mm微距镜头f/2.8浅景深"
+    label: "Soft Miniature Diorama Plastic (微缩柔感模型塑料材质)",
+    shaderEn:
+      "soft-touch matte diorama shader over canonical Roblox 2x2x1/1x2x1 blocky geometry, warm tabletop lighting, 50mm f/2.8 shallow depth of field",
+    shaderZh:
+      "标准Roblox 2x2x1/1x2x1方块几何体配微缩柔感哑光材质，暖调桌面布光，50mm微距浅景深"
   },
   "neon-cyber": {
-    label: "Cyber Polycarbonate & Neon (赛博高光聚碳酸酯材质)",
-    shaderEn: "glossy dark polycarbonate blocky shell with emissive neon edge strips, high-contrast cyan and magenta rim lighting, studio reflective floor",
-    shaderZh: "高光深色聚碳酸酯方块外壳配自发光霓虹边条，高反差青紫双色轮廓边缘光，摄影棚微反射地面"
+    label: "Roblox Neon + ForceField Cyber Shader (Roblox自发光Neon与高光材质)",
+    shaderEn:
+      "Roblox SmoothPlastic dark shell paired with glowing Roblox Neon material accents, high-contrast cyan and magenta rim lighting, reflective studded floor",
+    shaderZh:
+      "深色Roblox SmoothPlastic方块外壳配高亮度Roblox Neon自发光材质边条，高反差轮廓光与微反射方格地面"
   }
 };
 
 const NEGATIVE_PROMPT_EN =
-  "human fingers, five fingers, realistic human hands, knuckles, fingernails, realistic human face, 3D protruding nose, skin pores, realistic eyeballs, Lego top studs, cylindrical brick pegs, Minecraft voxel cubes, pixelated block texture, rubbery noodle limbs, blurry decal, extra limbs, watermark";
+  "human fingers, five fingers, realistic human hands, knuckles, Lego C-shaped claw hands, Lego hook hands, Lego top head studs, cylindrical Lego pegs, Minecraft sharp voxel cube head, 8x8 pixel texture, separated thin legs with thigh gap, protruding human sneakers, realistic human face, 3D protruding nose, skin pores, rubbery noodle limbs, blurry decal, watermark";
 
 const NEGATIVE_PROMPT_ZH =
-  "人类五指，真实人手，手指关节，指甲，真实人类面部骨骼，3D凸起高鼻梁，皮肤毛孔，真实眼球，乐高顶部圆柱凸起颗粒，我的世界像素方块贴图，橡胶面条状弯曲四肢，五官贴图模糊，多手多脚，水印文字";
+  "人类五指，真实人手，乐高C型夹爪手，乐高钩子手，乐高头顶圆柱凸起颗粒，我的世界直角像素方块头，双腿分叉有空隙，凸出真人运动鞋，真实人类面部骨骼，3D凸起高鼻梁，皮肤毛孔，橡胶面条状弯曲四肢，五官贴图模糊，水印文字";
 
 function printHelp() {
   console.log(`Usage: node scripts/avatar_spec.mjs [options]
@@ -237,8 +274,8 @@ export function buildAvatarSpec(rawOpts = {}) {
     locks: {
       headAndFaceEn: preset.faceEn,
       headAndFaceZh: preset.faceZh,
-      handsEn: "Fingerless C-shaped plastic claw hands, zero human fingers",
-      handsZh: "无手指C型塑料夹爪手，零人类手指",
+      handsEn: "Fingerless and clawless solid 1x2x1 beveled rectangular block hands (zero human fingers, zero Lego C-shaped hooks)",
+      handsZh: "平头倒角1x2x1实心方块手（严禁人类五指、严禁乐高C型钩子手）",
       outfitEn: preset.outfitEn,
       outfitZh: preset.outfitZh,
       accessoriesEn: `${preset.accessoriesEn}${extraAccessory}`,

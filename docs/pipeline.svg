@@ -15,9 +15,9 @@
   <rect x="24" y="34" width="164" height="152" rx="14" fill="url(#cardBg)" stroke="#F59E0B" stroke-width="2"/>
   <rect x="38" y="48" width="52" height="24" rx="6" fill="#F59E0B" fill-opacity="0.18"/>
   <text x="48" y="65" fill="#FBBF24" font-family="Segoe UI, Inter, sans-serif" font-size="13" font-weight="700">01 · DNA</text>
-  <text x="38" y="96" fill="#F8FAFC" font-family="Segoe UI, Inter, sans-serif" font-size="16" font-weight="700">捏人几何锁定</text>
-  <text x="38" y="118" fill="#94A3B8" font-family="Segoe UI, Inter, sans-serif" font-size="12">R6 / R15 / 盲盒比例</text>
-  <text x="38" y="138" fill="#94A3B8" font-family="Segoe UI, Inter, sans-serif" font-size="12">无手指C型手 · 2D贴图脸</text>
+  <text x="38" y="96" fill="#F8FAFC" font-family="Segoe UI, Inter, sans-serif" font-size="16" font-weight="700">Roblox 比例锁</text>
+  <text x="38" y="118" fill="#94A3B8" font-family="Segoe UI, Inter, sans-serif" font-size="12">2x2x1躯干 · 1x2x1齐平方腿</text>
+  <text x="38" y="138" fill="#94A3B8" font-family="Segoe UI, Inter, sans-serif" font-size="12">实心平头方手 · 2D贴图脸</text>
   <text x="38" y="166" fill="#FDE68A" font-family="Consolas, monospace" font-size="11">avatar_spec.mjs</text>
 
   <!-- Arrow 1->2 -->
@@ -28,10 +28,10 @@
   <rect x="214" y="34" width="164" height="152" rx="14" fill="url(#cardBg)" stroke="#38BDF8" stroke-width="2"/>
   <rect x="228" y="48" width="64" height="24" rx="6" fill="#38BDF8" fill-opacity="0.18"/>
   <text x="238" y="65" fill="#38BDF8" font-family="Segoe UI, Inter, sans-serif" font-size="13" font-weight="700">02 · SHEET</text>
-  <text x="228" y="96" fill="#F8FAFC" font-family="Segoe UI, Inter, sans-serif" font-size="16" font-weight="700">首帧与三视图</text>
-  <text x="228" y="118" fill="#94A3B8" font-family="Segoe UI, Inter, sans-serif" font-size="12">正/侧/45°角色设定图</text>
-  <text x="228" y="138" fill="#94A3B8" font-family="Segoe UI, Inter, sans-serif" font-size="12">跨镜头保持衣服与材质</text>
-  <text x="228" y="166" fill="#BAE6FD" font-family="Consolas, monospace" font-size="11">I2V Anchors</text>
+  <text x="228" y="96" fill="#F8FAFC" font-family="Segoe UI, Inter, sans-serif" font-size="16" font-weight="700">3D三视图与首帧</text>
+  <text x="228" y="118" fill="#94A3B8" font-family="Segoe UI, Inter, sans-serif" font-size="12">正/侧/45°角色三视图</text>
+  <text x="228" y="138" fill="#94A3B8" font-family="Segoe UI, Inter, sans-serif" font-size="12">SmoothPlastic · Studs底板</text>
+  <text x="228" y="166" fill="#BAE6FD" font-family="Consolas, monospace" font-size="11">render_preview.mjs</text>
 
   <!-- Arrow 2->3 -->
   <path d="M382 110H398" stroke="#64748B" stroke-width="2.5" stroke-linecap="round"/>
@@ -68,7 +68,7 @@
   <rect x="798" y="48" width="66" height="24" rx="6" fill="#F43F5E" fill-opacity="0.18"/>
   <text x="808" y="65" fill="#FB7185" font-family="Segoe UI, Inter, sans-serif" font-size="13" font-weight="700">05 · RESCUE</text>
   <text x="798" y="96" fill="#F8FAFC" font-family="Segoe UI, Inter, sans-serif" font-size="16" font-weight="700">防串味与救场</text>
-  <text x="798" y="118" fill="#94A3B8" font-family="Segoe UI, Inter, sans-serif" font-size="12">拦截长手指 / 乐高颗粒</text>
-  <text x="798" y="138" fill="#94A3B8" font-family="Segoe UI, Inter, sans-serif" font-size="12">修复滑步与关节软化</text>
+  <text x="798" y="118" fill="#94A3B8" font-family="Segoe UI, Inter, sans-serif" font-size="12">拦截人手 / 乐高C型爪</text>
+  <text x="798" y="138" fill="#94A3B8" font-family="Segoe UI, Inter, sans-serif" font-size="12">拦截MC像素 / 动作超载</text>
   <text x="798" y="166" fill="#FECDD3" font-family="Consolas, monospace" font-size="11">drift_check.mjs</text>
 </svg>

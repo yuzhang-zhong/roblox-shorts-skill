@@ -1,4 +1,4 @@
-#!/usr/bin/env node
+﻿#!/usr/bin/env node
 /**
  * shot_compiler.mjs
  * Zero-dependency CLI storyboard planner and engine-specific I2V/T2V prompt compiler
@@ -11,8 +11,8 @@ const TEMPLATES = {
     titleEn: "Monday 8 AM Alarm Meltdown",
     defaultRig: "chibi-blocky",
     defaultMaterial: "glossy-vinyl",
-    subjectEn: "a 2.4-head chibi blocky Roblox-style toy figure with a smooth studless cream cylindrical head, flat 2D screen-printed face decal, fingerless C-shaped claw hands, and a pastel matcha hoodie",
-    subjectZh: "2.4头身盲盒高光PVC材质的Roblox方块小人（平滑无颗粒圆柱头、纯平2D丝网印刷五官贴图、无手指C型夹爪手、穿抹茶绿倒角方柱卫衣）",
+    subjectEn: "a 2.4-head chibi blocky Roblox-style toy figure with a smooth studless cream cylindrical head, flat 2D screen-printed face decal, fingerless and clawless solid 1x2x1 rectangular block hands, and a pastel matcha hoodie",
+    subjectZh: "2.4头身盲盒高光PVC材质的Roblox方块小人（平滑无颗粒圆柱头、纯平2D丝网印刷五官贴图、1x2x1实心平头倒角方柱手、穿抹茶绿倒角方柱卫衣）",
     shots: [
       {
         role: "Hook / 黄金前3秒",
@@ -29,7 +29,7 @@ const TEMPLATES = {
       {
         role: "Escalation 1 / 动作推进",
         actionEn: "pivots its rigid right rectangular arm downward at the shoulder hinge to slam the red alarm clock flat",
-        actionZh: "右侧刚性倒角方柱手臂沿肩部转轴干脆利落地向下挥落，用C型夹爪手一巴掌拍扁闹钟",
+        actionZh: "右侧刚性倒角方柱手臂沿肩部转轴干脆利落地向下挥落，用1x2x1实心平头方柱手一巴掌拍扁闹钟",
         faceEn: "grumpy squinted line eyes (-_-) and a tiny wavy frown decal",
         faceZh: "2D贴图切换为起床气眯眯眼(-_-)与波浪小撇嘴",
         cameraEn: "Medium side-angle macro shot, 50mm f/2.8 shallow depth of field",
@@ -69,13 +69,13 @@ const TEMPLATES = {
     titleEn: "Fashion UGC vs Classic Noob Bestie Contrast",
     defaultRig: "r15",
     defaultMaterial: "matte-abs",
-    subjectEn: "two contrasting Roblox-style blocky figures: on the left, a glossy Y2K streetwear blocky avatar with star sunglasses; on the right, a classic yellow-head blue-torso R6 Noob with fingerless C-shaped hands",
-    subjectZh: "同框反差双人Roblox方块小人：左侧为戴星星墨镜的Y2K高光潮牌方块小人，右侧为经典黄头蓝衣绿腿的R6刚性新手小人（均为无手指C型手与2D印刷五官）",
+    subjectEn: "two contrasting Roblox-style blocky figures: on the left, a glossy Y2K streetwear blocky avatar with star sunglasses; on the right, a classic yellow-head blue-torso R6 Noob with fingerless and clawless solid 1x2x1 rectangular block hands",
+    subjectZh: "同框反差双人Roblox方块小人：左侧为戴星星墨镜的Y2K高光潮牌方块小人，右侧为经典黄头蓝衣绿腿的R6刚性新手小人（均为1x2x1实心平头方柱手与2D印刷五官）",
     shots: [
       {
         role: "Hook / 黄金前3秒",
-        actionEn: "strike contrasting poses side by side: the Y2K avatar poses with C-shaped hands on hips while the Classic Noob stands completely stiff like a wooden plank",
-        actionZh: "并排反差亮相：左侧潮人小人C型手叉腰摆出时尚造型，右侧经典黄皮新手像木板一样笔直僵立一动不动",
+        actionEn: "strike contrasting poses side by side: the Y2K avatar poses with solid 1x2x1 rectangular block hands on hips while the Classic Noob stands completely stiff like a wooden plank",
+        actionZh: "并排反差亮相：左侧潮人小人1x2x1实心方柱手叉腰摆出时尚造型，右侧经典黄皮新手像木板一样笔直僵立一动不动",
         faceEn: "left avatar has a confident smirk decal; right Noob has the unchanging classic black line smile",
         faceZh: "左侧自信歪嘴笑2D贴图，右侧永恒不变的经典呆萌线条笑脸",
         cameraEn: "Fast snap-zoom into a two-shot medium framing on a pastel studio stage",
@@ -127,8 +127,8 @@ const TEMPLATES = {
     titleEn: "Pastel Sky Obby Parkour Storytime",
     defaultRig: "r6",
     defaultMaterial: "matte-abs",
-    subjectEn: "a classic R6 Roblox-style blocky runner with a smooth yellow cylindrical head, cyan blocky jersey, fingerless C-shaped hands, and a miniature twin jetpack",
-    subjectZh: "经典R6刚性比例Roblox跑酷方块小人（平滑亮黄圆柱头、青色运动方柱上衣、无手指C型手、背微缩双联方块喷气包）",
+    subjectEn: "a classic R6 Roblox-style blocky runner with a smooth yellow cylindrical head, cyan blocky jersey, fingerless and clawless solid 1x2x1 rectangular block hands, and a miniature twin jetpack",
+    subjectZh: "经典R6刚性比例Roblox跑酷方块小人（平滑亮黄圆柱头、青色运动方柱上衣、1x2x1实心平头方柱手、背微缩双联方块喷气包）",
     shots: [
       {
         role: "Hook / 黄金前3秒",
@@ -185,8 +185,8 @@ const TEMPLATES = {
     titleEn: "Cozy Miniature Croissant Café Tycoon",
     defaultRig: "chibi-blocky",
     defaultMaterial: "clay-soft",
-    subjectEn: "a 2.4-head chibi blocky bakery chef with a soft-touch clay-plastic finish, puffy white blocky chef hat, caramel apron, flat 2D happy face decal, and fingerless C-shaped hands",
-    subjectZh: "2.4头身柔感黏土塑料材质的Roblox甜点师方块小人（戴圆角方块白厨师帽、焦糖棕围裙、纯平2D弯弯笑眼贴图、无手指C型手）",
+    subjectEn: "a 2.4-head chibi blocky bakery chef with a soft-touch clay-plastic finish, puffy white blocky chef hat, caramel apron, flat 2D happy face decal, and fingerless and clawless solid 1x2x1 rectangular block hands",
+    subjectZh: "2.4头身柔感黏土塑料材质的Roblox甜点师方块小人（戴圆角方块白厨师帽、焦糖棕围裙、纯平2D弯弯笑眼贴图、1x2x1实心平头方柱手）",
     shots: [
       {
         role: "Hook / 黄金前3秒",
@@ -202,11 +202,11 @@ const TEMPLATES = {
       },
       {
         role: "Escalation 1 / 动作推进",
-        actionEn: "uses its fingerless C-shaped claw hands to clamp a golden blocky croissant onto a pastel tray with a crisp snap",
-        actionZh: "用无手指C型夹爪手稳稳夹起一个金黄圆角方块可颂，啪嗒一声精准卡入马卡龙色托盘槽位中",
+        actionEn: "uses its fingerless and clawless solid 1x2x1 rectangular block hands to clamp a golden blocky croissant onto a pastel tray with a crisp snap",
+        actionZh: "用1x2x1实心平头倒角方柱手稳稳夹起一个金黄圆角方块可颂，啪嗒一声精准卡入马卡龙色托盘槽位中",
         faceEn: "focused cute tongue-blep decal on the smooth cylindrical head",
         faceZh: "专注可爱的微吐舌头2D贴图",
-        cameraEn: "Extreme macro close-up on the C-shaped hands and tray",
+        cameraEn: "Extreme macro close-up on the solid 1x2x1 rectangular block hands and tray",
         cameraZh: "手部C型夹爪与托盘微距大特写，展现细腻倒角质感",
         hailuoTag: "[Static shot]",
         sfx: "清脆积木卡扣声 (ASMR Snap!)",
@@ -243,8 +243,8 @@ const TEMPLATES = {
     titleEn: "Runway Beat-Drop UGC Outfit Transition",
     defaultRig: "r15",
     defaultMaterial: "glossy-vinyl",
-    subjectEn: "an R15 Roblox-style blocky fashion avatar with a smooth cylindrical head, flat 2D decal face, and fingerless C-shaped hands on a glowing runway podium",
-    subjectZh: "站在发光T台上的R15分段比例Roblox穿搭方块小人（平滑圆柱头、纯平2D印刷五官、无手指C型手、高光盲盒PVC材质）",
+    subjectEn: "an R15 Roblox-style blocky fashion avatar with a smooth cylindrical head, flat 2D decal face, and fingerless and clawless solid 1x2x1 rectangular block hands on a glowing runway podium",
+    subjectZh: "站在发光T台上的R15分段比例Roblox穿搭方块小人（平滑圆柱头、纯平2D印刷五官、1x2x1实心平头方柱手、高光盲盒PVC材质）",
     shots: [
       {
         role: "Hook / 黄金前3秒",
@@ -284,8 +284,8 @@ const TEMPLATES = {
       },
       {
         role: "Payoff & Loop / 反转收尾",
-        actionEn: "raises its right fingerless C-shaped hand to tilt its star-framed sunglasses on its forehead while camera flashes pop in the background",
-        actionZh: "抬起右侧无手指C型手轻扶额头五角星墨镜，背景亮起密集的T台闪光灯",
+        actionEn: "raises its right fingerless solid 1x2x1 rectangular block hand to tilt its star-framed sunglasses on its forehead while camera flashes pop in the background",
+        actionZh: "抬起右侧1x2x1实心平头方柱手轻扶额头五角星墨镜，背景亮起密集的T台闪光灯",
         faceEn: "cool unbothered idol smile decal",
         faceZh: "酷飒偶像微笑2D贴图",
         cameraEn: "Smooth 30-degree orbit around the glossy blocky figure",
@@ -301,13 +301,13 @@ const TEMPLATES = {
     titleEn: "Burnt Pizza Deadpan R6 Ragdoll Slapstick",
     defaultRig: "r6",
     defaultMaterial: "glossy-vinyl",
-    subjectEn: "a classic R6 Roblox-style blocky figure with a bright yellow cylindrical head, blue blocky torso, green blocky legs, white chef hat, and fingerless C-shaped hands",
-    subjectZh: "戴白色方块厨师帽的经典R6黄头蓝衣Roblox方块小人（无手指C型手、纯平2D默认微笑贴图、刚性不弯曲四肢）",
+    subjectEn: "a classic R6 Roblox-style blocky figure with a bright yellow cylindrical head, blue blocky torso, green blocky legs, white chef hat, and fingerless and clawless solid 1x2x1 rectangular block hands",
+    subjectZh: "戴白色方块厨师帽的经典R6黄头蓝衣Roblox方块小人（1x2x1实心平头方柱手、纯平2D默认微笑贴图、刚性不弯曲四肢）",
     shots: [
       {
         role: "Hook / 黄金前3秒",
-        actionEn: "proudly holds up a completely charred, pitch-black blocky pizza on a silver tray using both fingerless C-shaped hands",
-        actionZh: "用双侧无手指C型手骄傲地端起托盘，上面放着一块烤得乌黑发亮的圆角方块黑暗料理披萨",
+        actionEn: "proudly holds up a completely charred, pitch-black blocky pizza on a silver tray using both fingerless and clawless solid 1x2x1 rectangular block hands",
+        actionZh: "用双侧1x2x1实心平头方柱手骄傲地端起托盘，上面放着一块烤得乌黑发亮的圆角方块黑暗料理披萨",
         faceEn: "cheerful unchanging default black-line smile decal despite the disaster",
         faceZh: "面对灾难现场依然保持毫无波澜的经典2D默认微笑贴图",
         cameraEn: "Fast crash-zoom from medium shot to close-up in a bright kitchen",
@@ -357,10 +357,10 @@ const TEMPLATES = {
 };
 
 const NEGATIVE_GUARD =
-  "human fingers, five-fingered hand, realistic human face, 3D protruding nose, skin pores, Lego top studs, Minecraft voxel blocks, rubbery noodle limbs, foot sliding, morphing clothes, watermark";
+  "human fingers, five-fingered hand, Lego solid 1x2x1 rectangular block hands, Lego hook hands, Lego top head studs, Minecraft sharp voxel cube head, separated thin legs with thigh gap, protruding human sneakers, realistic human face, 3D protruding nose, skin pores, rubbery noodle limbs, foot sliding, morphing clothes, watermark";
 
 const NEGATIVE_GUARD_ZH =
-  "人类五指，真实人手，真实人类面部骨骼，3D凸起高鼻梁，皮肤毛孔，乐高顶部凸起圆颗粒，我的世界像素方块，橡胶面条状弯曲四肢，脚底打滑，服装中途变形，水印文字";
+  "人类五指，真实人手，乐高1x2x1实心平头方柱手，乐高钩子手，乐高头顶圆柱凸起颗粒，我的世界直角像素方块头，双腿分叉有空隙，外凸真人运动鞋，真实人类面部骨骼，3D凸起高鼻梁，皮肤毛孔，橡胶面条状弯曲四肢，脚底打滑，服装中途变形，水印文字";
 
 function printHelp() {
   console.log(`Usage: node scripts/shot_compiler.mjs [options]
@@ -410,9 +410,9 @@ export function parseArgs(argv) {
 
 function formatEnginePrompt(shot, tpl, engine, aspect, rig) {
   const geometryTailEn =
-    "Rigid mechanical hinge joints, fingerless C-shaped claw hands, smooth studless ABS/vinyl plastic, Octane miniature studio lighting, no human fingers, no Lego top studs.";
+    "Canonical Roblox 2x2x1 torso and flush 1x2x1 solid rectangular limbs, fingerless and clawless flat beveled block hands (no human fingers, no Lego C-claws), 1:1 barrel-beveled cylindrical head, SmoothPlastic shader on a classic Roblox studded baseplate, Motor6D rigid hinge joints.";
   const geometryTailZh =
-    "刚性机械转轴关节，无手指C型夹爪手，平滑无乐高颗粒的高光盲盒塑料质感，Octane微缩摄影棚布光，严禁出现人类五指或真人鼻子。";
+    "纯正Roblox 2x2x1长方体躯干配并拢齐平的1x2x1实心平头方柱四肢（无人类五指、无乐高C型钩爪），1:1上下大圆角桶状圆柱头，SmoothPlastic平滑塑料配经典Roblox方格Studs底板，Motor6D刚性转轴关节。";
 
   let i2vPromptEn = "";
   let i2vPromptZh = "";
@@ -423,12 +423,12 @@ function formatEnginePrompt(shot, tpl, engine, aspect, rig) {
       i2vPromptZh = `${shot.hailuoTag}（${aspect}竖屏，${rig}骨架）画面主体为${tpl.subjectZh}。小人${shot.actionZh}，${shot.faceZh}。${geometryTailZh}`;
       break;
     case "seedance":
-      i2vPromptEn = `[Seedance I2V · ${aspect}] ${shot.cameraEn}. ${tpl.subjectEn} ${shot.actionEn} with crisp stop-motion-like toy timing; ${shot.faceEn}. ${geometryTailEn}`;
-      i2vPromptZh = `【即梦/Seedance首帧I2V · ${aspect}】${shot.cameraZh}。${tpl.subjectZh}${shot.actionZh}，${shot.faceZh}。动作干脆利落有潮玩定格节奏感，${geometryTailZh}`;
+      i2vPromptEn = `[Seedance I2V · ${aspect}] ${shot.cameraEn}. ${tpl.subjectEn} ${shot.actionEn} with crisp Roblox Motor6D timing; ${shot.faceEn}. ${geometryTailEn}`;
+      i2vPromptZh = `【即梦/Seedance首帧I2V · ${aspect}】${shot.cameraZh}。${tpl.subjectZh}${shot.actionZh}，${shot.faceZh}。动作干脆利落有Roblox刚体节奏感，${geometryTailZh}`;
       break;
     case "wan":
-      i2vPromptEn = `${aspect} vertical 3D miniature toy render. ${shot.cameraEn}. Subject: ${tpl.subjectEn} ${shot.actionEn}. Expression: ${shot.faceEn}. ${geometryTailEn}`;
-      i2vPromptZh = `${aspect}竖屏3D微缩盲盒渲染，${shot.cameraZh}。主体：${tpl.subjectZh}${shot.actionZh}，${shot.faceZh}。${geometryTailZh}`;
+      i2vPromptEn = `${aspect} vertical 3D Roblox SmoothPlastic render. ${shot.cameraEn}. Subject: ${tpl.subjectEn} ${shot.actionEn}. Expression: ${shot.faceEn}. ${geometryTailEn}`;
+      i2vPromptZh = `${aspect}竖屏3D纯正Roblox渲染，${shot.cameraZh}。主体：${tpl.subjectZh}${shot.actionZh}，${shot.faceZh}。${geometryTailZh}`;
       break;
     case "sora":
     case "runway":
@@ -442,8 +442,8 @@ function formatEnginePrompt(shot, tpl, engine, aspect, rig) {
       break;
   }
 
-  const firstFramePromptEn = `${aspect} vertical keyframe still. ${shot.cameraEn}. ${tpl.subjectEn} positioned at the start of the action (${shot.actionEn}), displaying ${shot.faceEn}. Smooth studless beveled plastic blocks, fingerless C-shaped claw hands, shallow macro depth of field, zero Lego studs, zero human fingers.`;
-  const firstFramePromptZh = `${aspect}竖屏首帧关键帧静帧。${shot.cameraZh}。${tpl.subjectZh}处于动作起始位（${shot.actionZh}），面部呈现${shot.faceZh}。平滑无颗粒倒角方块，无手指C型夹爪手，微距浅景深摄影棚布光。`;
+  const firstFramePromptEn = `${aspect} vertical keyframe still. ${shot.cameraEn}. ${tpl.subjectEn} positioned at the start of the action (${shot.actionEn}), displaying ${shot.faceEn}. ${geometryTailEn}`;
+  const firstFramePromptZh = `${aspect}竖屏首帧关键帧静帧。${shot.cameraZh}。${tpl.subjectZh}处于动作起始位（${shot.actionZh}），面部呈现${shot.faceZh}。${geometryTailZh}`;
 
   return {
     firstFramePromptEn,
