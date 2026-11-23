@@ -7,7 +7,7 @@ When an AI video clip ruins the Roblox aesthetic, the cause is almost always one
 | Issue Code | Symptom / 翻车表现 | Root Cause / 根本原因 | Immediate Fix / 核心修复手段 |
 | --- | --- | --- | --- |
 | `human-fingers` | 小人手臂末端长出人类五指或关节纹 | 模型将 "hands" 默认映射为真人手部 | 强制替换 `hands` 为 `fingerless and clawless solid 1x2x1 beveled rectangular block hands`，负向排除 `five fingers, human hands` |
-| `lego-studs` | 头顶长出乐高圆颗粒，或手部变成乐高C型钩爪 | 误用了 "C-shaped claw hands" 或 "brick toy" 触发乐高先验 | **严禁使用乐高C型爪！** 正向声明 `solid 1x2x1 rectangular block arms, smooth studless barrel-beveled Roblox head`，负向排除 `Lego top studs, Lego C-shaped claw hands` |
+| `lego-studs` | 头顶或地面长出乐高圆颗粒，或手部变成乐高C型钩爪 | 误用了 "C-shaped claw hands"、"studded floor" 或 "brick toy" 触发乐高先验 | **严禁使用乐高C型爪与地面凸点！** 正向声明 `solid 1x2x1 rectangular block arms, smooth studless barrel-beveled Roblox head, flat SmoothPlastic / WoodPlanks floor (zero raised circular Lego studs)`，负向排除 `Lego top studs, raised circular floor studs, Lego C-shaped claw hands` |
 | `minecraft-voxels` | 头部与身体变成直角锋利方块且带像素马赛克贴图 | 模型混淆了 Roblox 与 Minecraft | 正向声明 `classic Roblox 1:1 barrel-cylinder head with deep curved top/bottom bevels, SmoothPlastic shader`，负向排除 `Minecraft voxel, pixel art` |
 | `limb-gap` | 双腿之间有明显空隙、穿了分体运动鞋，不像 Roblox 方腿 | 未声明 Roblox 标志性的 `2×2×1` 躯干与并拢 `1×2×1` 双腿比例 | 正向声明 `canonical Roblox 2x2x1 rectangular torso with two 1x2x1 rectangular leg blocks sitting flush side-by-side matching exact torso width` |
 | `face-morph` | 说话或做表情时五官凸起长出真人鼻子与牙齿 | 动态幅度过大触发真人面部骨骼先验 | 正向锁定 `flat 2D screen-printed decal face, painted ink eyes and mouth, zero 3D nose`，调低运动幅度 |
@@ -23,7 +23,7 @@ When an AI video clip ruins the Roblox aesthetic, the cause is almost always one
   `A cute Roblox girl holding an iced coffee cup with both hands and smiling happily at the camera.`
 - **Why it fails**: "girl", "both hands", and "smiling" trigger human finger generation and 3D human cheek/lip deformation.
 - **Rescued Prompt (救场修复词)**:
-  `A 3D blind-box Roblox-style chibi blocky figure with a smooth studless cylindrical head and flat 2D screen-printed decal face showing starry eyes and a painted curved smile. Its fingerless C-shaped plastic claw hands clamp around the sides of a miniature translucent iced coffee cup. Rigid rectangular arms pivot slightly upward at the shoulder hinges. Glossy vinyl toy shader, soft studio lighting, no human fingers, no 3D human nose, no skin pores.`
+  `A 3D SmoothPlastic Roblox-style chibi blocky figure with a smooth studless 1:1 barrel-beveled head and flat 2D screen-printed decal face showing starry eyes and a painted curved smile. Its fingerless and clawless solid 1x2x1 beveled rectangular block hands hold the sides of a miniature translucent iced coffee cup with a dome lid and straw. Rigid rectangular arms pivot slightly upward at the shoulder hinges. Soft studio lighting, zero human fingers, zero Lego C-claws, no 3D human nose.`
 
 ### Case B: Fixing Action Overload (`overload`)
 
@@ -39,4 +39,4 @@ When an AI video clip ruins the Roblox aesthetic, the cause is almost always one
 - **Broken Prompt (翻车原词)**:
   `A blocky plastic toy character jumping across floating blocks in the sky.`
 - **Rescued Prompt (救场修复词)**:
-  `A Roblox R6 blocky avatar with a smooth studless cylindrical head, chamfered rectangular blue torso, and fingerless C-shaped hands hops cleanly onto a smooth pastel-pink floating platform with rounded 2mm bevels. Smooth satin ABS plastic surface, zero Lego studs, non-voxel geometry, bright sky dome lighting.`
+  `A Roblox R6 blocky avatar with a smooth studless 1:1 barrel-beveled head, chamfered 2x2x1 blue torso, and fingerless and clawless solid 1x2x1 rectangular block hands hops cleanly onto a smooth pastel-pink SmoothPlastic floating platform with crisp white trim. Smooth flat architectural surfaces, zero raised Lego floor or head studs, non-voxel geometry, bright sky dome lighting.`

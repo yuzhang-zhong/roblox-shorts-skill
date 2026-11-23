@@ -37,7 +37,7 @@ Why do top Roblox AI videos look like expensive collectibles rather than flat ga
 
 Pair each visual beat with tactile toy and retro game audio cues in post-production:
 
-- **Plastic Clack (`清脆ABS塑料碰撞声`)**: when C-shaped hands tap a desk, cup, or keyboard.
+- **Plastic Clack (`清脆SmoothPlastic碰撞声`)**: when solid 1x2x1 block hands tap a desk, cup, or keyboard.
 - **Classic "Oof" / Comic Thud (`经典闷响/摔倒声`)**: when an R6/chibi avatar tips over rigidly at 90 degrees.
 - **Cartoon Boing (`弹簧Q弹声`)**: when oversized UGC cat ears, backpack, or springy hats bounce after a jump.
 - **Vinyl Squeak (`轻微橡胶摩擦声`)**: when the cylindrical head rotates 45 degrees in deadpan silence.

@@ -43,12 +43,12 @@
       "preview": "assets/library/avatars/avatar_guest.png",
       "brickColors": {
         "headAndHands": "Institutional white (#F8F8F8)",
-        "torsoAndArms": "Really black (#111827) with red/white Roblox R logo",
+        "torsoAndArms": "Really black (#111827) varsity jacket with white chest stripes (unbranded)",
         "legs": "Black (#1B2A35)",
-        "hat": "Bright red (#C4281C) Roblox Baseball Cap"
+        "hat": "Bright red (#C4281C) unbranded sport baseball cap"
       },
-      "promptEn": "authentic Roblox R6 Classic Guest avatar wearing a bright red Roblox baseball cap, black 2x2x1 Roblox R logo jacket, pale white 1:1 barrel head with 2D grin decal, and black flush 1x2x1 rectangular legs",
-      "promptZh": "经典Roblox R6游客形象（头戴亮红色Roblox棒球帽，黑色2x2x1胸前带红白R标夹克，纯白1:1桶状圆柱头，黑色并拢1x2x1方柱长裤）"
+      "promptEn": "blocky R6 Classic Guest-style avatar wearing a plain bright red unbranded baseball cap, black 2x2x1 varsity stripe jacket (no trademark logos), pale white 1:1 barrel head with 2D grin decal, and black flush 1x2x1 rectangular legs",
+      "promptZh": "经典R6游客风方块形象（头戴纯色无标亮红棒球帽，黑色2x2x1白条纹运动夹克无商标Logo，纯白1:1桶状圆柱头，黑色并拢1x2x1方柱长裤）"
     },
     {
       "id": "bacon-hair",
@@ -88,12 +88,12 @@
       "preview": "assets/library/avatars/avatar_obby.png",
       "brickColors": {
         "skin": "Bright yellow (#F5CD30)",
-        "hat": "Bright red (#E12626) Roblox Visor",
-        "torso": "Cyan (#00A2E8) jersey with tilted white Roblox R logo",
+        "hat": "Bright red (#E12626) unbranded sport visor",
+        "torso": "Cyan (#00A2E8) jersey with yellow lightning-bolt emblem (unbranded)",
         "gear": "Glowing red Neon Speed Coil on right 1x2x1 arm"
       },
-      "promptEn": "classic Roblox R6 obby speedrunner wearing a red Roblox visor cap, cyan 2x2x1 jersey with tilted white Roblox square logo, short sleeves with bare yellow 1x2x1 solid rectangular arms and a glowing red Speed Coil wrapped around the right arm",
-      "promptZh": "经典Roblox R6跑酷玩家（头戴红色Roblox遮阳帽，青色2x2x1短袖球衣印有倾斜白色R标，黄色1x2x1实心方柱右臂缠绕发光红色加速弹簧Speed Coil）"
+      "promptEn": "blocky R6 obby speedrunner wearing a plain red unbranded visor cap, cyan 2x2x1 jersey with yellow lightning-bolt graphic (zero trademark logos), short sleeves with bare yellow 1x2x1 solid rectangular arms and a glowing red Speed Coil wrapped around the right arm",
+      "promptZh": "R6跑酷玩家形象（头戴纯色无标红遮阳帽，青色2x2x1短袖球衣印有原创黄色闪电徽章无商标Logo，黄色1x2x1实心方柱右臂缠绕发光红色加速弹簧Speed Coil）"
     },
     {
       "id": "brookhaven-hoodie",
@@ -125,7 +125,7 @@
     { "id": "speed-coil", "name": "Speed Coil", "nameZh": "红色加速弹簧", "tokenEn": "glowing bright-red Roblox Neon spiral Speed Coil wrapped around the right 1x2x1 solid rectangular arm block" },
     { "id": "bloxy-cola", "name": "Bloxy Cola Can", "nameZh": "Bloxy Cola 可乐罐", "tokenEn": "classic cylindrical brown-and-red Bloxy Cola soda can held against the right flat rectangular block hand" },
     { "id": "linked-sword", "name": "Classic Linked Sword", "nameZh": "经典十字长剑", "tokenEn": "classic metallic grey Roblox Linked Sword with blue hilt and yellow crossguard held upright" },
-    { "id": "red-roblox-cap", "name": "Classic Red Roblox Baseball Cap", "nameZh": "经典红色 R 标棒球帽", "tokenEn": "classic bright-red Roblox baseball cap with curved front brim sitting on the 1:1 barrel-cylinder head" },
+    { "id": "red-sport-cap", "name": "Plain Red Sport Baseball Cap", "nameZh": "纯色无标红棒球帽", "tokenEn": "plain bright-red unbranded sport baseball cap with curved front brim sitting cleanly on the 1:1 barrel-cylinder head (zero brand logos)" },
     { "id": "bc-hard-hat", "name": "Builder's Club Hard Hat", "nameZh": "建造者俱乐部黄色安全帽", "tokenEn": "classic bright-yellow ribbed Builder's Club construction hard hat" },
     { "id": "gold-crown", "name": "Classic Gold Crown", "nameZh": "经典黄金宝石皇冠", "tokenEn": "classic metallic gold crown with pointed spikes and red/blue gem studs on top of the head" }
   ]

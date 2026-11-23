@@ -63,10 +63,10 @@ const ARCHETYPES = {
     primaryColor: "Really black #111827",
     secondaryColor: "Black #1B2A35",
     accentColor: "Bright red #C4281C",
-    outfitEn: "black 2x2x1 Roblox R logo jacket with white cuffs, flush black 1x2x1 rectangular blocky pants",
-    outfitZh: "纯黑2x2x1胸前带红白R标夹克配白袖口、纯黑并拢齐平1x2x1方柱长裤",
-    accessoriesEn: "bright red Roblox baseball cap with curved front brim on the pale white 1:1 barrel head",
-    accessoriesZh: "纯白1:1桶状圆角头上佩戴亮红色经典Roblox棒球帽",
+    outfitEn: "black 2x2x1 varsity street jacket with crisp white chest stripes and cuffs (zero brand logos), flush black 1x2x1 rectangular blocky pants",
+    outfitZh: "纯黑2x2x1双白条纹运动夹克配白袖口（无任何品牌商标Logo）、纯黑并拢齐平1x2x1方柱长裤",
+    accessoriesEn: "plain bright red sport baseball cap with curved front brim (unbranded, no logo) on the pale white 1:1 barrel head",
+    accessoriesZh: "纯白1:1桶状圆角头上佩戴纯色无标亮红运动棒球帽",
     faceEn: "classic Roblox 2D Winning Grin (:D) decal with white top teeth bar",
     faceZh: "经典Roblox 2D露齿笑(:D)平面贴图"
   },
@@ -143,10 +143,10 @@ const ARCHETYPES = {
     primaryColor: "Cyan #00AAE4",
     secondaryColor: "Hot pink #FF55A3",
     accentColor: "Bright red #EF4444 (Speed Coil)",
-    outfitEn: "sporty cyan 2x2x1 blocky jersey with classic white Roblox R emblem, hot-pink 1x2x1 rectangular leg blocks sitting flush side-by-side",
-    outfitZh: "亮青色2x2x1运动方柱球衣（胸前经典白色R字徽标）、亮粉色并拢齐平1x2x1长方体双腿",
-    accessoriesEn: "classic red Roblox sport visor cap on head, glowing red Speed Coil wrapped around the right 1x2x1 solid rectangular arm block, twin white blocky jetpack",
-    accessoriesZh: "头戴经典红色Roblox运动遮阳帽、右侧1x2x1实心方柱手臂缠绕发光红色加速弹簧(Speed Coil)、背后白色双联方块喷气包",
+    outfitEn: "sporty cyan 2x2x1 blocky jersey with a yellow lightning-bolt graphic (no trademark logos), hot-pink 1x2x1 rectangular leg blocks sitting flush side-by-side",
+    outfitZh: "亮青色2x2x1运动方柱球衣（胸前原创黄色闪电徽章，无任何商标Logo）、亮粉色并拢齐平1x2x1长方体双腿",
+    accessoriesEn: "plain bright-red sport visor cap (unbranded, no logo), glowing red Speed Coil wrapped around the right 1x2x1 solid rectangular arm block, twin white blocky jetpack",
+    accessoriesZh: "头戴纯色无标红色运动遮阳帽、右侧1x2x1实心方柱手臂缠绕发光红色加速弹簧(Speed Coil)、背后白色双联方块喷气包",
     faceEn: "flat 2D screen-printed Roblox Winning/Energetic grin decal with determined wide eyes",
     faceZh: "纯平2D印刷专注大眼与活力露齿笑贴图（纯平面无3D深度）"
   }
@@ -178,47 +178,47 @@ const RIGS = {
 
 const MATERIALS = {
   "smooth-plastic": {
-    label: "Roblox SmoothPlastic + Studs Baseplate (官方SmoothPlastic塑料与方格Studs底板)",
+    label: "Roblox SmoothPlastic + Flat Square-Seam Baseplate (官方SmoothPlastic平滑塑料与无凸点方格底板)",
     shaderEn:
-      "authentic Roblox Studio SmoothPlastic shader with crisp 2mm edge bevels on the avatar, standing on a classic Roblox 1x1 square tile baseplate with raised square studs, clean ambient occlusion and bright skybox lighting",
+      "authentic Roblox Studio SmoothPlastic shader with crisp 2mm edge bevels on the avatar, standing on a flat matte Roblox SmoothPlastic / WoodPlanks / Concrete surface with subtle recessed square grid seams (zero raised circular Lego floor studs or pegs), clean ambient occlusion and bright skybox lighting",
     shaderZh:
-      "纯正Roblox Studio SmoothPlastic平滑塑料材质（角色身体带2毫米利落倒角高光），脚踩带1x1方格凸起纹理的经典Roblox Studs底板，清晰环境光遮蔽与明亮天空盒布光"
+      "纯正Roblox Studio SmoothPlastic平滑塑料材质（角色身体带2毫米利落倒角高光），脚踩平整无圆粒凸起的Roblox平滑地板或木地板（严禁乐高地面凸点颗粒），清晰环境光遮蔽与明亮天空盒布光"
   },
   "glossy-vinyl": {
     label: "Glossy Blind-Box SmoothPlastic (高光潮玩级SmoothPlastic材质)",
     shaderEn:
-      "glossy collectible Roblox SmoothPlastic & PVC shader, smooth studless character surfaces, crisp specular highlights, subtle subsurface scattering, standing on a Roblox studded baseplate under three-point studio lighting",
+      "glossy collectible Roblox SmoothPlastic & PVC shader, smooth studless character and floor surfaces (zero raised Lego pegs), crisp specular highlights, subtle subsurface scattering under three-point studio lighting",
     shaderZh:
-      "高光潮玩级Roblox SmoothPlastic材质，角色表面平滑无凸起颗粒，清脆高光反射与次表面散射，配合经典Roblox方格底板与三点摄影棚布光"
+      "高光潮玩级Roblox SmoothPlastic材质，角色与地面完全平滑无乐高凸起圆粒，清脆高光反射与次表面散射，配合三点摄影棚布光"
   },
   "matte-abs": {
     label: "Satin Matte SmoothPlastic (绸感哑光SmoothPlastic材质)",
     shaderEn:
-      "satin matte Roblox SmoothPlastic blocks, 2mm chamfered edges, studless character body, clean ambient occlusion in Motor6D joint seams, studio lighting",
+      "satin matte Roblox SmoothPlastic blocks, 2mm chamfered edges, studless character body and smooth flat set pieces, clean ambient occlusion in Motor6D joint seams, studio lighting",
     shaderZh:
-      "绸感哑光Roblox SmoothPlastic方块材质，2毫米精密倒角边缘，Motor6D关节接缝柔和环境光遮蔽"
+      "绸感哑光Roblox SmoothPlastic方块材质，2毫米精密倒角边缘，平滑无颗粒布景道具，Motor6D关节接缝柔和环境光遮蔽"
   },
   "clay-soft": {
     label: "Soft Miniature Diorama Plastic (微缩柔感模型塑料材质)",
     shaderEn:
-      "soft-touch matte diorama shader over canonical Roblox 2x2x1/1x2x1 blocky geometry, warm tabletop lighting, 50mm f/2.8 shallow depth of field",
+      "soft-touch matte diorama shader over canonical Roblox 2x2x1/1x2x1 blocky geometry with multi-part miniature Roblox Studio props, warm tabletop lighting, 50mm f/2.8 shallow depth of field",
     shaderZh:
-      "标准Roblox 2x2x1/1x2x1方块几何体配微缩柔感哑光材质，暖调桌面布光，50mm微距浅景深"
+      "标准Roblox 2x2x1/1x2x1方块几何体配微缩柔感哑光材质与精致多部件Roblox道具，暖调桌面布光，50mm微距浅景深"
   },
   "neon-cyber": {
     label: "Roblox Neon + ForceField Cyber Shader (Roblox自发光Neon与高光材质)",
     shaderEn:
-      "Roblox SmoothPlastic dark shell paired with glowing Roblox Neon material accents, high-contrast cyan and magenta rim lighting, reflective studded floor",
+      "Roblox SmoothPlastic dark shell paired with glowing Roblox Neon material accents, high-contrast cyan and magenta rim lighting, sleek smooth reflective floor (zero raised Lego studs)",
     shaderZh:
-      "深色Roblox SmoothPlastic方块外壳配高亮度Roblox Neon自发光材质边条，高反差轮廓光与微反射方格地面"
+      "深色Roblox SmoothPlastic方块外壳配高亮度Roblox Neon自发光材质边条，高反差轮廓光与平滑微反射地面（无乐高凸起圆粒）"
   }
 };
 
 const NEGATIVE_PROMPT_EN =
-  "human fingers, five fingers, realistic human hands, knuckles, Lego C-shaped claw hands, Lego hook hands, Lego top head studs, cylindrical Lego pegs, Minecraft sharp voxel cube head, 8x8 pixel texture, separated thin legs with thigh gap, protruding human sneakers, realistic human face, 3D protruding nose, skin pores, rubbery noodle limbs, blurry decal, watermark";
+  "official Roblox logo, tilted square Roblox trademark emblem, Roblox R badge, brand logos, watermarks, human fingers, five fingers, realistic human hands, knuckles, Lego C-shaped claw hands, Lego hook hands, Lego top head studs, raised circular Lego floor studs, cylindrical Lego brick pegs, studded Lego baseplate, Minecraft sharp voxel cube head, 8x8 pixel texture, featureless blank single-box props, separated thin legs with thigh gap, protruding human sneakers, realistic human face, 3D protruding nose, skin pores, rubbery noodle limbs, blurry decal";
 
 const NEGATIVE_PROMPT_ZH =
-  "人类五指，真实人手，乐高C型夹爪手，乐高钩子手，乐高头顶圆柱凸起颗粒，我的世界直角像素方块头，双腿分叉有空隙，凸出真人运动鞋，真实人类面部骨骼，3D凸起高鼻梁，皮肤毛孔，橡胶面条状弯曲四肢，五官贴图模糊，水印文字";
+  "官方Roblox商标Logo，倾斜方框标志，R字品牌徽标，任何品牌水印，人类五指，真实人手，乐高C型夹爪手，乐高钩子手，乐高头顶圆柱凸起颗粒，乐高地面凸起圆粒，乐高积木凸点底板，我的世界直角像素方块头，无细节简陋纯色单一方块道具，双腿分叉有空隙，凸出真人运动鞋，真实人类面部骨骼，3D凸起高鼻梁，皮肤毛孔，橡胶面条状弯曲四肢，五官贴图模糊";
 
 function printHelp() {
   console.log(`Usage: node scripts/avatar_spec.mjs [options]

@@ -27,30 +27,30 @@ For multi-shot Roblox shorts, **First-Frame Image-to-Video (首帧图生视频 I
 
 - **Structure**: `[主体锚点 + 刚体关节声明] + [单一核心动作] + [表情贴图与配饰次级物理] + [运镜指令]`
 - **Example (Chinese)**:
-  `画面中的3D盲盒塑料质感Roblox方块小人（圆柱体平滑头部、2D印刷五官、无手指C型手、倒角方柱四肢），刚性机械肩部关节快速向上抬起双臂抱头，脸部2D贴图呈现出瞳孔缩小的震惊表情，头顶毛绒猫耳针织帽随之轻微弹跳。镜头快速推近至中近景，微距摄影景深，严禁出现人类手指或乐高顶部颗粒。`
+  `画面中的3D高光SmoothPlastic材质Roblox方块小人（1:1桶状圆角平滑头部、纯平2D印刷五官、无手指且无乐高C型爪的1x2x1实心平头方柱手、2x2x1躯干配并拢方腿），刚性Motor6D肩部关节快速向上抬起双臂抱头，脸部2D贴图呈现出瞳孔缩小的震惊表情，头顶毛绒猫耳针织帽随之轻微弹跳。木纹地板与多部件书桌道具清晰细腻，镜头快速推近至中近景，严禁出现人类手指或乐高圆粒凸起。`
 
 ### Seedance / Jimeng (即梦) Formula
 
 - **Structure**: `[画风与材质锁定] + [镜头机位] + [干脆利落的单步动作] + [光影氛围]`
 - **Example (Chinese)**:
-  `盲盒高光PVC材质Roblox方块小人，中景微俯拍镜头快速推近。小人保持倒角方柱躯干与无手指C型手，猛地向后仰倒在微缩键盘上，脸部2D贴图切换为流泪破防表情，桌面暖光台灯产生柔和塑料高光反射，动作干脆有卡顿定格感。`
+  `高光SmoothPlastic材质Roblox方块小人，中景微俯拍镜头快速推近。小人保持2x2x1倒角方柱躯干与1x2x1实心平头方块手（无人类手指、无乐高C型爪），猛地向前倾倒扑在带键帽细节的微缩笔记本电脑键盘上，脸部2D贴图切换为流泪破防表情，桌面双铃闹钟与暖光台灯产生柔和塑料高光反射，动作干脆利落。`
 
 ### Hailuo MiniMax (海螺 Director) Formula
 
 - **Structure**: `[Bracketed Camera Tag] + [Blocky Subject Lock] + [Single Hinged Action] + [Environment & Shader Tail]`
 - **Example (English)**:
-  `[Push in, Shake] A glossy blind-box vinyl Roblox-style blocky character with a smooth cylindrical head, flat 2D painted face decal, and fingerless C-shaped hands. The character rigidly slams its blocky C-shaped hand onto a miniature red alarm clock on the desk, causing the clock to bounce upward. Rigid hinge joints, studless ABS plastic, Octane studio lighting, no human fingers.`
+  `[Push in, Shake] A glossy SmoothPlastic Roblox-style blocky character with a 1:1 barrel-beveled cylindrical head, flat 2D painted face decal, and fingerless and clawless solid 1x2x1 rectangular block hands. The character rigidly slams its solid rectangular block hand onto a twin-bell red alarm clock with a white clock face on the wooden desk, causing the clock to bounce upward. Rigid Motor6D hinge joints, smooth studless floor and props (zero Lego bumps), studio lighting, no human fingers.`
 
 ### Wan 2.1 / 2.6 (通义万相) Formula
 
 - **Structure**: `Positive Prompt (Style + Subject + Action + Camera)` + `Explicit Negative Prompt`
 - **Positive Example**:
-  `9:16竖屏，Octane渲染3D微缩盲盒画风，高光ABS塑料材质的Roblox方块小人，圆角圆柱头，纯平2D印刷五官，无手指C型夹爪手，刚性铰链四肢。小人迈着僵硬可爱的方块步向前跳跃落地，背上的微缩方块书包轻微晃动，镜头低角度跟随平移，柔和摄影棚边缘光。`
+  `9:16竖屏，3D纯正Roblox Studio画风，SmoothPlastic平滑塑料材质的Roblox方块小人，1:1桶状圆角圆柱头，纯平2D印刷五官，无手指无乐高爪的1x2x1实心平头方柱手，刚性Motor6D铰链四肢。小人迈着干脆的方块步向前跳跃踏上带发光圆环的重生点平台，背上的立体方块书包轻微晃动，镜头低角度跟随平移，柔和天空盒轮廓光。`
 - **Negative Example**:
-  `人类手指，五指手掌，真实人类皮肤毛孔，3D高鼻梁，乐高顶部凸起圆颗粒，我的世界像素方块，面条状弯曲手臂，脚底打滑，画面模糊，多手多脚`
+  `人类手指，五指手掌，乐高C型夹爪手，乐高头顶与地面凸起圆颗粒，真实人类皮肤毛孔，3D高鼻梁，我的世界像素方块，面条状弯曲手臂，脚底打滑，画面模糊，多手多脚`
 
 ### Sora & Runway Formula
 
 - **Structure**: `[Camera & Lens] + [Tactile Material & Rig Lock] + [Primary Physics Action] + [Constraint Tail]`
 - **Example (English)**:
-  `Camera: Medium close-up, 50mm tilt-shift macro lens, rapid dolly push-in. Subject: A stylized 3D Roblox-inspired chibi blocky toy figure made of satin-gloss ABS plastic, featuring a smooth studless cylindrical head, flat 2D screen-printed face decal, fingerless C-shaped claw hands, and rigid rectangular limbs with 2mm beveled edges. Action: The figure pivots its stiff right arm at the shoulder hinge to slap a miniature plastic alarm clock off the desk. Limbs remain strictly rectangular and rigid without bending like rubber.`
+  `Camera: Medium close-up, 50mm macro lens, rapid dolly push-in. Subject: A stylized 3D Roblox R6/blocky figure made of satin-gloss SmoothPlastic, featuring a smooth studless 1:1 barrel-beveled cylindrical head, flat 2D screen-printed face decal, fingerless and clawless solid 1x2x1 rectangular block hands, and flush 1x2x1 blocky legs under a 2x2x1 torso. Action: The figure pivots its stiff right arm block at the shoulder hinge to slap a twin-bell red alarm clock on a wooden bedroom desk. Smooth flat architectural surfaces (zero raised circular Lego floor studs), rigid rectangular limbs.`

@@ -3,7 +3,7 @@
 Short-form Roblox-style videos immediately read as **"authentic Roblox"** when they lock three things at once:
 1. **Canonical Roblox Stud Proportions (`2×2×1` torso + four flush `1×2×1` limbs + `1.2×1.2×1.2` barrel-beveled head)**
 2. **Solid Rectangular Block Hands (NOT Lego C-shaped claw hooks and NOT 5 human fingers)**
-3. **Roblox World & UI Signatures (`SmoothPlastic` avatar + `Studs` baseplate + `BillboardGui` overhead chat bubble + UGC hair/coils)**
+3. **Roblox World & UI Signatures (`SmoothPlastic` / `WoodPlanks` / `Neon` surfaces with zero raised circular Lego bumps + multi-part Roblox Studio props + `BillboardGui` overhead chat bubble + UGC hair/coils)**
 
 When a prompt vaguely says "blocky toy character" or adds "C-shaped claw hands," diffusion models drift into **Lego minifigures** instead of Roblox. Use the exact geometric and material tokens below to lock the aesthetic.
 

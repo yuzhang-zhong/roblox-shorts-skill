@@ -1,6 +1,6 @@
 <svg width="512" height="512" viewBox="0 0 512 512" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="title desc">
-  <title id="title">Roblox Style Skill icon</title>
-  <desc id="desc">A Roblox R6 blocky avatar with a 1:1 barrel-beveled yellow head, 2x2x1 blue torso, flush 1x2x1 solid rectangular arms and green legs, overhead chat bubble, and 9:16 play badge.</desc>
+  <title id="title">Roblox Style Video Skill icon</title>
+  <desc id="desc">A blocky R6-style avatar with a 1:1 barrel-beveled yellow head, 2x2x1 blue torso with lightning emblem, flush 1x2x1 solid rectangular arms and green legs, overhead chat bubble, and 9:16 play badge.</desc>
   <defs>
     <linearGradient id="bg" x1="56" y1="40" x2="456" y2="472" gradientUnits="userSpaceOnUse">
       <stop stop-color="#0F172A"/>
@@ -42,11 +42,8 @@
   <rect width="512" height="512" rx="112" fill="url(#bg)"/>
   <rect x="20" y="20" width="472" height="472" rx="94" stroke="url(#glow)" stroke-width="4" stroke-opacity="0.55"/>
 
-  <!-- Roblox Studded Baseplate Grid Hint at Bottom -->
-  <path d="M64 436H448" stroke="#475569" stroke-width="3" opacity="0.45"/>
-  <rect x="108" y="428" width="28" height="8" rx="3" fill="#475569" opacity="0.45"/>
-  <rect x="164" y="428" width="28" height="8" rx="3" fill="#475569" opacity="0.45"/>
-  <rect x="320" y="428" width="28" height="8" rx="3" fill="#475569" opacity="0.45"/>
+  <!-- Smooth Studio Stage Horizon Line (Zero Raised Studs) -->
+  <path d="M64 442H448" stroke="#475569" stroke-width="3" opacity="0.45"/>
 
   <!-- REC 9:16 viewfinder indicator -->
   <circle cx="96" cy="88" r="8" fill="#F43F5E"/>
@@ -72,11 +69,8 @@
     <rect x="168" y="220" width="176" height="160" rx="10" fill="url(#torsoBlue)" stroke="#7DD3FC" stroke-width="3.5"/>
     <path d="M184 234H328" stroke="#E0F2FE" stroke-width="5" stroke-linecap="round" opacity="0.65"/>
 
-    <!-- Iconic Tilted Square Roblox-style Emblem on Chest -->
-    <g transform="rotate(14 256 300)">
-      <rect x="226" y="270" width="60" height="60" rx="8" fill="#F8FAFC"/>
-      <rect x="245" y="289" width="22" height="22" rx="3" fill="#0D69AC"/>
-    </g>
+    <!-- Original Trademark-Free Speed Lightning Emblem on Chest -->
+    <path d="M268 262L234 304H258L244 342L282 296H258L268 262Z" fill="#FEF08A" stroke="#F8FAFC" stroke-width="2.5" stroke-linejoin="round"/>
 
     <!-- Canonical 1:1 Barrel-Beveled Cylindrical Head (1.2x1.2x1.2 studs) -->
     <rect x="196" y="108" width="120" height="108" rx="34" fill="url(#headYellow)" stroke="#FEF9C3" stroke-width="3.5"/>

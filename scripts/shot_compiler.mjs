@@ -206,8 +206,8 @@ const TEMPLATES = {
         actionZh: "用1x2x1实心平头倒角方柱手稳稳夹起一个金黄圆角方块可颂，啪嗒一声精准卡入马卡龙色托盘槽位中",
         faceEn: "focused cute tongue-blep decal on the smooth cylindrical head",
         faceZh: "专注可爱的微吐舌头2D贴图",
-        cameraEn: "Extreme macro close-up on the solid 1x2x1 rectangular block hands and tray",
-        cameraZh: "手部C型夹爪与托盘微距大特写，展现细腻倒角质感",
+        cameraEn: "Extreme macro close-up on the solid 1x2x1 rectangular block hands, flaky golden croissant, and espresso machine behind the counter",
+        cameraZh: "1x2x1实心平头方柱手、多层金黄羊角包与身后意式咖啡机的微距大特写",
         hailuoTag: "[Static shot]",
         sfx: "清脆积木卡扣声 (ASMR Snap!)",
         caption: "强迫症极度舒适的摆盘"
@@ -337,7 +337,7 @@ const TEMPLATES = {
         cameraEn: "Medium shot with a subtle downward tilt toward the detached blocky arm",
         cameraZh: "中景轻微下摇看向掉落桌面的方柱手臂",
         hailuoTag: "[Tilt down]",
-        sfx: "清脆乐高/积木散架声 (Plastic Clatter!)",
+        sfx: "清脆Roblox部件散落声 (Motor6D Clatter!)",
         caption: "心态与胳膊一起崩了"
       },
       {
@@ -359,13 +359,13 @@ const TEMPLATES = {
     titleEn: "Natural Disaster Survival: Tornado Tower",
     defaultRig: "r6",
     defaultMaterial: "smooth-plastic",
-    subjectEn: "an authentic Roblox R6 Classic Guest avatar wearing a red Roblox cap and black [R] jacket with flush 1x2x1 blocky legs",
-    subjectZh: "头戴红色Roblox棒球帽、身穿黑色R标2x2x1夹克与并拢1x2x1方柱长裤的经典R6游客小人",
+    subjectEn: "an authentic R6 blocky Classic Guest-style avatar wearing a plain unbranded red baseball cap and black varsity stripe jacket with flush 1x2x1 blocky legs (zero brand logos)",
+    subjectZh: "头戴纯色无标红棒球帽、身穿黑底白条纹2x2x1运动夹克与并拢1x2x1方柱长裤的R6游客风小人（无任何品牌商标Logo）",
     shots: [
       {
         role: "Hook / 黄金前3秒",
-        actionEn: "stands atop a bright green studded observation tower pointing rigidly at a spinning dark-gray blocky tornado funnel approaching across the island",
-        actionZh: "站在绿色方格Studs高塔顶端，抬起右侧1x2x1实心方柱手指向远处席卷而来的深灰方块龙卷风漏斗",
+        actionEn: "stands atop a multi-pillar green and wooden observation watchtower with yellow guardrails, pointing rigidly at a swirling dark-gray tornado funnel whipping flying planks across the grass island",
+        actionZh: "站在带黄色护栏与木梁支架的绿色瞭望高塔顶端，抬起右侧1x2x1实心方柱手指向远处卷着木板碎片席卷草地岛屿的深灰龙卷风漏斗",
         faceEn: "wide white shocked ring eyes and open gasp mouth decal",
         faceZh: "震惊白圈眼与张嘴倒吸凉气2D贴图",
         cameraEn: "Low-angle dramatic push-in with wind camera shake",
@@ -538,8 +538,8 @@ const TEMPLATES = {
     shots: [
       {
         role: "Hook / 黄金前3秒",
-        actionEn: "both R6 fighters raise their metallic Linked Swords upright on opposite ends of a studded stone bridge over glowing orange lava",
-        actionZh: "岩浆池上方的方格石桥两端，两名R6剑客同时高举经典金属十字长剑摆出迎战姿态",
+        actionEn: "both R6 fighters raise their metallic Linked Swords (with golden crossguards and blue grips) upright between stone castle battlements on opposite ends of a SmoothPlastic slate bridge over glowing molten orange lava",
+        actionZh: "滚烫熔岩河上方的平滑石桥与城堡垛口之间，两名R6剑客同时高举金护手蓝握柄的经典金属十字长剑摆出迎战姿态",
         faceEn: "confident smirk on Builderman; determined grin on the Noob",
         faceZh: "安全帽小人挑眉自信笑，黄皮新手露齿战意贴图",
         cameraEn: "Wide side-profile arcade fighting framing pushing in",
@@ -705,10 +705,10 @@ const TEMPLATES = {
 };
 
 const NEGATIVE_GUARD =
-  "human fingers, five-fingered hand, Lego C-shaped claw hands, Lego hook hands, Lego top head studs, Minecraft sharp voxel cube head, separated thin legs with thigh gap, protruding human sneakers, realistic human face, 3D protruding nose, skin pores, rubbery noodle limbs, foot sliding, morphing clothes, watermark";
+  "official Roblox logo, tilted square Roblox trademark emblem, Roblox R badge, brand logos, watermarks, human fingers, five-fingered hand, Lego C-shaped claw hands, Lego hook hands, Lego top head studs, raised circular Lego floor studs, studded Lego baseplate, cylindrical brick pegs, Minecraft sharp voxel cube head, featureless blank single-box props, separated thin legs with thigh gap, protruding human sneakers, realistic human face, 3D protruding nose, skin pores, rubbery noodle limbs, foot sliding, morphing clothes";
 
 const NEGATIVE_GUARD_ZH =
-  "人类五指，真实人手，乐高C型夹爪手，乐高钩子手，乐高头顶圆柱凸起颗粒，我的世界直角像素方块头，双腿分叉有空隙，外凸真人运动鞋，真实人类面部骨骼，3D凸起高鼻梁，皮肤毛孔，橡胶面条状弯曲四肢，脚底打滑，服装中途变形，水印文字";
+  "官方Roblox商标Logo，倾斜方框标志，R字品牌徽标，任何品牌水印，人类五指，真实人手，乐高C型夹爪手，乐高钩子手，乐高头顶圆柱凸起颗粒，乐高地面凸起圆粒，乐高积木凸点底板，我的世界直角像素方块头，简陋无细节纯色单一方块道具，双腿分叉有空隙，外凸真人运动鞋，真实人类面部骨骼，3D凸起高鼻梁，皮肤毛孔，橡胶面条状弯曲四肢，脚底打滑，服装中途变形";
 
 function printHelp() {
   console.log(`Usage: node scripts/shot_compiler.mjs [options]
@@ -769,9 +769,9 @@ export function parseArgs(argv) {
 
 function formatEnginePrompt(shot, tpl, engine, aspect, rig) {
   const geometryTailEn =
-    "Canonical Roblox 2x2x1 torso and flush 1x2x1 solid rectangular limbs, fingerless and clawless flat beveled block hands (no human fingers, no Lego C-claws), 1:1 barrel-beveled cylindrical head, SmoothPlastic shader on a classic Roblox studded baseplate, Motor6D rigid hinge joints.";
+    "Canonical Roblox 2x2x1 torso and flush 1x2x1 solid rectangular limbs, fingerless and clawless flat beveled block hands (no human fingers, no Lego C-claws), 1:1 barrel-beveled cylindrical head, smooth Roblox SmoothPlastic / WoodPlanks / Concrete surfaces (zero raised circular Lego floor studs or brick pegs), detailed multi-part Roblox Studio props, Motor6D rigid hinge joints.";
   const geometryTailZh =
-    "纯正Roblox 2x2x1长方体躯干配并拢齐平的1x2x1实心平头方柱四肢（无人类五指、无乐高C型钩爪），1:1上下大圆角桶状圆柱头，SmoothPlastic平滑塑料配经典Roblox方格Studs底板，Motor6D刚性转轴关节。";
+    "纯正Roblox 2x2x1长方体躯干配并拢齐平的1x2x1实心平头方柱四肢（无人类五指、无乐高C型钩爪），1:1上下大圆角桶状圆柱头，平整无圆粒凸起的Roblox SmoothPlastic/木板/混凝土表面（严禁乐高地面凸点颗粒），多部件精致Roblox场景道具，Motor6D刚性转轴关节。";
 
   let i2vPromptEn = "";
   let i2vPromptZh = "";

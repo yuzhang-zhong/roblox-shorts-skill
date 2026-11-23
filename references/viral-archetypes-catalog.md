@@ -8,7 +8,7 @@ Use these six proven short-video archetypes when the user wants a high-retention
 - **Recommended Rig & Shader**: `chibi-blocky` + `glossy-vinyl`
 - **4-Shot 15s Beat Structure**:
   1. **0.0s–3.5s (Hook)**: Extreme close-up on a vibrating miniature red alarm clock; a yellow/cream blocky head pops into frame with hollow shocked 2D eyes.
-  2. **3.5s–7.5s (Escalation 1)**: The chibi blocky avatar swings a rigid C-shaped hand down to smash the alarm clock, sending plastic number blocks flying.
+  2. **3.5s–7.5s (Escalation 1)**: The chibi blocky avatar swings a rigid 1x2x1 solid rectangular block hand down to smash the twin-bell alarm clock on the wooden desk.
   3. **7.5s–11.5s (Escalation 2)**: Seated at a miniature matcha-toned desk, the avatar stares at a glowing laptop screen as waterfall tear decals appear on its cheeks.
   4. **11.5s–15.0s (Payoff / Loop)**: The avatar pivots 90 degrees forward at the waist hinge and face-plants flat onto the keyboard with a comical bounce.
 
@@ -38,7 +38,7 @@ Use these six proven short-video archetypes when the user wants a high-retention
 - **Recommended Rig & Shader**: `chibi-blocky` + `clay-soft`
 - **4-Shot 15s Beat Structure**:
   1. **0.0s–3.5s (Hook)**: 45-degree isometric macro view of a miniature sun-lit bakery counter; a chibi blocky chef pops up behind the cash register.
-  2. **3.5s–7.5s (Escalation 1)**: Close-up as fingerless C-shaped hands place a glossy blocky croissant and a miniature latte cup onto a pastel tray with a crisp snap.
+  2. **3.5s–7.5s (Escalation 1)**: Close-up as fingerless solid 1x2x1 rectangular block hands place a golden layered croissant and a sleeved latte cup onto a pastel tray beside an espresso machine.
   3. **7.5s–11.5s (Escalation 2)**: A tiny blocky customer with a cat-ear beanie waddles up to the counter, starry-eyed decal gleaming under warm pendant lamps.
   4. **11.5s–15.0s (Payoff)**: Pull-back diorama shot as golden coin blocks float upward above the cozy café roof.
 
@@ -50,7 +50,7 @@ Use these six proven short-video archetypes when the user wants a high-retention
   1. **0.0s–3.5s (Hook)**: A plain gray blocky avatar stands on a dim runway podium looking shy with a sweat-drop 2D decal as a spotlight flickers on.
   2. **3.5s–7.5s (Escalation 1)**: Camera orbits rapidly as the avatar leaps upward into a glowing ring of floating blocky clothes and star particles.
   3. **7.5s–11.5s (Escalation 2)**: Match-cut landing on the beat drop: the avatar now wears a glossy Y2K cyber puffer, oversized headphones, and star glasses with a confident smirk decal.
-  4. **11.5s–15.0s (Payoff)**: Low-angle hero shot as camera flashes pop around the runway and the avatar holds a victory peace pose with C-shaped hands.
+  4. **11.5s–15.0s (Payoff)**: Low-angle hero shot as camera flashes pop around the 5-star neon arch stage and the avatar strikes a runway victory pose with solid 1x2x1 block arms.
 
 ## 6. `meme-slapstick` · 抽象定格梗图小剧场
 
@@ -66,7 +66,7 @@ Use these six proven short-video archetypes when the user wants a high-retention
 
 - **Recommended Rig & Shader**: `r6` + `smooth-plastic`
 - **4-Shot 15s Beat Structure**:
-  1. **0.0s–3.5s (Hook)**: Classic Guest atop a green studded observation tower points at a dark blocky tornado funnel approaching across the island.
+  1. **0.0s–3.5s (Hook)**: Classic Guest atop a green wooden-framed observation watchtower points at a swirling dark tornado funnel whipping debris planks across the grass island.
   2. **3.5s–7.5s (Escalation 1)**: Clings to the yellow guardrail as green roof bricks rip off and whirl upward.
   3. **7.5s–11.5s (Escalation 2)**: Hops desperately onto the last remaining central pillar block as floor plates fall away.
   4. **11.5s–15.0s (Payoff)**: Sky clears instantly; Guest celebrates on the lone surviving pillar (`examples/disaster-tower-tornado/`).
@@ -93,7 +93,7 @@ Use these six proven short-video archetypes when the user wants a high-retention
 
 - **Recommended Rig & Shader**: `r6` + `smooth-plastic`
 - **4-Shot 15s Beat Structure**:
-  1. **0.0s–3.5s (Hook)**: Builderman and Classic Noob raise metallic Linked Swords on opposite ends of a studded bridge over lava.
+  1. **0.0s–3.5s (Hook)**: Builderman and Classic Noob raise metallic Linked Swords with golden crossguards between stone castle battlements on opposite ends of a slate bridge over lava.
   2. **3.5s–7.5s (Escalation 1)**: Mid-air R6 double-jump sword clash with bright yellow blocky sparks.
   3. **7.5s–11.5s (Escalation 2)**: Spin-slash knocks the Noob sliding to the very edge of the bridge ledge.
   4. **11.5s–15.0s (Payoff)**: Both fighters call a truce and toast with red Bloxy Cola cans (`examples/crossroads-sword-duel/`).

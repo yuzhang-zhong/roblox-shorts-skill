@@ -15,7 +15,7 @@
 | --- | --- |
 | Head / 头部 | Smooth cylindrical block with soft rounded top bevel, studless top surface |
 | Face / 面部 | Flat 2D screen-printed decal face, glossy ink eyes, painted mouth, no 3D human nose |
-| Hands / 手部 | Fingerless C-shaped claw hands (or solid rectangular block hands), zero human fingers |
+| Hands / 手部 | Fingerless and clawless solid 1x2x1 beveled rectangular block hands (zero human fingers, zero Lego C-claws) |
 | Torso & Limbs / 躯干四肢 | Trapezoidal/rectangular beveled blocks, 2mm chamfered edges, rigid hinge pivots |
 | Surface Shader / 材质光泽 | `<Matte ABS plastic / Glossy blind-box vinyl / Soft subsurface clay-plastic>` |
 | Color Palette / 配色方案 | Primary `<#HEX>`, Secondary `<#HEX>`, Accent `<#HEX>`, Head tone `<#HEX>` |

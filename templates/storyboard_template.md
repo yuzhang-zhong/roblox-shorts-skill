@@ -22,5 +22,6 @@
 
 - [ ] Every shot uses the same 3-view turnaround sheet as character reference or I2V start frame.
 - [ ] Each clip contains at most one primary body action and one camera move.
-- [ ] Hands remain fingerless C-shaped claws or solid rectangular blocks in every keyframe.
+- [ ] Hands remain fingerless and clawless solid 1x2x1 rectangular blocks in every keyframe (no human fingers, no Lego C-claws).
+- [ ] Floors and props use smooth Roblox SmoothPlastic, WoodPlanks, or Concrete with multi-part details (no raised circular Lego floor studs).
 - [ ] Background props use matching beveled miniature plastic geometry (`studless, non-voxel`).

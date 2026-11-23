@@ -9,10 +9,10 @@ All visual assets in this catalog are pre-rendered in [`assets/library/`](../ass
 | Preset ID | Era & Name | Official BrickColors & Outfit Details | Individual Asset |
 | --- | --- | --- | --- |
 | `classic-noob` | **Classic Noob (2006)** | Bright yellow (`#F5CD30`) head & `1×2×1` bare arms, Bright blue (`#0D69AC`) `2×2×1` torso, Br. yellowish green (`#A4BD47`) flush `1×2×1` legs | [`avatar_noob.png`](../assets/library/avatars/avatar_noob.png) |
-| `classic-guest` | **Classic Guest (2008–2017)** | Institutional white (`#F8F8F8`) head, Really black (`#111827`) Roblox `R` jacket, red Roblox baseball cap, black blocky pants | [`avatar_guest.png`](../assets/library/avatars/avatar_guest.png) |
-| `bacon-hair` | **Bacon Hair / Pal Hair (2014)** | Light stone grey (`#E5E4DF`) skin, brown 3D strip-textured **Pal Hair**, dark grey open moto jacket over blue tee, black pants | [`avatar_bacon.png`](../assets/library/avatars/avatar_bacon.png) |
-| `builderman` | **Builderman / TBC Hard Hat (2007)** | Yellow Builder's Club construction hard hat, Bright orange (`#F97316`) zip hoodie with kangaroo pocket, dark blue jeans | [`avatar_builderman.png`](../assets/library/avatars/avatar_builderman.png) |
-| `obby-runner` | **Obby Speedrunner + Speed Coil** | Red Roblox visor cap, Cyan (`#00A2E8`) jersey with tilted white `[R]` emblem, glowing red **Speed Coil** on right arm | [`avatar_obby.png`](../assets/library/avatars/avatar_obby.png) |
+| `classic-guest` | **Classic Guest Style** | Institutional white (`#F8F8F8`) head, Really black (`#111827`) varsity stripe jacket (unbranded, no trademark logo), plain red sport cap, black blocky pants | [`avatar_guest.png`](../assets/library/avatars/avatar_guest.png) |
+| `bacon-hair` | **Bacon Hair / Pal Hair** | Light stone grey (`#E5E4DF`) skin, brown 3D strip-textured **Pal Hair**, dark grey open moto jacket over blue tee, black pants | [`avatar_bacon.png`](../assets/library/avatars/avatar_bacon.png) |
+| `builderman` | **Builder Hard Hat** | Yellow ribbed construction hard hat, Bright orange (`#F97316`) zip hoodie with kangaroo pocket, dark blue jeans | [`avatar_builderman.png`](../assets/library/avatars/avatar_builderman.png) |
+| `obby-runner` | **Obby Speedrunner + Speed Coil** | Plain red visor cap, Cyan (`#00A2E8`) jersey with yellow lightning-bolt graphic (no trademark logo), glowing red **Speed Coil** on right arm | [`avatar_obby.png`](../assets/library/avatars/avatar_obby.png) |
 | `brookhaven-hoodie` | **Storytime Hero (`Theo` / `Momo`)** | Chestnut-brown 3D swept hair clumps, sky-blue (`#3898F2`) hoodie with 3D white drawstrings & crescent moon patch, Bloxy Cola | [`avatar_theo.png`](../assets/library/avatars/avatar_theo.png) |
 
 ## 2. Eight Classic Roblox 2D Face Decals (`classic_faces_atlas.en.png`)
@@ -35,6 +35,6 @@ All visual assets in this catalog are pre-rendered in [`assets/library/`](../ass
 - **Speed Coil (`加速弹簧`)**: `glowing bright-red Roblox Neon spiral Speed Coil wrapped around the right 1x2x1 solid rectangular arm block`
 - **Bloxy Cola (`可乐罐`)**: `classic cylindrical brown-and-red Bloxy Cola can held against the right flat rectangular block hand`
 - **Classic Linked Sword (`经典十字剑`)**: `classic metallic grey Roblox Linked Sword with blue hilt and yellow crossguard`
-- **Classic Red Roblox Cap (`经典红棒球帽`)**: `classic bright-red Roblox baseball cap with curved front brim sitting on the 1:1 barrel head`
+- **Plain Red Baseball Cap (`纯色红棒球帽`)**: `plain bright-red unbranded sport baseball cap with curved front brim sitting cleanly on the 1:1 barrel head (zero trademark logos)`
 - **Builder's Club Hard Hat (`建造者安全帽`)**: `classic bright-yellow ribbed Builder's Club construction hard hat`
 - **Classic 3D Hoodie (`3D抽绳卫衣`)**: `2x2x1 Roblox torso hoodie with 3D raised hood collar, two white cylindrical drawstrings on chest, kangaroo pocket, and wrist cuffs`

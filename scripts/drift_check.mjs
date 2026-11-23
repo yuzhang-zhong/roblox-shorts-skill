@@ -12,9 +12,9 @@ const ISSUE_PATCHES = {
     fixZh: "平头倒角1x2x1实心方块手部，严禁出现人类五指或手部关节纹"
   },
   "lego-studs": {
-    titleZh: "出现乐高头顶圆颗粒或乐高C型夹爪手 (Lego Stud & C-Claw Contamination)",
-    fixEn: "smooth studless 1:1 barrel-beveled Roblox head, solid 1x2x1 rectangular block hands (no Lego C-shaped hook claws, no cylindrical brick pegs)",
-    fixZh: "头顶完全平滑的1:1桶状圆角Roblox头部，1x2x1实心平头方柱手（严禁乐高C型钩子爪与头顶凸起颗粒）"
+    titleZh: "出现乐高头顶/地面圆颗粒或乐高C型夹爪手 (Lego Stud & C-Claw Contamination)",
+    fixEn: "smooth studless 1:1 barrel-beveled Roblox head, flat SmoothPlastic / WoodPlanks / Concrete floor surfaces (zero raised circular Lego floor studs or cylindrical brick pegs), solid 1x2x1 rectangular block hands (no Lego C-shaped hook claws)",
+    fixZh: "头顶完全平滑的1:1桶状圆角Roblox头部，平滑无凸起圆粒的Roblox SmoothPlastic/木纹/柏油地面（严禁乐高地面凸点底板），1x2x1实心平头方柱手（严禁乐高C型钩子爪）"
   },
   "minecraft-voxels": {
     titleZh: "串味成我的世界像素方块 (Minecraft Voxel Drift)",
@@ -38,8 +38,8 @@ const ISSUE_PATCHES = {
   },
   "foot-sliding": {
     titleZh: "走路脚底打滑/太空步 (Foot Skating / Sliding)",
-    fixEn: "medium three-quarter framing, crisp bouncy R6 hop landing firmly on a classic Roblox 1x1 studded baseplate grid",
-    fixZh: "改用中景或七分景机位，将连续碎步走改为干脆的R6方块跳步落地，强化与Roblox方格底板的接触"
+    fixEn: "medium three-quarter framing, crisp bouncy R6 hop landing firmly on a flat smooth Roblox SmoothPlastic or WoodPlanks floor",
+    fixZh: "改用中景或七分景机位，将连续碎步走改为干脆的R6方块跳步落地，强化与平整Roblox地面的接触阴影"
   },
   "outfit-drift": {
     titleZh: "切镜头后衣服与配饰变形 (Cross-Shot Outfit Drift)",
@@ -178,28 +178,38 @@ export function inspectPrompt(rawOpts = {}) {
     });
   }
 
-  // 3. Lego / Minecraft contamination check
-  const hasStudlessLock = /studless|non-voxel|chamfered|beveled|无颗粒|无乐高颗粒|倒角/.test(lower);
+  // 3. Lego / Minecraft contamination check (including floor/brick "studded" prompts that trigger Lego bumps!)
+  const hasStudlessLock = /studless|zero raised.*stud|no raised.*lego|non-voxel|chamfered|beveled|无颗粒|无乐高|无凸点|倒角/.test(lower);
+  const mentionsLegoStuds =
+    /\b(studded|raised studs|lego studs|brick pegs|乐高颗粒|凸点底板)\b/.test(lower) &&
+    !/no.*studded|zero.*stud|without.*stud|无.*凸点|严禁.*乐高/.test(lower);
   if (issue === "lego-studs" || issue === "minecraft-voxels") {
     checks.push({
-      gate: "Studless & Non-Voxel Guard / 乐高与MC防串味锁",
+      gate: "Studless & Non-Voxel Guard / 乐高凸粒与MC防串味锁",
       status: "FAIL",
-      reasonEn: `Observed style contamination (${issue}). Must lock studless smooth ABS/vinyl plastic and 2mm rounded bevels.`,
-      reasonZh: `已发生风格串味（${issue}），必须正向声明平滑无颗粒盲盒塑料与2毫米圆润倒角。`
+      reasonEn: `Observed style contamination (${issue}). Must lock studless SmoothPlastic/WoodPlanks surfaces (zero raised circular Lego floor/head studs) and 2mm rounded bevels.`,
+      reasonZh: `已发生风格串味（${issue}），必须正向声明平滑无颗粒SmoothPlastic/木板材质（严禁乐高头顶与地面凸起圆粒）与2毫米圆润倒角。`
+    });
+  } else if (mentionsLegoStuds) {
+    checks.push({
+      gate: "Studless & Non-Voxel Guard / 乐高凸粒与MC防串味锁",
+      status: "WARN",
+      reasonEn: "Prompt mentions `studded` / `raised studs`, which causes video models to hallucinate circular LEGO pegs on floors and props; replace with `smooth flat Roblox SmoothPlastic / WoodPlanks / Concrete surfaces (zero raised Lego studs)`.",
+      reasonZh: "提示词包含 `studded` / 凸起颗粒描述，极易诱发模型在地面和物品上生成乐高圆粒凸起；请改为平整的 Roblox SmoothPlastic / WoodPlanks / Concrete 表面。"
     });
   } else if (!hasStudlessLock) {
     checks.push({
-      gate: "Studless & Non-Voxel Guard / 乐高与MC防串味锁",
+      gate: "Studless & Non-Voxel Guard / 乐高凸粒与MC防串味锁",
       status: "WARN",
-      reasonEn: "Missing `smooth studless plastic, 2mm chamfered edges, non-voxel`; model may add Lego studs or voxel cubes.",
-      reasonZh: "缺少「无乐高凸起颗粒、2毫米倒角、非像素方块」描述，模型可能混入乐高颗粒或MC像素块。"
+      reasonEn: "Missing `smooth studless SmoothPlastic, 2mm chamfered edges, zero raised Lego studs, non-voxel`; model may add Lego bumps or voxel cubes.",
+      reasonZh: "缺少「平滑无乐高凸粒、2毫米倒角、非像素方块」描述，模型可能混入乐高圆粒或MC像素块。"
     });
   } else {
     checks.push({
-      gate: "Studless & Non-Voxel Guard / 乐高与MC防串味锁",
+      gate: "Studless & Non-Voxel Guard / 乐高凸粒与MC防串味锁",
       status: "PASS",
-      reasonEn: "Studless beveled Roblox geometry tokens present.",
-      reasonZh: "已包含无颗粒倒角方块材质锁定。"
+      reasonEn: "Studless beveled Roblox geometry and flat surface tokens present.",
+      reasonZh: "已包含无乐高凸粒倒角方块与平整表面锁定。"
     });
   }
 
@@ -283,12 +293,12 @@ export function inspectPrompt(rawOpts = {}) {
 
   const enginePrefixEn =
     engine === "hailuo" ? "[Push in] " : `[${engine.toUpperCase()} I2V · 9:16] `;
-  const rescuedPromptEn = `${enginePrefixEn}An authentic Roblox R6/Blocky figure built on canonical stud proportions (1:1 barrel-beveled cylindrical head, flat 2D screen-printed Roblox decal face, 2x2x1 SmoothPlastic rectangular torso, two 1x2x1 rectangular leg blocks sitting flush side-by-side matching torso width, and two 1x2x1 solid rectangular arm blocks with fingerless and clawless flat beveled block hands). Single action: ${cleanedSubject}. Rigid Motor6D mechanical hinge joints at shoulders and hips, classic Roblox studded baseplate, zero human fingers, zero Lego C-claws or top studs, non-voxel.`;
+  const rescuedPromptEn = `${enginePrefixEn}An authentic Roblox R6/Blocky figure built on canonical stud proportions (1:1 barrel-beveled cylindrical head, flat 2D screen-printed Roblox decal face, 2x2x1 SmoothPlastic rectangular torso, two 1x2x1 rectangular leg blocks sitting flush side-by-side matching torso width, and two 1x2x1 solid rectangular arm blocks with fingerless and clawless flat beveled block hands). Single action: ${cleanedSubject}. Rigid Motor6D mechanical hinge joints at shoulders and hips, smooth flat Roblox SmoothPlastic / WoodPlanks environment with detailed multi-part Roblox Studio props, zero human fingers, zero Lego C-claws or raised circular Lego floor/head studs, non-voxel.`;
 
-  const rescuedPromptZh = `【${engine.toUpperCase()} 首帧I2V · 9:16竖屏】纯正Roblox Studio SmoothPlastic材质的方块小人（1:1上下大圆角桶状圆柱头、纯平2D丝网印刷五官贴图、2x2x1宽扁长方体躯干、两条并拢齐平与躯干同宽的1x2x1方柱腿、两条紧贴两侧的1x2x1实心平头倒角方柱手臂，Motor6D刚性转轴关节）。单一核心动作：${cleanedSubject}。配合经典Roblox方格Studs底板，严禁出现人类五指、乐高C型钩爪、乐高头顶圆颗粒或3D真人鼻子。`;
+  const rescuedPromptZh = `【${engine.toUpperCase()} 首帧I2V · 9:16竖屏】纯正Roblox Studio SmoothPlastic材质的方块小人（1:1上下大圆角桶状圆柱头、纯平2D丝网印刷五官贴图、2x2x1宽扁长方体躯干、两条并拢齐平与躯干同宽的1x2x1方柱腿、两条紧贴两侧的1x2x1实心平头倒角方柱手臂，Motor6D刚性转轴关节）。单一核心动作：${cleanedSubject}。配合平滑无凸粒的Roblox木地板/混凝土场景与多部件精致道具，严禁出现人类五指、乐高C型钩爪、乐高头顶与地面凸起圆颗粒或3D真人鼻子。`;
 
   const negativePrompt =
-    "human fingers, five-fingered hand, Lego C-shaped claw hands, Lego hook hands, Lego top head studs, Minecraft sharp voxel cube head, separated thin legs with thigh gap, protruding human sneakers, realistic human face, 3D protruding nose, skin pores, rubbery noodle limbs, foot sliding, morphing clothes, watermark / 人类五指，真实人脸，乐高C型夹爪手，乐高头顶圆颗粒，我的世界直角像素块，双腿分叉穿真人运动鞋，3D高鼻梁，面条状弯曲手臂，脚底打滑";
+    "official Roblox logo, tilted square Roblox trademark emblem, Roblox R badge, brand watermarks, human fingers, five-fingered hand, Lego C-shaped claw hands, Lego hook hands, Lego top head studs, raised circular Lego floor studs, studded Lego baseplate, Minecraft sharp voxel cube head, featureless blank cube props, separated thin legs with thigh gap, protruding human sneakers, realistic human face, 3D protruding nose, skin pores, rubbery noodle limbs, foot sliding, morphing clothes / 官方Roblox倾斜方框商标Logo，R字品牌徽标，品牌水印，人类五指，真实人脸，乐高C型夹爪手，乐高头顶与地面凸起圆颗粒，我的世界直角像素块，简陋无细节单一方块道具，双腿分叉穿真人运动鞋，3D高鼻梁，面条状弯曲手臂，脚底打滑";
 
   return {
     overallStatus,

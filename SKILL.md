@@ -8,11 +8,11 @@ metadata:
   version: "1.4.0"
 ---
 
-# Roblox Style Video
+# Roblox Style Video Skill
 
 ## Core Objective / 核心目标
 
-Help creators turn a short-video idea into a geometry-consistent Roblox-style blocky avatar video package: a locked Character DNA card, a 3-view reference sheet prompt, a 9:16 beat-timed storyboard, model-specific Image-to-Video (I2V) or Text-to-Video (T2V) prompts, and prompt patches when a video clip drifts.
+An Agent Skill (`SKILL.md` + references + zero-dependency CLI scripts) that helps creators and coding agents turn a short-video idea into a geometry-consistent Roblox-style blocky avatar video package: a locked Character DNA card, a 3-view reference sheet prompt, a 9:16 beat-timed storyboard, model-specific Image-to-Video (I2V) or Text-to-Video (T2V) prompts, prompt patches when a clip drifts, and local 3D preview animatics.
 
 Respond in the user's language (`en`, `zh`, `zh-tw`, `ja`, `ko`, `es`, `fr`, `de`, `pt`, `ru`). When the user requests bilingual output or uses domestic Chinese video engines (Kling 可灵, Seedance/Jimeng 即梦, Hailuo 海螺, Wan 通义万相), provide localized explanations alongside English generation prompts and Chinese prompt equivalents.
 
@@ -28,8 +28,8 @@ General video diffusion models default to human anatomy, Lego minifigures, or Mi
    - A `1.2 × 1.2 × 1.2` stud (`1:1` aspect ratio) barrel cylinder with **deep curved top and bottom fillets** and a smooth studless top surface (never a tall narrow cylinder, never a Lego stud on top, never a sharp Minecraft cube).
 4. **Flat 2D Roblox Face Decal**:
    - Iconic screen-printed 2D face decal (`Classic Smile :)`, `Check It`, `Chill`, `Shocked Ring Eyes`, `Waterfall Tears`, or `Blush Anime UGC Decal`) painted flat on the front of the head (`no 3D protruding human nose, no realistic eyeballs, no mouth cavity`).
-5. **Authentic Roblox Material Contrast (`SmoothPlastic` + `Studs` + `Neon`)**:
-   - Character limbs and torso use satin-gloss `SmoothPlastic` with crisp edge bevels; ground baseplates and Obby platforms use classic Roblox `1×1` square tile grids with raised/recessed square `Studs`, paired with glowing `Neon` obstacle bricks or `SpawnLocation` decals.
+5. **Authentic Roblox Studio Materials & Multi-Part Props (Zero Lego Floor Bumps)**:
+   - Character limbs and torso use satin-gloss `SmoothPlastic` with crisp edge bevels. Environments use authentic smooth Roblox Studio materials (`SmoothPlastic`, `WoodPlanks`, `Concrete`, `Slate`, `Grass`, `Neon`, `Glass`) with flat architectural seams—**never** prompt `studded floor` or `raised studs`, which triggers circular LEGO bumps in diffusion models. Build props as recognizable multi-part Roblox Studio assemblies (e.g., twin-bell alarm clock with white dial and hands, Linked Sword with golden crossguard, espresso machine with portafilter, DOORS `050` brass-plaque door) rather than featureless single-box primitives.
 6. **Roblox UI & Gear Signatures (`BillboardGui`, `Speed Coil`, `Bloxy Cola`, `Highlight`)**:
    - Use recognizable Roblox visual shorthands: overhead white rounded-rectangle `BillboardGui` chat bubbles, `@DisplayName` overhead tags, 3D UGC hair (`Bacon Hair`, fluffy anime bob/twin-tails), glowing red `Speed Coil` around the arm block, or a red `Highlight` damage outline flash on slapstick impacts.
 7. **Motor6D Joint Physics & Single-Action Clip Budget**:
@@ -118,7 +118,7 @@ node scripts/drift_check.mjs --prompt "A cute Roblox character walking in a room
 
 Read `references/rescue-and-anti-drift.md` when troubleshooting specific defects:
 - `human-fingers`: inject `fingerless and clawless solid 1x2x1 beveled rectangular block hands, no human fingers, no five fingers`.
-- `lego-studs`: inject `solid 1x2x1 rectangular block hands (no Lego C-shaped hook claws), smooth studless barrel-beveled Roblox head, no cylindrical Lego studs on head`.
+- `lego-studs`: inject `solid 1x2x1 rectangular block hands (no Lego C-shaped hook claws), smooth studless barrel-beveled Roblox head, flat SmoothPlastic / WoodPlanks floor (zero raised circular Lego floor or head studs)`.
 - `minecraft-voxels`: inject `classic Roblox 1:1 barrel-cylinder head with deep curved top and bottom bevels, SmoothPlastic shader, non-voxel, no pixelated cube textures`.
 - `limb-gap`: inject `canonical Roblox 2x2x1 rectangular torso with two 1x2x1 rectangular leg blocks sitting flush side-by-side matching exact torso width`.
 - `face-morph`: inject `flat 2D screen-printed Roblox decal face on smooth cylindrical surface, no 3D nose, no realistic mouth cavity`.
@@ -138,7 +138,7 @@ node scripts/render_preview.mjs
 
 - **Prompts, storyboards, and local 3D preview renderer.** This skill and its four CLI scripts (`avatar_spec.mjs`, `shot_compiler.mjs`, `drift_check.mjs`, `render_preview.mjs`) generate structured character cards, storyboards, anti-drift diagnostics, and local 3D Roblox studio preview renders. Generating diffusion videos requires an external model (Kling, Seedance/Jimeng, Hailuo, Wan, Sora, Runway).
 - **Zero external runtime dependencies.** All scripts in `scripts/` use the Node.js standard library only and run offline without API keys.
-- **Trademark clarity.** "Roblox-style" describes a blocky 3D character aesthetic (`R6`/`R15`/chibi blocky rigs) for creative prompt engineering. This project is an independent open-source skill and is not affiliated with or endorsed by Roblox Corporation.
+- **Trademark clarity & zero brand logos.** "Roblox-style" describes a blocky 3D character aesthetic (`R6`/`R15`/chibi blocky rigs) for creative prompt engineering. Never place official Roblox Corporation trademarks, wordmarks, `[R]` badges, or tilted-square logos onto generated outfits, caps, UI, or thumbnails—use original geometric graphics (stars, lightning bolts, varsity stripes) and keep official brand logos in the negative prompt. This project is an independent open-source Agent Skill and is not affiliated with or endorsed by Roblox Corporation.
 
 ## Reference Navigation / 参考文档索引
 
@@ -146,6 +146,7 @@ node scripts/render_preview.mjs
 - [`references/model-prompt-playbook.md`](references/model-prompt-playbook.md): prompt structures, camera syntax, and motion settings for Kling, Seedance/Jimeng, Hailuo, Wan, Sora, and Runway.
 - [`references/rescue-and-anti-drift.md`](references/rescue-and-anti-drift.md): diagnostic matrix and prompt patches for the 8 most common Roblox AI video generation failures.
 - [`references/short-video-beats-and-audio.md`](references/short-video-beats-and-audio.md): 0 to 3s hook patterns, shot pacing, camera transitions, SFX cues, and caption placement for 9:16 vertical shorts.
-- [`references/viral-archetypes-catalog.md`](references/viral-archetypes-catalog.md): 6 reusable short-video templates with shot-by-shot breakdowns.
+- [`references/viral-archetypes-catalog.md`](references/viral-archetypes-catalog.md): 12 reusable short-video templates with shot-by-shot breakdowns.
+- [`references/classic-roblox-catalog.md`](references/classic-roblox-catalog.md): classic Roblox avatars, outfits, gear, and 2D face decals.
 - [`templates/`](templates/): blank markdown templates for character cards, storyboards, and shot prompts.
-- [`examples/`](examples/): 3 complete checked-in short-video packages (`monday-alarm-meltdown`, `obby-sky-run`, `duo-bestie-contrast`) with rendered PNG sheets, GIFs, and MP4 videos.
+- [`examples/`](examples/): 12 complete checked-in short-video packages (`monday-alarm-meltdown`, `obby-sky-run`, `duo-bestie-contrast`, `cozy-cafe-tycoon`, `runway-outfit-drop`, `burnt-pizza-slapstick`, `disaster-tower-tornado`, `brookhaven-police-chase`, `doors-flashlight-hallway`, `crossroads-sword-duel`, `classroom-exam-panic`, `red-light-freeze`) with rendered PNG sheets, GIFs, and MP4 videos.
