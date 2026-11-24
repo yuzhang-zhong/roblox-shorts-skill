@@ -10,7 +10,7 @@ An Agent Skill (`SKILL.md` + reference playbooks + offline CLI tools) for Claude
 
 **[Video examples](#video-examples)** · [Scene boards](#scene-boards-and-shot-pacing) · [Skill workflow & quick start](#skill-workflow-and-quick-start) · [Skill guide](SKILL.md)
 
-**English** · [简体中文](README.zh-CN.md) · [More languages](#languages)
+**English** · [简体中文](README.zh-CN.md) · [繁體中文](docs/i18n/README.zh-TW.md) · [日本語](docs/i18n/README.ja.md) · [한국어](docs/i18n/README.ko.md) · [Español](docs/i18n/README.es.md) · [Français](docs/i18n/README.fr.md) · [Deutsch](docs/i18n/README.de.md) · [Português](docs/i18n/README.pt-BR.md) · [Русский](docs/i18n/README.ru.md)
 
 </div>
 

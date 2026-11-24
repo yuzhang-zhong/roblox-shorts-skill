@@ -47,6 +47,7 @@ const requiredFiles = [
   "docs/pipeline.svg",
   "docs/pipeline.en.svg",
   "docs/pipeline.zh.svg",
+  "docs/pipeline.zh-TW.svg",
   "references/avatar-geometry-and-materials.md",
   "references/model-prompt-playbook.md",
   "references/rescue-and-anti-drift.md",
@@ -179,6 +180,28 @@ const iconSvg = readUtf8("assets/icon.svg");
 const renderSrc = readUtf8("scripts/render_preview.mjs");
 if (/rotate\(14 256 300\)/.test(iconSvg) || /9:16 R6/.test(iconSvg) || /roblox_r/.test(renderSrc)) {
   fail("Trademark/icon check failed: found deprecated tilted-square emblem or 9:16 R6 badge");
+}
+
+const readmeFiles = [
+  "README.md",
+  "README.zh-CN.md",
+  "docs/i18n/README.zh-TW.md",
+  "docs/i18n/README.ja.md",
+  "docs/i18n/README.ko.md",
+  "docs/i18n/README.es.md",
+  "docs/i18n/README.fr.md",
+  "docs/i18n/README.de.md",
+  "docs/i18n/README.pt-BR.md",
+  "docs/i18n/README.ru.md"
+];
+for (const rf of readmeFiles) {
+  const txt = readUtf8(rf);
+  if (/\?\?\?|\uFFFD/.test(txt)) {
+    fail(`Encoding corruption detected in ${rf}`);
+  }
+  if (txt.split(/\r?\n/).length < 95) {
+    fail(`Incomplete README detected in ${rf}`);
+  }
 }
 
 const skillWords = skillText.split(/\s+/).filter(Boolean).length;

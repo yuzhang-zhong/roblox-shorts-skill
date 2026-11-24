@@ -10,7 +10,7 @@
 
 **[短片示例](#短片示例)** · [分镜与场景图](#分镜拆解与多题材场景表) · [Skill 工作流与安装](#skill-工作流与安装使用) · [Skill 指南](SKILL.md)
 
-[English](README.md) · **简体中文** · [更多语言](#语言)
+[English](README.md) · **简体中文** · [繁體中文](docs/i18n/README.zh-TW.md) · [日本語](docs/i18n/README.ja.md) · [한국어](docs/i18n/README.ko.md) · [Español](docs/i18n/README.es.md) · [Français](docs/i18n/README.fr.md) · [Deutsch](docs/i18n/README.de.md) · [Português](docs/i18n/README.pt-BR.md) · [Русский](docs/i18n/README.ru.md)
 
 </div>
 

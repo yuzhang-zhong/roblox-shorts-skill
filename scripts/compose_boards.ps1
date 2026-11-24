@@ -258,15 +258,16 @@ foreach ($case in $manifest.cases) {
 
       $rawShotPath = Join-Path $rawDir ($case.prefix + "_shot_" + $s + ".png")
       $img = [System.Drawing.Image]::FromFile($rawShotPath)
-      $chatText = if ($lang -eq "zh") { $sh.chatZh } else { $sh.chatEn }
+      # Speech bubbles inside all storyboard frames are always in English
+      $chatText = $sh.chatEn
 
-      if ($lang -eq "zh" -and $sh.savePath) {
+      if ($lang -eq "en" -and $sh.savePath) {
         $shotBmp = New-Object System.Drawing.Bitmap(360, 640)
         $sg = [System.Drawing.Graphics]::FromImage($shotBmp)
         $sg.SmoothingMode = [System.Drawing.Drawing2D.SmoothingMode]::AntiAlias
         $sg.TextRenderingHint = [System.Drawing.Text.TextRenderingHint]::ClearTypeGridFit
         $sg.DrawImage($img, 0, 0, 360, 640)
-        Draw-CleanChatBubble $sg ($sh.bubbleX * 1.1) ($sh.bubbleY * 1.1) $chatText $fontBub
+        Draw-CleanChatBubble $sg ($sh.bubbleX * 1.1) ($sh.bubbleY * 1.1) $chatText $fBubbleEn
         $shotBmp.Save($sh.savePath, [System.Drawing.Imaging.ImageFormat]::Png)
         $sg.Dispose()
         $shotBmp.Dispose()
@@ -275,7 +276,7 @@ foreach ($case in $manifest.cases) {
       $g.DrawImage($img, ($sx + 6), ($sy + 6), 312, 554)
       $img.Dispose()
 
-      Draw-CleanChatBubble $g ($sx + $sh.bubbleX) ($sy + $sh.bubbleY) $chatText $fontBub
+      Draw-CleanChatBubble $g ($sx + $sh.bubbleX) ($sy + $sh.bubbleY) $chatText $fBubbleEn
 
       $label = if ($lang -eq "zh") { $sh.labelZh } else { $sh.labelEn }
       $lsz = $g.MeasureString($label, $fontLabel)
@@ -291,34 +292,36 @@ foreach ($case in $manifest.cases) {
     $bmp.Dispose()
   }
 
-  # Render clean 24-frame animation (no dark top/bottom HUD clutter, only clean Roblox speech bubble)
-  $hudDir = Join-Path $rootDir ("tmp\hud_" + $case.prefix)
-  New-Item -ItemType Directory -Force -Path $hudDir | Out-Null
+  # Render clean 24-frame animation when anim frames exist
+  if (Test-Path (Join-Path $rawDir ($case.prefix + "_anim_23.png"))) {
+    $hudDir = Join-Path $rootDir ("tmp\hud_" + $case.prefix)
+    New-Item -ItemType Directory -Force -Path $hudDir | Out-Null
 
-  for ($f = 0; $f -lt 24; $f++) {
-    $sIdx = [Math]::Floor($f / 6)
-    $sh = $case.shots[$sIdx]
-    $fname = $case.prefix + "_anim_" + $f.ToString("00") + ".png"
-    $srcImg = [System.Drawing.Image]::FromFile((Join-Path $rawDir $fname))
-    $frameBmp = New-Object System.Drawing.Bitmap(270, 480)
-    $fg = [System.Drawing.Graphics]::FromImage($frameBmp)
-    $fg.SmoothingMode = [System.Drawing.Drawing2D.SmoothingMode]::AntiAlias
-    $fg.TextRenderingHint = [System.Drawing.Text.TextRenderingHint]::ClearTypeGridFit
-    $fg.DrawImage($srcImg, 0, 0, 270, 480)
-    $srcImg.Dispose()
+    for ($f = 0; $f -lt 24; $f++) {
+      $sIdx = [Math]::Floor($f / 6)
+      $sh = $case.shots[$sIdx]
+      $fname = $case.prefix + "_anim_" + $f.ToString("00") + ".png"
+      $srcImg = [System.Drawing.Image]::FromFile((Join-Path $rawDir $fname))
+      $frameBmp = New-Object System.Drawing.Bitmap(270, 480)
+      $fg = [System.Drawing.Graphics]::FromImage($frameBmp)
+      $fg.SmoothingMode = [System.Drawing.Drawing2D.SmoothingMode]::AntiAlias
+      $fg.TextRenderingHint = [System.Drawing.Text.TextRenderingHint]::ClearTypeGridFit
+      $fg.DrawImage($srcImg, 0, 0, 270, 480)
+      $srcImg.Dispose()
 
-    Draw-CleanChatBubble $fg ($sh.bubbleX * 0.84) ($sh.bubbleY * 0.84) $sh.chatEn $fBubbleEn
+      Draw-CleanChatBubble $fg ($sh.bubbleX * 0.84) ($sh.bubbleY * 0.84) $sh.chatEn $fBubbleEn
 
-    $outFrame = Join-Path $hudDir ("frame_" + $f.ToString("00") + ".png")
-    $frameBmp.Save($outFrame, [System.Drawing.Imaging.ImageFormat]::Png)
-    $fg.Dispose()
-    $frameBmp.Dispose()
+      $outFrame = Join-Path $hudDir ("frame_" + $f.ToString("00") + ".png")
+      $frameBmp.Save($outFrame, [System.Drawing.Imaging.ImageFormat]::Png)
+      $fg.Dispose()
+      $frameBmp.Dispose()
+    }
+
+    $inPattern = Join-Path $hudDir "frame_%02d.png"
+    $palPath = Join-Path $hudDir "palette.png"
+    & ffmpeg -y -loglevel error -framerate 6 -i $inPattern -vf "palettegen=max_colors=128" $palPath
+    & ffmpeg -y -loglevel error -framerate 6 -i $inPattern -i $palPath -lavfi "paletteuse=dither=bayer" $case.gifPath
+    & ffmpeg -y -loglevel error -framerate 6 -i $inPattern -f lavfi -i "sine=frequency=520:beep_factor=4:duration=4" -c:v libx264 -pix_fmt yuv420p -vf "fps=24" -c:a aac -b:a 96k -shortest $case.mp4Path
   }
-
-  $inPattern = Join-Path $hudDir "frame_%02d.png"
-  $palPath = Join-Path $hudDir "palette.png"
-  & ffmpeg -y -loglevel error -framerate 6 -i $inPattern -vf "palettegen=max_colors=128" $palPath
-  & ffmpeg -y -loglevel error -framerate 6 -i $inPattern -i $palPath -lavfi "paletteuse=dither=bayer" $case.gifPath
-  & ffmpeg -y -loglevel error -framerate 6 -i $inPattern -f lavfi -i "sine=frequency=520:beep_factor=4:duration=4" -c:v libx264 -pix_fmt yuv420p -vf "fps=24" -c:a aac -b:a 96k -shortest $case.mp4Path
 }
 Write-Output "All bilingual .zh.png / .en.png boards, keyframes, GIFs, and MP4s generated!"

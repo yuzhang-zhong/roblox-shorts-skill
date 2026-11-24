@@ -1,0 +1,78 @@
+<svg width="960" height="196" viewBox="0 0 960 196" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="wf-tw-title wf-tw-desc">
+  <title id="wf-tw-title">Roblox Style Video Skill 工作流</title>
+  <desc id="wf-tw-desc">五步 Agent Skill 流程：鎖定方塊角色比例、渲染三視圖與本機預演、拆解 9:16 直式分鏡、編譯多模型提示詞、防走樣靜態檢查。</desc>
+
+  <rect width="960" height="196" rx="14" fill="#F8FAFC"/>
+  <rect x="1" y="1" width="958" height="194" rx="13" stroke="#E2E8F0" stroke-width="2"/>
+
+  <!-- Step 1 -->
+  <rect x="20" y="20" width="168" height="156" rx="10" fill="#FFFFFF" stroke="#CBD5E1" stroke-width="1.5"/>
+  <rect x="34" y="34" width="38" height="22" rx="5" fill="#EFF6FF"/>
+  <polygon points="44,40 52,45 44,50" fill="#2563EB"/>
+  <text x="56" y="49" fill="#1D4ED8" font-family="Microsoft JhengHei UI, PingFang TC, sans-serif" font-size="11.5" font-weight="700">01</text>
+  <text x="34" y="78" fill="#0F172A" font-family="Microsoft JhengHei UI, PingFang TC, sans-serif" font-size="15" font-weight="700">鎖定角色比例</text>
+  <text x="34" y="100" fill="#475569" font-family="Microsoft JhengHei UI, PingFang TC, sans-serif" font-size="12">2x2x1 軀幹 · 1x2x1 方肢</text>
+  <text x="34" y="120" fill="#64748B" font-family="Microsoft JhengHei UI, PingFang TC, sans-serif" font-size="11.5">實心平頭手 · 2D 貼圖臉</text>
+  <rect x="34" y="138" width="140" height="24" rx="5" fill="#F8FAFC" stroke="#E2E8F0"/>
+  <text x="42" y="154" fill="#0F172A" font-family="Consolas, monospace" font-size="11">avatar_spec.mjs</text>
+
+  <!-- Arrow 1->2 -->
+  <path d="M192 98H206" stroke="#94A3B8" stroke-width="2" stroke-linecap="round"/>
+  <path d="M202 94L207 98L202 102" stroke="#94A3B8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+
+  <!-- Step 2 -->
+  <rect x="210" y="20" width="168" height="156" rx="10" fill="#FFFFFF" stroke="#CBD5E1" stroke-width="1.5"/>
+  <rect x="224" y="34" width="38" height="22" rx="5" fill="#EFF6FF"/>
+  <polygon points="234,40 242,45 234,50" fill="#2563EB"/>
+  <text x="246" y="49" fill="#1D4ED8" font-family="Microsoft JhengHei UI, PingFang TC, sans-serif" font-size="11.5" font-weight="700">02</text>
+  <text x="224" y="78" fill="#0F172A" font-family="Microsoft JhengHei UI, PingFang TC, sans-serif" font-size="15" font-weight="700">三視圖與本機預演</text>
+  <text x="224" y="100" fill="#475569" font-family="Microsoft JhengHei UI, PingFang TC, sans-serif" font-size="12">0° / 45° / 90° 角色設定圖</text>
+  <text x="224" y="120" fill="#64748B" font-family="Microsoft JhengHei UI, PingFang TC, sans-serif" font-size="11.5">離線生成 MP4 與動圖</text>
+  <rect x="224" y="138" width="140" height="24" rx="5" fill="#F8FAFC" stroke="#E2E8F0"/>
+  <text x="232" y="154" fill="#0F172A" font-family="Consolas, monospace" font-size="11">render_preview.mjs</text>
+
+  <!-- Arrow 2->3 -->
+  <path d="M382 98H396" stroke="#94A3B8" stroke-width="2" stroke-linecap="round"/>
+  <path d="M392 94L397 98L392 102" stroke="#94A3B8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+
+  <!-- Step 3 -->
+  <rect x="400" y="20" width="168" height="156" rx="10" fill="#FFFFFF" stroke="#CBD5E1" stroke-width="1.5"/>
+  <rect x="414" y="34" width="38" height="22" rx="5" fill="#EFF6FF"/>
+  <polygon points="424,40 432,45 424,50" fill="#2563EB"/>
+  <text x="436" y="49" fill="#1D4ED8" font-family="Microsoft JhengHei UI, PingFang TC, sans-serif" font-size="11.5" font-weight="700">03</text>
+  <text x="414" y="78" fill="#0F172A" font-family="Microsoft JhengHei UI, PingFang TC, sans-serif" font-size="15" font-weight="700">9:16 直式分鏡</text>
+  <text x="414" y="100" fill="#475569" font-family="Microsoft JhengHei UI, PingFang TC, sans-serif" font-size="12">每鏡 3.5–4 秒單一動作</text>
+  <text x="414" y="120" fill="#64748B" font-family="Microsoft JhengHei UI, PingFang TC, sans-serif" font-size="11.5">開場鉤子 · 推進 · 循環</text>
+  <rect x="414" y="138" width="140" height="24" rx="5" fill="#F8FAFC" stroke="#E2E8F0"/>
+  <text x="422" y="154" fill="#0F172A" font-family="Consolas, monospace" font-size="11">shot_compiler.mjs</text>
+
+  <!-- Arrow 3->4 -->
+  <path d="M572 98H586" stroke="#94A3B8" stroke-width="2" stroke-linecap="round"/>
+  <path d="M582 94L587 98L582 102" stroke="#94A3B8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+
+  <!-- Step 4 -->
+  <rect x="590" y="20" width="168" height="156" rx="10" fill="#FFFFFF" stroke="#CBD5E1" stroke-width="1.5"/>
+  <rect x="604" y="34" width="38" height="22" rx="5" fill="#EFF6FF"/>
+  <polygon points="614,40 622,45 614,50" fill="#2563EB"/>
+  <text x="626" y="49" fill="#1D4ED8" font-family="Microsoft JhengHei UI, PingFang TC, sans-serif" font-size="11.5" font-weight="700">04</text>
+  <text x="604" y="78" fill="#0F172A" font-family="Microsoft JhengHei UI, PingFang TC, sans-serif" font-size="15" font-weight="700">多模型提示詞</text>
+  <text x="604" y="100" fill="#475569" font-family="Microsoft JhengHei UI, PingFang TC, sans-serif" font-size="12">可靈 · 即夢 · 海螺 · 萬相</text>
+  <text x="604" y="120" fill="#64748B" font-family="Microsoft JhengHei UI, PingFang TC, sans-serif" font-size="11.5">Sora · Runway 語法適配</text>
+  <rect x="604" y="138" width="140" height="24" rx="5" fill="#F8FAFC" stroke="#E2E8F0"/>
+  <text x="612" y="154" fill="#0F172A" font-family="Consolas, monospace" font-size="11">prompts.json</text>
+
+  <!-- Arrow 4->5 -->
+  <path d="M762 98H776" stroke="#94A3B8" stroke-width="2" stroke-linecap="round"/>
+  <path d="M772 94L777 98L772 102" stroke="#94A3B8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+
+  <!-- Step 5 -->
+  <rect x="780" y="20" width="160" height="156" rx="10" fill="#FFFFFF" stroke="#CBD5E1" stroke-width="1.5"/>
+  <rect x="794" y="34" width="38" height="22" rx="5" fill="#EFF6FF"/>
+  <polygon points="804,40 812,45 804,50" fill="#2563EB"/>
+  <text x="816" y="49" fill="#1D4ED8" font-family="Microsoft JhengHei UI, PingFang TC, sans-serif" font-size="11.5" font-weight="700">05</text>
+  <text x="794" y="78" fill="#0F172A" font-family="Microsoft JhengHei UI, PingFang TC, sans-serif" font-size="15" font-weight="700">防走樣檢查</text>
+  <text x="794" y="100" fill="#475569" font-family="Microsoft JhengHei UI, PingFang TC, sans-serif" font-size="12">攔截五指 · 樂高圓粒 · 像素</text>
+  <text x="794" y="120" fill="#64748B" font-family="Microsoft JhengHei UI, PingFang TC, sans-serif" font-size="11.5">輸出修補提示詞</text>
+  <rect x="794" y="138" width="132" height="24" rx="5" fill="#F8FAFC" stroke="#E2E8F0"/>
+  <text x="802" y="154" fill="#0F172A" font-family="Consolas, monospace" font-size="11">drift_check.mjs</text>
+</svg>

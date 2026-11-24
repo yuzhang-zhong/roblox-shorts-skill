@@ -1996,10 +1996,11 @@ export function buildRedLightScene(shotIndex, phase = 0.5) {
   };
 }
 
-export function renderRawPanelSet(tmpDir, force = false, shardIdx = 0, shardCount = 1, onlyPrefixes = null) {
+export function renderRawPanelSet(tmpDir, force = false, shardIdx = 0, shardCount = 1, onlyPrefixes = null, shotsOnly = false) {
   fs.mkdirSync(tmpDir, { recursive: true });
   let taskCounter = 0;
   const writePng = (name, w, h, computeFn) => {
+    if (shotsOnly && !/_shot_[0-3]\.png$/.test(name)) return;
     if (onlyPrefixes && !onlyPrefixes.some((p) => name.startsWith(p + "_"))) return;
     const myTask = taskCounter++;
     if (myTask % shardCount !== shardIdx) return;
@@ -2430,11 +2431,12 @@ if (isMain) {
 
   const onlyIdx = process.argv.indexOf("--only");
   const onlyPrefixes = onlyIdx !== -1 && process.argv[onlyIdx + 1] ? process.argv[onlyIdx + 1].split(",") : null;
+  const shotsOnly = process.argv.includes("--shots-only");
 
   const shardArgIdx = process.argv.indexOf("--shard");
   if (shardArgIdx !== -1 && process.argv[shardArgIdx + 1]) {
     const [sIdx, sTotal] = process.argv[shardArgIdx + 1].split("/").map(Number);
-    renderRawPanelSet(rawDir, force, sIdx, sTotal, onlyPrefixes);
+    renderRawPanelSet(rawDir, force, sIdx, sTotal, onlyPrefixes, shotsOnly);
     process.exit(0);
   }
 
@@ -2445,6 +2447,7 @@ if (isMain) {
       return new Promise((resolve, reject) => {
         const args = [process.argv[1], "--raw-dir", rawDir, "--shard", `${i}/${workers}`];
         if (force) args.push("--force");
+        if (shotsOnly) args.push("--shots-only");
         if (onlyPrefixes) args.push("--only", onlyPrefixes.join(","));
         const child = spawn(process.execPath, args, { stdio: "inherit" });
         child.on("exit", (code) => (code === 0 ? resolve() : reject(new Error(`Shard ${i} exited ${code}`))));
