@@ -1,8 +1,10 @@
 <div align="center">
 
-# Roblox Style Video
+# Roblox Style Video Skill
 
-9:16 Roblox 쇼츠 기획: R6 블록 비율 잠금, 컷별 프롬프트 컴파일, 로컬 3D 애니메이션 프리뷰.
+Claude Code, Cursor, GitHub Copilot, Codex? **Agent Skill** (`SKILL.md` + ???? + ???? CLI): 9:16 ?? ??? ??? R6 ?? ??, ?? ???? ??? ? ?? 3D ???? ?????.
+
+[![Agent Skill](https://img.shields.io/badge/Agent_Skill-SKILL.md-0f172a?style=flat-square)](../../SKILL.md) [![MIT License](https://img.shields.io/badge/License-MIT-2563eb?style=flat-square)](../../LICENSE)
 
 [English](../../README.md) · [简体中文](../../README.zh-CN.md) · [繁體中文](README.zh-TW.md) · [日本語](README.ja.md) · **한국어** · [Español](README.es.md) · [Français](README.fr.md) · [Deutsch](README.de.md) · [Português](README.pt-BR.md) · [Русский](README.ru.md)
 
@@ -42,6 +44,12 @@
 
 ## 빠른 시작
 
+<p align="center">
+  <img src="../../docs/pipeline.en.svg" width="860" alt="Roblox Style Video Skill workflow" />
+</p>
+
+????? Skills ????? ???? [`SKILL.md`](../../SKILL.md)? ?? ????? ???? ?????:
+
 ```bash
 git clone https://github.com/yuzhang-zhong/roblox-style-video.git ~/.codex/skills/roblox-style-video
 ```
@@ -60,3 +68,5 @@ node scripts/render_preview.mjs --only tornado,chase,doors
 
 - [`SKILL.md`](../../SKILL.md) · [`scripts/shot_compiler.mjs`](../../scripts/shot_compiler.mjs) · [`scripts/avatar_spec.mjs`](../../scripts/avatar_spec.mjs) · [`scripts/drift_check.mjs`](../../scripts/drift_check.mjs) · [`scripts/render_preview.mjs`](../../scripts/render_preview.mjs)
 - [`references/avatar-geometry-and-materials.md`](../../references/avatar-geometry-and-materials.md) · [`references/model-prompt-playbook.md`](../../references/model-prompt-playbook.md) · [`references/rescue-and-anti-drift.md`](../../references/rescue-and-anti-drift.md) · [`references/viral-archetypes-catalog.md`](../../references/viral-archetypes-catalog.md) · [`LICENSE`](../../LICENSE)
+
+?? ???? Agent Skill ????? ???? ??? ???? ???? Roblox Corporation? ?????.

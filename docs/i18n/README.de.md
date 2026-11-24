@@ -1,8 +1,10 @@
 <div align="center">
 
-# Roblox Style Video
+# Roblox Style Video Skill
 
-9:16-Roblox-Shorts planen: R6-Proportionen fixieren, Shot-Prompts kompilieren und lokal als 3D-Vorschau prüfen.
+Ein **Agent Skill** (`SKILL.md` + Referenzen + Offline-CLI) f?r Claude Code, Cursor, GitHub Copilot und Codex zum Planen von 9:16-Shorts im Blocky-R6-Stil, Kompilieren von Shot-Prompts und Rendern lokaler 3D-Vorschauen.
+
+[![Agent Skill](https://img.shields.io/badge/Agent_Skill-SKILL.md-0f172a?style=flat-square)](../../SKILL.md) [![MIT License](https://img.shields.io/badge/License-MIT-2563eb?style=flat-square)](../../LICENSE)
 
 [English](../../README.md) · [简体中文](../../README.zh-CN.md) · [繁體中文](README.zh-TW.md) · [日本語](README.ja.md) · [한국어](README.ko.md) · [Español](README.es.md) · [Français](README.fr.md) · **Deutsch** · [Português](README.pt-BR.md) · [Русский](README.ru.md)
 
@@ -42,6 +44,12 @@
 
 ## Schnellstart
 
+<p align="center">
+  <img src="../../docs/pipeline.en.svg" width="860" alt="Roblox Style Video Skill workflow" />
+</p>
+
+Klonen Sie diesen Agent Skill in das Skills-Verzeichnis Ihres Agenten, um [`SKILL.md`](../../SKILL.md) und die CLI-Skripte zu aktivieren:
+
 ```bash
 git clone https://github.com/yuzhang-zhong/roblox-style-video.git ~/.codex/skills/roblox-style-video
 ```
@@ -60,3 +68,5 @@ node scripts/render_preview.mjs --only tornado,chase,doors
 
 - [`SKILL.md`](../../SKILL.md) · [`scripts/shot_compiler.mjs`](../../scripts/shot_compiler.mjs) · [`scripts/avatar_spec.mjs`](../../scripts/avatar_spec.mjs) · [`scripts/drift_check.mjs`](../../scripts/drift_check.mjs) · [`scripts/render_preview.mjs`](../../scripts/render_preview.mjs)
 - [`references/avatar-geometry-and-materials.md`](../../references/avatar-geometry-and-materials.md) · [`references/model-prompt-playbook.md`](../../references/model-prompt-playbook.md) · [`references/rescue-and-anti-drift.md`](../../references/rescue-and-anti-drift.md) · [`references/viral-archetypes-catalog.md`](../../references/viral-archetypes-catalog.md) · [`LICENSE`](../../LICENSE)
+
+Unabh?ngiger Open-Source-Agent-Skill mit eigenem Dreiecks-Emblem; nicht mit der Roblox Corporation verbunden.

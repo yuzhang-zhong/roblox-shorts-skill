@@ -1,11 +1,11 @@
 ---
 name: roblox-style-video
 description: |
-  Generate Roblox-style R6 and blocky avatar short videos with locked stud proportions, 9:16 storyboards, and model-specific prompts.
+  Agent Skill to generate Roblox-style R6 and blocky avatar 9:16 short videos with locked proportions, storyboards, and model-specific prompts.
   Use when the user wants to generate Roblox-style avatar videos, blocky 3D character shorts, Douyin/Xiaohongshu/TikTok Roblox skits, R6/R15/chibi-plush character turnaround sheets, or prompts for Kling (可灵), Seedance/Jimeng (即梦), Hailuo MiniMax (海螺), Wan (通义万相), Sora, or Runway, or when fixing AI video defects such as human fingers, Lego C-claws/studs, Minecraft voxels, realistic faces, or rubbery limbs.
 license: MIT
 metadata:
-  version: "1.4.0"
+  version: "1.5.0"
 ---
 
 # Roblox Style Video Skill
@@ -138,7 +138,7 @@ node scripts/render_preview.mjs
 
 - **Prompts, storyboards, and local 3D preview renderer.** This skill and its four CLI scripts (`avatar_spec.mjs`, `shot_compiler.mjs`, `drift_check.mjs`, `render_preview.mjs`) generate structured character cards, storyboards, anti-drift diagnostics, and local 3D Roblox studio preview renders. Generating diffusion videos requires an external model (Kling, Seedance/Jimeng, Hailuo, Wan, Sora, Runway).
 - **Zero external runtime dependencies.** All scripts in `scripts/` use the Node.js standard library only and run offline without API keys.
-- **Trademark clarity & zero brand logos.** "Roblox-style" describes a blocky 3D character aesthetic (`R6`/`R15`/chibi blocky rigs) for creative prompt engineering. Never place official Roblox Corporation trademarks, wordmarks, `[R]` badges, or tilted-square logos onto generated outfits, caps, UI, or thumbnails—use original geometric graphics (stars, lightning bolts, varsity stripes) and keep official brand logos in the negative prompt. This project is an independent open-source Agent Skill and is not affiliated with or endorsed by Roblox Corporation.
+- **Trademark clarity & zero brand logos.** "Roblox-style" describes a blocky 3D character aesthetic (`R6`/`R15`/chibi blocky rigs) for creative prompt engineering. Never place official Roblox Corporation trademarks, wordmarks, `[R]` badges, or Roblox Tilt tilted-square logos onto generated outfits, caps, icons, UI, or thumbnails; use a clean geometric triangle emblem instead and keep official brand logos in the negative prompt. This project is an independent open-source Agent Skill and is not affiliated with or endorsed by Roblox Corporation.
 
 ## Reference Navigation / 参考文档索引
 

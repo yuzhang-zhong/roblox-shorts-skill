@@ -1,6 +1,6 @@
 <svg width="512" height="512" viewBox="0 0 512 512" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="title desc">
   <title id="title">Roblox Style Video Skill icon</title>
-  <desc id="desc">A blocky R6-style avatar with a 1:1 barrel-beveled yellow head, 2x2x1 blue torso with lightning emblem, flush 1x2x1 solid rectangular arms and green legs, overhead chat bubble, and 9:16 play badge.</desc>
+  <desc id="desc">A blocky R6-style avatar with a 1:1 barrel-beveled yellow head, 2x2x1 blue torso with a white geometric triangle emblem, flush 1x2x1 solid rectangular arms and green legs, overhead chat bubble, and play badge.</desc>
   <defs>
     <linearGradient id="bg" x1="56" y1="40" x2="456" y2="472" gradientUnits="userSpaceOnUse">
       <stop stop-color="#0F172A"/>
@@ -45,10 +45,6 @@
   <!-- Smooth Studio Stage Horizon Line (Zero Raised Studs) -->
   <path d="M64 442H448" stroke="#475569" stroke-width="3" opacity="0.45"/>
 
-  <!-- REC 9:16 viewfinder indicator -->
-  <circle cx="96" cy="88" r="8" fill="#F43F5E"/>
-  <text x="112" y="94" fill="#E2E8F0" font-family="Segoe UI, Inter, sans-serif" font-size="18" font-weight="700" letter-spacing="1.2">9:16 R6</text>
-
   <!-- Canonical Roblox R6 Avatar (2x2x1 Torso + Flush 1x2x1 Solid Block Limbs + 1:1 Barrel Head) -->
   <g filter="url(#drop)">
     <!-- Flush 1x2x1 Left & Right Legs (matching exact 2x2x1 torso width = 168..344) -->
@@ -69,8 +65,8 @@
     <rect x="168" y="220" width="176" height="160" rx="10" fill="url(#torsoBlue)" stroke="#7DD3FC" stroke-width="3.5"/>
     <path d="M184 234H328" stroke="#E0F2FE" stroke-width="5" stroke-linecap="round" opacity="0.65"/>
 
-    <!-- Original Trademark-Free Speed Lightning Emblem on Chest -->
-    <path d="M268 262L234 304H258L244 342L282 296H258L268 262Z" fill="#FEF08A" stroke="#F8FAFC" stroke-width="2.5" stroke-linejoin="round"/>
+    <!-- Original Trademark-Free Geometric Triangle Emblem on Chest -->
+    <polygon points="256,266 290,326 222,326" fill="#F8FAFC" stroke="#BAE6FD" stroke-width="3" stroke-linejoin="round"/>
 
     <!-- Canonical 1:1 Barrel-Beveled Cylindrical Head (1.2x1.2x1.2 studs) -->
     <rect x="196" y="108" width="120" height="108" rx="34" fill="url(#headYellow)" stroke="#FEF9C3" stroke-width="3.5"/>

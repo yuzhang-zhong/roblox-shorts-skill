@@ -1,7 +1,7 @@
 interface:
-  display_name: "Roblox Style Video"
-  short_description: "Roblox-style R6 and blocky avatar short video prompts"
+  display_name: "Roblox Style Video Skill"
+  short_description: "Agent Skill for Roblox-style blocky avatar 9:16 short videos"
   icon_small: "./assets/icon.svg"
   icon_large: "./assets/icon.svg"
   brand_color: "#E11D48"
-  default_prompt: "Use $roblox-style-video to design a Roblox-style character card, plan a 9:16 storyboard, and compile model-specific video prompts."
+  default_prompt: "Use $roblox-style-video to design a blocky R6/chibi character card, plan a 9:16 storyboard, and compile model-specific video prompts."

@@ -1,13 +1,14 @@
 <div align="center">
 
-# Roblox Style Video
+# Roblox Style Video Skill
 
-Plan a 9:16 Roblox-style short: lock R6/blocky proportions, compile prompts for each shot, and preview the cut locally.
+An Agent Skill (`SKILL.md` + reference playbooks + offline CLI tools) for Claude Code, Cursor, GitHub Copilot, and Codex to plan 9:16 Roblox-style blocky avatar shorts, lock R6 proportions, compile shot-by-shot video prompts, and preview cuts locally.
 
-[![Node.js 18+ for the CLI](https://img.shields.io/badge/Node.js-18%2B-268354?style=flat-square)](#quick-start)
+[![Agent Skill](https://img.shields.io/badge/Agent_Skill-SKILL.md-0f172a?style=flat-square)](SKILL.md)
+[![Node.js 18+ for the CLI](https://img.shields.io/badge/Node.js-18%2B-268354?style=flat-square)](#skill-workflow-and-quick-start)
 [![MIT license](https://img.shields.io/badge/License-MIT-2563eb?style=flat-square)](LICENSE)
 
-**[Video examples](#video-examples)** · [Scene boards](#scene-boards-and-shot-pacing) · [Quick start](#quick-start) · [Skill guide](SKILL.md)
+**[Video examples](#video-examples)** · [Scene boards](#scene-boards-and-shot-pacing) · [Skill workflow & quick start](#skill-workflow-and-quick-start) · [Skill guide](SKILL.md)
 
 **English** · [简体中文](README.zh-CN.md) · [More languages](#languages)
 
@@ -17,7 +18,7 @@ Plan a 9:16 Roblox-style short: lock R6/blocky proportions, compile prompts for 
 
 ## Video examples
 
-Each package plans a 15-second, four-shot vertical (`9:16`) short across 12 classic Roblox story formats. The **4-second MP4s** and GIFs below are offline 3D animatics rendered by `scripts/render_preview.mjs` to verify R6 proportions, camera moves, and overhead `BillboardGui` chat bubbles before spending credits in an external video model.
+When invoked in an AI coding agent, this skill turns a short-video idea into a 15-second, four-shot vertical (`9:16`) package across 12 classic blocky story formats. The **4-second MP4s** and GIFs below are offline 3D animatics rendered by the skill's `scripts/render_preview.mjs` tool so you can check R6 proportions, multi-part props, camera moves, and overhead `BillboardGui` chat bubbles before spending credits in an external video model.
 
 <p align="center">
   <a href="examples/monday-alarm-meltdown/assets/monday_alarm_meltdown.mp4"><img src="examples/monday-alarm-meltdown/assets/monday_alarm_meltdown.gif" width="134" alt="Monday Alarm 9:16 animated preview" /></a>
@@ -53,17 +54,21 @@ Four-shot contact sheets across six game genres, pairing camera angle changes wi
 | **10 · Crossroads Sword Duel (`Seedance` · Linked Sword 1v1)** | **12 · Red Light Freeze (`Runway` · Arena Sprint & Freeze)** |
 | <a href="examples/crossroads-sword-duel/"><img src="examples/crossroads-sword-duel/assets/sword_storyboard_sheet.en.png" width="410" alt="Crossroads Sword Duel 4-shot storyboard sheet" /></a> | <a href="examples/red-light-freeze/"><img src="examples/red-light-freeze/assets/redlight_storyboard_sheet.en.png" width="410" alt="Red Light Freeze 4-shot storyboard sheet" /></a> |
 
-## Quick start
+## Skill workflow and quick start
 
-### Use the Agent Skill
+<p align="center">
+  <img src="docs/pipeline.en.svg" width="860" alt="Five-step Roblox Style Video Skill workflow: Lock Avatar DNA, 3D Animatic and I2V, 9:16 Storyboard, Engine Prompts, and Anti-Drift Lint" />
+</p>
 
-Clone into your agent host's skills directory. This path is for Codex; for GitHub Copilot, use `~/.copilot/skills/roblox-style-video`. Use the configured skills directory for Claude Code or Cursor.
+### Install as an Agent Skill
+
+Clone this skill into your agent host's skills directory. Once installed, the agent reads [`SKILL.md`](SKILL.md), loads the relevant prompt guides from [`references/`](references/), and runs the Node.js scripts automatically when you ask for a Roblox-style short. This path is for Codex; use `~/.copilot/skills/roblox-style-video` for GitHub Copilot, or your configured skills folder in Claude Code and Cursor.
 
 ```bash
 git clone https://github.com/yuzhang-zhong/roblox-style-video.git ~/.codex/skills/roblox-style-video
 ```
 
-Ask your agent to use `roblox-style-video`:
+Trigger the `roblox-style-video` skill in your agent chat:
 
 ```text
 Use $roblox-style-video to plan a 15-second 9:16 short set in a dim hotel corridor (doors-horror):
@@ -71,9 +76,9 @@ an R6 avatar in a blue hoodie sweeps a flashlight past Door 050 when the lights 
 Give me the character geometry lock, a 4-shot storyboard, and Sora / Kling I2V prompts.
 ```
 
-### Use the CLI
+### Run the skill's CLI tools directly
 
-From a regular checkout, run these from the repository root. The scripts require Node.js 18+ and use only the standard library (no `npm install` or API keys).
+Every helper script bundled inside the skill also runs standalone from the repository root on Node.js 18+ using only the standard library (no `npm install` or API keys).
 
 ```bash
 node scripts/shot_compiler.mjs --template brookhaven-chase --duration 15 --engine hailuo --rig r6 --lang en
@@ -81,27 +86,28 @@ node scripts/drift_check.mjs --prompt "A cute Roblox girl with C-shaped claw han
 node scripts/render_preview.mjs --only tornado,chase,doors
 ```
 
-## CLI scripts, geometry checks, and references
+## Skill scripts, anti-drift checks, and references
 
-Generic prompts often produce human fingers, Lego C-claws/head studs, or Minecraft voxel cubes instead of standard Roblox R6 geometry (`2x2x1` torso, flush `1x2x1` legs, solid block hands, and `1:1` barrel head on a studded baseplate). `drift_check.mjs` flags these failure modes before generation:
+Generic video prompts often produce human fingers, circular Lego floor/head studs and C-claws, or Minecraft voxel cubes instead of clean blocky R6 geometry (`2x2x1` torso, flush `1x2x1` legs, solid block hands, `1:1` barrel head, smooth architectural floors, and multi-part props). The skill's `drift_check.mjs` linter flags these failure modes before generation:
 
 <p align="center">
-  <img src="assets/showcase/drift_rescue_comparison.en.png" width="760" alt="Geometry check comparing human fingers, Lego C-claws, and voxel heads against locked Roblox R6 proportions" />
+  <img src="assets/showcase/drift_rescue_comparison.en.png" width="760" alt="Geometry check comparing human fingers, Lego C-claws, and voxel heads against locked blocky R6 proportions" />
 </p>
 
-| Script | Output |
+| Skill component | Output |
 | --- | --- |
+| [`SKILL.md`](SKILL.md) | Main Agent Skill entry point defining the 6 production modes (`Avatar`, `Storyboard`, `Prompt-Compile`, `Rescue`, `Remix`, `Render`) and 8 geometry invariants. |
 | [`shot_compiler.mjs`](scripts/shot_compiler.mjs) | 9:16 beat sheet and I2V/T2V prompts across 12 templates (`daily-meltdown`, `obby-storytime`, `duo-comedy`, `mini-tycoon`, `outfit-drop`, `meme-slapstick`, `disaster-survival`, `brookhaven-chase`, `doors-horror`, `sword-duel`, `school-panic`, `red-light-game`) for Kling, Seedance, Hailuo, Wan, Sora, and Runway. |
 | [`avatar_spec.mjs`](scripts/avatar_spec.mjs) | Character DNA card with `BrickColor` codes, stud proportions, and a [three-view turnaround](assets/showcase/momo_turnaround_sheet.en.png) prompt. |
-| [`drift_check.mjs`](scripts/drift_check.mjs) | Diagnostic report and patched prompt when a draft triggers finger growth, Lego claws, or multi-verb overload. |
+| [`drift_check.mjs`](scripts/drift_check.mjs) | Diagnostic report and patched prompt when a draft triggers finger growth, Lego claws/bumps, brand logos, or multi-verb overload. |
 | [`render_preview.mjs`](scripts/render_preview.mjs) | Offline 3D contact sheets, GIFs, and MP4 animatics (Windows board composition uses PowerShell `System.Drawing` and `ffmpeg`). |
 
 [Avatar geometry and materials](references/avatar-geometry-and-materials.md) · [Classic gear and props](references/classic-roblox-catalog.md) · [Model prompt playbook](references/model-prompt-playbook.md) · [Drift fixes](references/rescue-and-anti-drift.md) · [Pacing and audio](references/short-video-beats-and-audio.md) · [12 story templates](references/viral-archetypes-catalog.md)
 
 ## Languages
 
-Agent replies and CLI `--lang` output support `en`, `zh`, `zh-tw`, `ja`, `ko`, `es`, `fr`, `de`, `pt`, and `ru`.
+Agent Skill replies and CLI `--lang` output support `en`, `zh`, `zh-tw`, `ja`, `ko`, `es`, `fr`, `de`, `pt`, and `ru`.
 
 **English** · [简体中文](README.zh-CN.md) · [繁體中文](docs/i18n/README.zh-TW.md) · [日本語](docs/i18n/README.ja.md) · [한국어](docs/i18n/README.ko.md) · [Español](docs/i18n/README.es.md) · [Français](docs/i18n/README.fr.md) · [Deutsch](docs/i18n/README.de.md) · [Português](docs/i18n/README.pt-BR.md) · [Русский](docs/i18n/README.ru.md)
 
-[MIT License](LICENSE). An independent project, not affiliated with or endorsed by Roblox Corporation.
+[MIT License](LICENSE). Independent open-source Agent Skill; uses original geometric triangle emblems and is not affiliated with or endorsed by Roblox Corporation.

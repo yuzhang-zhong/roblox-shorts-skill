@@ -1,5 +1,5 @@
 {
-  "version": "1.4.0",
+  "version": "1.5.0",
   "skill": "roblox-style-video",
   "description": "Classic Roblox R6/Blocky Avatar, Outfit, Face Decal, and Gear Asset Library",
   "sheets": {
@@ -43,12 +43,12 @@
       "preview": "assets/library/avatars/avatar_guest.png",
       "brickColors": {
         "headAndHands": "Institutional white (#F8F8F8)",
-        "torsoAndArms": "Really black (#111827) varsity jacket with white chest stripes (unbranded)",
+        "torsoAndArms": "Really black (#111827) jacket with white geometric triangle emblem (unbranded)",
         "legs": "Black (#1B2A35)",
         "hat": "Bright red (#C4281C) unbranded sport baseball cap"
       },
-      "promptEn": "blocky R6 Classic Guest-style avatar wearing a plain bright red unbranded baseball cap, black 2x2x1 varsity stripe jacket (no trademark logos), pale white 1:1 barrel head with 2D grin decal, and black flush 1x2x1 rectangular legs",
-      "promptZh": "经典R6游客风方块形象（头戴纯色无标亮红棒球帽，黑色2x2x1白条纹运动夹克无商标Logo，纯白1:1桶状圆柱头，黑色并拢1x2x1方柱长裤）"
+      "promptEn": "blocky R6 Classic Guest-style avatar wearing a plain bright red unbranded baseball cap, black 2x2x1 jacket with white geometric triangle chest emblem (no trademark logos), pale white 1:1 barrel head with 2D grin decal, and black flush 1x2x1 rectangular legs",
+      "promptZh": "经典R6游客风方块形象（头戴纯色无标亮红棒球帽，黑色2x2x1印白色几何三角形胸章夹克无商标Logo，纯白1:1桶状圆柱头，黑色并拢1x2x1方柱长裤）"
     },
     {
       "id": "bacon-hair",
@@ -89,11 +89,11 @@
       "brickColors": {
         "skin": "Bright yellow (#F5CD30)",
         "hat": "Bright red (#E12626) unbranded sport visor",
-        "torso": "Cyan (#00A2E8) jersey with yellow lightning-bolt emblem (unbranded)",
+        "torso": "Cyan (#00A2E8) jersey with white geometric triangle emblem (unbranded)",
         "gear": "Glowing red Neon Speed Coil on right 1x2x1 arm"
       },
-      "promptEn": "blocky R6 obby speedrunner wearing a plain red unbranded visor cap, cyan 2x2x1 jersey with yellow lightning-bolt graphic (zero trademark logos), short sleeves with bare yellow 1x2x1 solid rectangular arms and a glowing red Speed Coil wrapped around the right arm",
-      "promptZh": "R6跑酷玩家形象（头戴纯色无标红遮阳帽，青色2x2x1短袖球衣印有原创黄色闪电徽章无商标Logo，黄色1x2x1实心方柱右臂缠绕发光红色加速弹簧Speed Coil）"
+      "promptEn": "blocky R6 obby speedrunner wearing a plain red unbranded visor cap, cyan 2x2x1 jersey with white geometric triangle chest emblem (zero trademark logos), short sleeves with bare yellow 1x2x1 solid rectangular arms and a glowing red Speed Coil wrapped around the right arm",
+      "promptZh": "R6跑酷玩家形象（头戴纯色无标红遮阳帽，青色2x2x1短袖球衣印白色几何三角形胸章无商标Logo，黄色1x2x1实心方柱右臂缠绕发光红色加速弹簧Speed Coil）"
     },
     {
       "id": "brookhaven-hoodie",

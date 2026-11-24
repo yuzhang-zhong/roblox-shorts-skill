@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.5.0
+
+- Replaced all tilted-square emblems in `assets/icon.svg`, character presets, prompt templates, and 3D renders with an original trademark-free geometric triangle badge, and removed the top-left `9:16 R6` HUD label from `assets/icon.svg`.
+- Eliminated circular Lego floor stud patterns across all 3D preview scenes and prompt tails, adding smooth per-scene architectural surfaces (`WoodPlanks`, `CheckerTile`, `Asphalt`, `HotelCarpet`, `Lava`, `Grass`, `Runway`, `SandCourt`) and rich multi-part 3D props across all 12 animated shorts.
+- Added dedicated English (`docs/pipeline.en.svg`) and Chinese (`docs/pipeline.zh.svg`) Agent Skill workflow diagrams, and updated all 10 READMEs under the **Roblox Style Video Skill** title with explicit Agent Skill documentation.
+
 ## 1.4.0
 
 - Added 6 new Roblox short-video story templates and 3D animated scene packages (`disaster-survival`, `brookhaven-chase`, `doors-horror`, `sword-duel`, `school-panic`, `red-light-game`), bringing the showcase to 12 animated 9:16 examples.

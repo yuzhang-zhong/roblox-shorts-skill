@@ -1,8 +1,10 @@
 <div align="center">
 
-# Roblox Style Video
+# Roblox Style Video Skill
 
-Planifiez des shorts 9:16 style Roblox : proportions R6 verrouillées, prompts par plan et aperçu 3D local.
+Un **Agent Skill** (`SKILL.md` + guides + CLI sans d?pendances) pour Claude Code, Cursor, GitHub Copilot et Codex permettant de planifier des shorts 9:16 de style Roblox, verrouiller les proportions R6, compiler les prompts par plan et pr?visualiser en 3D localement.
+
+[![Agent Skill](https://img.shields.io/badge/Agent_Skill-SKILL.md-0f172a?style=flat-square)](../../SKILL.md) [![MIT License](https://img.shields.io/badge/License-MIT-2563eb?style=flat-square)](../../LICENSE)
 
 [English](../../README.md) · [简体中文](../../README.zh-CN.md) · [繁體中文](README.zh-TW.md) · [日本語](README.ja.md) · [한국어](README.ko.md) · [Español](README.es.md) · **Français** · [Deutsch](README.de.md) · [Português](README.pt-BR.md) · [Русский](README.ru.md)
 
@@ -42,6 +44,12 @@ Planifiez des shorts 9:16 style Roblox : proportions R6 verrouillées, prompts p
 
 ## Démarrage rapide
 
+<p align="center">
+  <img src="../../docs/pipeline.en.svg" width="860" alt="Roblox Style Video Skill workflow" />
+</p>
+
+Clonez cet Agent Skill dans le dossier skills de votre agent pour activer [`SKILL.md`](../../SKILL.md) et ses scripts CLI :
+
 ```bash
 git clone https://github.com/yuzhang-zhong/roblox-style-video.git ~/.codex/skills/roblox-style-video
 ```
@@ -60,3 +68,5 @@ node scripts/render_preview.mjs --only tornado,chase,doors
 
 - [`SKILL.md`](../../SKILL.md) · [`scripts/shot_compiler.mjs`](../../scripts/shot_compiler.mjs) · [`scripts/avatar_spec.mjs`](../../scripts/avatar_spec.mjs) · [`scripts/drift_check.mjs`](../../scripts/drift_check.mjs) · [`scripts/render_preview.mjs`](../../scripts/render_preview.mjs)
 - [`references/avatar-geometry-and-materials.md`](../../references/avatar-geometry-and-materials.md) · [`references/model-prompt-playbook.md`](../../references/model-prompt-playbook.md) · [`references/rescue-and-anti-drift.md`](../../references/rescue-and-anti-drift.md) · [`references/viral-archetypes-catalog.md`](../../references/viral-archetypes-catalog.md) · [`LICENSE`](../../LICENSE)
+
+Agent Skill open-source ind?pendant utilisant un embl?me triangulaire original, sans affiliation avec Roblox Corporation.

@@ -359,8 +359,8 @@ const TEMPLATES = {
     titleEn: "Natural Disaster Survival: Tornado Tower",
     defaultRig: "r6",
     defaultMaterial: "smooth-plastic",
-    subjectEn: "an authentic R6 blocky Classic Guest-style avatar wearing a plain unbranded red baseball cap and black varsity stripe jacket with flush 1x2x1 blocky legs (zero brand logos)",
-    subjectZh: "头戴纯色无标红棒球帽、身穿黑底白条纹2x2x1运动夹克与并拢1x2x1方柱长裤的R6游客风小人（无任何品牌商标Logo）",
+    subjectEn: "an authentic R6 blocky Classic Guest-style avatar wearing a plain unbranded red baseball cap and black jacket with a white geometric triangle chest emblem and flush 1x2x1 blocky legs (zero brand logos)",
+    subjectZh: "头戴纯色无标红棒球帽、身穿黑底白色几何三角形胸章2x2x1夹克与并拢1x2x1方柱长裤的R6游客风小人（无任何品牌商标Logo）",
     shots: [
       {
         role: "Hook / 黄金前3秒",

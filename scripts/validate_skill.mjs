@@ -45,6 +45,8 @@ const requiredFiles = [
   ".cursor-plugin/plugin.json",
   "assets/icon.svg",
   "docs/pipeline.svg",
+  "docs/pipeline.en.svg",
+  "docs/pipeline.zh.svg",
   "references/avatar-geometry-and-materials.md",
   "references/model-prompt-playbook.md",
   "references/rescue-and-anti-drift.md",
@@ -161,7 +163,7 @@ if (versions.size !== 1) {
 }
 
 const firstSentence =
-  "Generate Roblox-style R6 and blocky avatar short videos with locked stud proportions, 9:16 storyboards, and model-specific prompts.";
+  "Agent Skill to generate Roblox-style R6 and blocky avatar 9:16 short videos with locked proportions, storyboards, and model-specific prompts.";
 for (const [label, desc] of [
   ["package.json", pkg.description],
   [".claude-plugin/plugin.json", claudePlugin.description],
@@ -171,6 +173,12 @@ for (const [label, desc] of [
   if (desc !== firstSentence) {
     fail(`Description mismatch in ${label}: ${desc}`);
   }
+}
+
+const iconSvg = readUtf8("assets/icon.svg");
+const renderSrc = readUtf8("scripts/render_preview.mjs");
+if (/rotate\(14 256 300\)/.test(iconSvg) || /9:16 R6/.test(iconSvg) || /roblox_r/.test(renderSrc)) {
+  fail("Trademark/icon check failed: found deprecated tilted-square emblem or 9:16 R6 badge");
 }
 
 const skillWords = skillText.split(/\s+/).filter(Boolean).length;

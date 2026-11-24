@@ -5,12 +5,12 @@
     "name": "yuzhang-zhong",
     "url": "https://github.com/yuzhang-zhong"
   },
-  "description": "Install Roblox Style Skill as a Claude plugin.",
+  "description": "Install Roblox Style Video Skill as a Claude plugin.",
   "plugins": [
     {
       "name": "roblox-style-video",
       "source": "./",
-      "description": "Generate Roblox-style R6 and blocky avatar short videos with locked stud proportions, 9:16 storyboards, and model-specific prompts.",
+      "description": "Agent Skill to generate Roblox-style R6 and blocky avatar 9:16 short videos with locked proportions, storyboards, and model-specific prompts.",
       "homepage": "https://github.com/yuzhang-zhong/roblox-style-video",
       "repository": "https://github.com/yuzhang-zhong/roblox-style-video",
       "license": "MIT",

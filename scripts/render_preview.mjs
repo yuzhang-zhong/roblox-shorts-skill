@@ -1,15 +1,15 @@
 #!/usr/bin/env node
 /**
  * render_preview.mjs
- * Authentic Roblox R6 / Blocky 3D Studio & Brookhaven Set Renderer.
+ * Blocky R6 / Chibi Studio 3D Preview & Set Renderer (Zero External Dependencies).
  *
- * Implements canonical Roblox R6 proportions (1 stud = 0.34 world units):
+ * Implements canonical blocky proportions (1 stud = 0.34 world units):
  * - Torso: 2.0 x 2.0 x 1.0 studs with 0.08 stud bevel + 3D collar/hoodie/pocket/cuffs
- * - Neck:  0.55 x 0.20 x 0.55 studs
- * - Head:  Classic Roblox SpecialMesh barrel cylinder (R=0.64, H=1.24 studs, 0.30 stud deep bevel)
- * - Hair:  Tapered 3D NURBS-style capsule strand clumps (messy swept bangs, pigtails, cap, crown)
- * - Limbs: Flush 0.98 x 2.0 x 0.98 stud solid rectangular arms & legs with short-sleeve/shoe steps
- * - World: Bright Brookhaven/Studio daytime lighting, 3D studded baseplate, and soft sun shadows.
+ * - Emblem: Original trademark-free geometric triangle / star / heart / moon badges
+ * - Head:  1:1 barrel-beveled cylinder (R=0.64, H=1.24 studs) with flat 2D face decals
+ * - Hair:  Full-coverage scalp dome + sculpted 3D hair locks / twin pigtails / 5-point crown
+ * - Limbs: Flush 0.98 x 2.0 x 0.98 stud solid rectangular arms & legs + multi-part hand props
+ * - World: Smooth architectural floor shaders (zero raised circular Lego floor bumps) + multi-part 3D props.
  */
 
 import fs from "node:fs";
@@ -102,7 +102,34 @@ function sdLegoCClaw(p, scale = 1.0) {
   return Math.max(dOuter, -Math.min(dInner, dSlot)) * scale;
 }
 
-// ---------- Roblox Face Atlas Evaluator ----------
+class SceneHit {
+  constructor() {
+    this.d = 1e9;
+    this.color = [128, 128, 128];
+    this.roughness = 0.35;
+    this.id = 0;
+  }
+  add(d, color, roughness = 0.35, id = 1) {
+    if (d < this.d) {
+      this.d = d;
+      this.color = color;
+      this.roughness = roughness;
+      this.id = id;
+    }
+    return this;
+  }
+  merge(other) {
+    if (other && other.d < this.d) {
+      this.d = other.d;
+      this.color = other.color;
+      this.roughness = other.roughness;
+      this.id = other.id;
+    }
+    return this;
+  }
+}
+
+// ---------- 2D Face Decal Evaluator ----------
 function evalFaceDecal(u, v, expression = "smile") {
   if (Math.abs(u) > 0.44 || Math.abs(v) > 0.44) return null;
 
@@ -221,7 +248,7 @@ function getCastPreset(theme = "theo") {
       hairStyle: "bald",
       hairColor: null,
       hat: "cap_red",
-      details: ["roblox_r", "cuffs"]
+      details: ["triangle", "cuffs"]
     };
   }
   if (theme === "bacon") {
@@ -263,10 +290,10 @@ function getCastPreset(theme = "theo") {
       pants: [30, 41, 59],
       shoes: [248, 250, 252],
       sleeves: "short",
-      hairStyle: "under_cap",
-      hairColor: [72, 42, 24],
+      hairStyle: "bald",
+      hairColor: null,
       hat: "cap_red",
-      details: ["roblox_r", "speed_coil"]
+      details: ["triangle", "speed_coil"]
     };
   }
   if (theme === "y2k") {
@@ -326,7 +353,7 @@ function getCastPreset(theme = "theo") {
       hairStyle: "bald",
       hairColor: null,
       hat: "cap_navy",
-      details: ["cuffs", "moon"]
+      details: ["cuffs", "star_gold"]
     };
   }
   return {
@@ -346,41 +373,86 @@ function getCastPreset(theme = "theo") {
 
 function evalHairSDF(pHead, style, driftMode) {
   if (!style || style === "bald" || driftMode !== "none") return 1e9;
-  const dBound = len3(pHead) - 0.38;
+  const dBound = len3(pHead) - 0.42;
   if (dBound > 0.08) return dBound;
 
-  // Solid hair cap covering the entire upper dome of the barrel head (up to y = 0.248)
-  const qCap = { x: pHead.x / 0.242, y: (pHead.y - 0.11) / 0.142, z: (pHead.z + 0.01) / 0.242 };
+  // Full scalp dome that seals the crown & stops cleanly above the eyebrows
+  const qCap = { x: pHead.x / 0.252, y: (pHead.y - 0.155) / 0.128, z: (pHead.z - 0.01) / 0.256 };
   let d = (len3(qCap) - 1.0) * 0.16;
-  d = Math.max(d, -(pHead.y - 0.05 + pHead.z * 0.18));
+  d = Math.max(d, -(pHead.y - 0.115 - pHead.z * 0.14));
 
   if (style === "messy") {
+    const bangs = sdRoundBox(rotX(sub3(pHead, v3(0, 0.218, 0.155)), 0.18), v3(0.205, 0.042, 0.085), 0.032);
+    d = Math.min(d, bangs);
     const strands = [
-      [v3(-0.13, 0.22, 0.04), v3(-0.15, 0.13, 0.235), 0.064, 0.032],
-      [v3(-0.04, 0.23, 0.05), v3(-0.05, 0.12, 0.245), 0.068, 0.034],
-      [v3(0.05, 0.23, 0.05), v3(0.07, 0.12, 0.245), 0.068, 0.034],
-      [v3(0.14, 0.21, 0.04), v3(0.17, 0.14, 0.225), 0.062, 0.030],
-      [v3(-0.08, 0.22, -0.02), v3(-0.13, 0.27, -0.05), 0.065, 0.032],
-      [v3(0.05, 0.22, -0.02), v3(0.10, 0.28, -0.04), 0.068, 0.032],
-      [v3(-0.21, 0.14, 0.02), v3(-0.235, 0.01, 0.05), 0.052, 0.026],
-      [v3(0.21, 0.14, 0.02), v3(0.235, 0.01, 0.05), 0.052, 0.026]
+      [v3(-0.14, 0.23, 0.05), v3(-0.15, 0.165, 0.235), 0.066, 0.038],
+      [v3(-0.04, 0.24, 0.06), v3(-0.04, 0.158, 0.245), 0.070, 0.040],
+      [v3(0.06, 0.24, 0.06), v3(0.07, 0.162, 0.242), 0.068, 0.038],
+      [v3(0.15, 0.22, 0.05), v3(0.16, 0.170, 0.228), 0.064, 0.036],
+      [v3(-0.07, 0.23, -0.02), v3(-0.12, 0.275, -0.05), 0.065, 0.034],
+      [v3(0.06, 0.23, -0.02), v3(0.11, 0.28, -0.04), 0.065, 0.034],
+      [v3(-0.215, 0.15, 0.02), v3(-0.238, 0.02, 0.05), 0.054, 0.028],
+      [v3(0.215, 0.15, 0.02), v3(0.238, 0.02, 0.05), 0.054, 0.028]
     ];
     for (const [a, b, r1, r2] of strands) {
       d = Math.min(d, sdTaperedCapsule(pHead, a, b, r1, r2));
     }
   } else if (style === "pigtails") {
+    const bangs = sdRoundBox(rotX(sub3(pHead, v3(0, 0.218, 0.158)), 0.16), v3(0.20, 0.040, 0.082), 0.030);
+    d = Math.min(d, bangs);
     const strands = [
-      [v3(-0.11, 0.21, 0.06), v3(-0.12, 0.13, 0.24), 0.056, 0.032],
-      [v3(0.0, 0.22, 0.06), v3(0.0, 0.13, 0.245), 0.060, 0.034],
-      [v3(0.11, 0.21, 0.06), v3(0.12, 0.13, 0.24), 0.056, 0.032],
-      [v3(-0.23, 0.12, -0.02), v3(-0.35, -0.14, -0.04), 0.075, 0.035],
-      [v3(0.23, 0.12, -0.02), v3(0.35, -0.14, -0.04), 0.075, 0.035]
+      [v3(-0.235, 0.13, -0.02), v3(-0.36, -0.15, -0.03), 0.082, 0.046],
+      [v3(0.235, 0.13, -0.02), v3(0.36, -0.15, -0.03), 0.082, 0.046]
     ];
     for (const [a, b, r1, r2] of strands) {
       d = Math.min(d, sdTaperedCapsule(pHead, a, b, r1, r2));
     }
   }
   return d;
+}
+
+function evalHandPropSDF(hit, pArmLocal, propType) {
+  if (!propType) return;
+  if (propType === "mug") {
+    const pm = sub3(pArmLocal, v3(0, -0.46, 0.22));
+    hit.add(sdRoundedCylinder(pm, 0.10, 0.018, 0.13), [239, 68, 68], 0.18, 8);
+    hit.add(sdRoundedCylinder(sub3(pm, v3(0, 0.115, 0)), 0.082, 0.008, 0.022), [68, 36, 20], 0.35, 8);
+    const pHandle = rotY(sub3(pm, v3(0.095, 0, 0)), Math.PI / 2);
+    const dHandle = Math.max(
+      sdRoundedCylinder(rotX(pHandle, Math.PI / 2), 0.068, 0.012, 0.018),
+      -sdRoundedCylinder(rotX(pHandle, Math.PI / 2), 0.040, 0.008, 0.04)
+    );
+    hit.add(dHandle, [255, 255, 255], 0.22, 8);
+  } else if (propType === "cola") {
+    const pc = sub3(pArmLocal, v3(0, -0.46, 0.21));
+    const dCan = sdRoundedCylinder(pc, 0.092, 0.018, 0.14);
+    const col = Math.abs(pc.y) < 0.048 ? [239, 68, 68] : [146, 64, 14];
+    hit.add(dCan, col, 0.16, 8);
+    hit.add(sdRoundedCylinder(sub3(pc, v3(0, 0.135, 0)), 0.084, 0.008, 0.014), [226, 232, 240], 0.12, 8);
+  } else if (propType === "boba") {
+    const pb = sub3(pArmLocal, v3(0, -0.46, 0.22));
+    hit.add(sdRoundedCylinder(pb, 0.092, 0.015, 0.125), [251, 182, 206], 0.16, 8);
+    hit.add(sdSphere(sub3(pb, v3(0, 0.11, 0)), 0.09), [255, 255, 255], 0.14, 8);
+    hit.add(sdRoundedCylinder(rotZ(sub3(pb, v3(0.015, 0.19, 0)), -0.18), 0.018, 0.004, 0.085), [56, 189, 248], 0.2, 8);
+  } else if (propType === "flashlight") {
+    // Extends forward along -Y of arm when armPitch > 0 (+1.15)
+    const pf = sub3(pArmLocal, v3(0, -0.60, 0.03));
+    hit.add(sdRoundedCylinder(pf, 0.054, 0.012, 0.14), [51, 65, 85], 0.28, 8);
+    hit.add(sdRoundedCylinder(sub3(pf, v3(0, -0.14, 0)), 0.082, 0.014, 0.045), [30, 41, 59], 0.22, 8);
+    hit.add(sdRoundedCylinder(sub3(pf, v3(0, -0.185, 0)), 0.068, 0.008, 0.012), [254, 240, 138], 0.03, 8);
+  } else if (propType === "sword") {
+    // Tilted -1.25 around X so +Y of sword points UP-AND-FORWARD when armPitch > 0 (+1.15..+1.35)
+    const ps = rotX(sub3(pArmLocal, v3(0, -0.50, 0.05)), -1.25);
+    hit.add(sdRoundedCylinder(sub3(ps, v3(0, -0.05, 0)), 0.034, 0.008, 0.09), [29, 78, 216], 0.30, 8);
+    hit.add(sdSphere(sub3(ps, v3(0, -0.15, 0)), 0.044), [250, 204, 21], 0.16, 8);
+    hit.add(sdRoundBox(sub3(ps, v3(0, 0.05, 0)), v3(0.145, 0.026, 0.038), 0.010), [250, 204, 21], 0.16, 8);
+    hit.add(sdRoundBox(sub3(ps, v3(0, 0.40, 0)), v3(0.038, 0.34, 0.015), 0.007), [226, 232, 240], 0.10, 8);
+  } else if (propType === "pencil") {
+    const pp = rotZ(rotX(sub3(pArmLocal, v3(0, -0.50, 0.20)), 1.15), 0.35);
+    hit.add(sdRoundedCylinder(pp, 0.024, 0.005, 0.14), [250, 204, 21], 0.28, 8);
+    hit.add(sdRoundedCylinder(sub3(pp, v3(0, -0.15, 0)), 0.025, 0.006, 0.028), [244, 114, 182], 0.32, 8);
+    hit.add(sdTaperedCapsule(pp, v3(0, 0.14, 0), v3(0, 0.20, 0), 0.024, 0.005), [30, 41, 59], 0.35, 8);
+  }
 }
 
 export function evalAvatarSDF(pWorld, cfg = {}) {
@@ -398,7 +470,11 @@ export function evalAvatarSDF(pWorld, cfg = {}) {
     expression = "smile",
     theme = "theo",
     driftMode = "none",
-    hasMug = false
+    hasMug = false,
+    handPropL = null,
+    handPropR = null,
+    backProp = null,
+    detachRightArm = false
   } = cfg;
 
   const pal = getCastPreset(theme);
@@ -408,25 +484,12 @@ export function evalAvatarSDF(pWorld, cfg = {}) {
   }
   p = rotY(p, -yaw);
 
-  const dBound = len3(p) - 2.15;
-  if (dBound > 0.2) {
+  const dBound = len3(p) - 2.35;
+  if (dBound > 0.22) {
     return { d: dBound, color: [0, 0, 0], roughness: 0.5, id: 0 };
   }
 
-  let bestD = 1e9;
-  let bestColor = pal.top;
-  let bestRough = 0.32;
-  let bestId = 1;
-
-  const addPart = (d, color, rough = 0.32, id = 1) => {
-    if (d < bestD) {
-      bestD = d;
-      bestColor = color;
-      bestRough = rough;
-      bestId = id;
-    }
-  };
-
+  const hit = new SceneHit();
   const bevel = driftMode === "minecraft-voxel" ? 0.002 : 0.028;
 
   const pWaist = rotX(sub3(p, v3(0, -0.16, 0)), -waistPitch);
@@ -435,13 +498,22 @@ export function evalAvatarSDF(pWorld, cfg = {}) {
   // 1. Torso (2.0 x 2.0 x 1.0 studs)
   const pTorso = sub3(pUpper, v3(0, 0.18, 0));
   const dTorso = sdRoundBox(pTorso, v3(0.34, 0.34, 0.17), bevel);
-  if (dTorso < bestD) {
+  if (dTorso < hit.d) {
     let col = pal.top;
-    if (pal.details.includes("roblox_r") && pTorso.z > 0.13) {
-      const rx = pTorso.x * 0.96 - (pTorso.y - 0.04) * 0.26;
-      const ry = pTorso.x * 0.26 + (pTorso.y - 0.04) * 0.96;
-      if (Math.abs(rx) < 0.115 && Math.abs(ry) < 0.115) {
-        col = Math.abs(rx) < 0.04 && Math.abs(ry) < 0.04 ? pal.top : [255, 255, 255];
+    // Original trademark-free upright white geometric TRIANGLE chest badge
+    if (pal.details.includes("triangle") && pTorso.z > 0.13) {
+      const ty = 0.175 - pTorso.y;
+      if (ty >= 0 && ty <= 0.215 && Math.abs(pTorso.x) <= ty * 0.58) {
+        col = [248, 250, 252];
+      }
+    }
+    if (pal.details.includes("star_gold") && pTorso.z > 0.13) {
+      const sx = pTorso.x + 0.15;
+      const sy = pTorso.y - 0.12;
+      const ang = Math.atan2(sy, sx);
+      const starR = 0.048 + 0.022 * Math.cos(ang * 5);
+      if (Math.hypot(sx, sy) < starR) {
+        col = [250, 204, 21];
       }
     }
     if (pal.details.includes("heart") && pTorso.z > 0.13) {
@@ -458,35 +530,44 @@ export function evalAvatarSDF(pWorld, cfg = {}) {
         col = [253, 224, 71];
       }
     }
-    addPart(dTorso, col, 0.42, 2);
+    hit.add(dTorso, col, 0.42, 2);
   }
 
   if (pal.details.includes("hood")) {
     const dHood = sdRoundBox(sub3(pUpper, v3(0, 0.51, -0.06)), v3(0.24, 0.065, 0.14), 0.035);
-    addPart(dHood, pal.trim, 0.45, 2);
+    hit.add(dHood, pal.trim, 0.45, 2);
     const dStrL = sdRoundedCylinder(sub3(pUpper, v3(-0.065, 0.39, 0.175)), 0.014, 0.005, 0.095);
     const dStrR = sdRoundedCylinder(sub3(pUpper, v3(0.065, 0.39, 0.175)), 0.014, 0.005, 0.095);
-    addPart(Math.min(dStrL, dStrR), pal.accent, 0.35, 3);
+    hit.add(Math.min(dStrL, dStrR), pal.accent, 0.35, 3);
   }
   if (pal.details.includes("kangaroo")) {
     const dKanga = sdRoundBox(sub3(pUpper, v3(0, -0.02, 0.165)), v3(0.20, 0.085, 0.022), 0.015);
-    addPart(dKanga, pal.trim, 0.48, 2);
+    hit.add(dKanga, pal.trim, 0.48, 2);
+  }
+
+  if (backProp === "backpack_purple") {
+    const pBag = sub3(pUpper, v3(0, 0.18, -0.26));
+    hit.add(sdRoundBox(pBag, v3(0.23, 0.25, 0.11), 0.035), [168, 85, 247], 0.32, 3);
+    hit.add(sdRoundBox(sub3(pBag, v3(0, -0.07, -0.095)), v3(0.16, 0.11, 0.045), 0.022), [192, 132, 252], 0.28, 3);
+    hit.add(sdRoundBox(sub3(pBag, v3(0, 0.26, 0)), v3(0.07, 0.03, 0.025), 0.01), [250, 204, 21], 0.2, 3);
+  } else if (backProp === "jetpack") {
+    const pjL = sub3(pUpper, v3(-0.12, 0.20, -0.25));
+    const pjR = sub3(pUpper, v3(0.12, 0.20, -0.25));
+    hit.add(Math.min(sdRoundedCylinder(pjL, 0.085, 0.02, 0.22), sdRoundedCylinder(pjR, 0.085, 0.02, 0.22)), [241, 245, 249], 0.22, 3);
+    hit.add(Math.min(sdRoundedCylinder(sub3(pjL, v3(0, -0.22, 0)), 0.055, 0.01, 0.03), sdRoundedCylinder(sub3(pjR, v3(0, -0.22, 0)), 0.055, 0.01, 0.03)), [251, 146, 60], 0.08, 3);
   }
 
   // 2. Neck
-  const dNeck = sdRoundedCylinder(sub3(pUpper, v3(0, 0.53, 0)), 0.095, 0.015, 0.045);
-  addPart(dNeck, pal.skin, 0.35, 4);
+  hit.add(sdRoundedCylinder(sub3(pUpper, v3(0, 0.53, 0)), 0.095, 0.015, 0.045), pal.skin, 0.35, 4);
 
   // 3. Head
   const pHeadLocal = rotY(rotX(sub3(pUpper, v3(0, 0.75, 0)), -headPitch), -headYaw);
-  let dHead;
-  if (driftMode === "minecraft-voxel") {
-    dHead = sdRoundBox(pHeadLocal, v3(0.24, 0.24, 0.24), 0.002);
-  } else {
-    dHead = sdRoundedCylinder(pHeadLocal, 0.222, 0.082, 0.212);
-  }
+  const dHead =
+    driftMode === "minecraft-voxel"
+      ? sdRoundBox(pHeadLocal, v3(0.24, 0.24, 0.24), 0.002)
+      : sdRoundedCylinder(pHeadLocal, 0.222, 0.082, 0.212);
 
-  if (dHead < bestD) {
+  if (dHead < hit.d) {
     let hCol = pal.skin;
     if (driftMode === "minecraft-voxel") {
       const vx = Math.floor((pHeadLocal.x + 2) * 10);
@@ -502,74 +583,82 @@ export function evalAvatarSDF(pWorld, cfg = {}) {
       const decal = evalFaceDecal(u, v, expression);
       if (decal) hCol = decal;
     }
-    addPart(dHead, hCol, 0.28, 4);
+    hit.add(dHead, hCol, 0.28, 4);
   }
 
   if (driftMode === "human-fingers") {
-    const dNose = sdRoundBox(sub3(pHeadLocal, v3(0, 0.0, 0.25)), v3(0.038, 0.058, 0.075), 0.02);
-    addPart(dNose, [235, 165, 130], 0.35, 4);
+    hit.add(sdRoundBox(sub3(pHeadLocal, v3(0, 0.0, 0.25)), v3(0.038, 0.058, 0.075), 0.02), [235, 165, 130], 0.35, 4);
   }
   if (driftMode === "lego-studs") {
     const dStud = sdRoundedCylinder(sub3(pHeadLocal, v3(0, 0.255, 0)), 0.115, 0.012, 0.065);
     const dShL = sdRoundedCylinder(sub3(pUpper, v3(-0.51, 0.56, 0)), 0.075, 0.01, 0.05);
     const dShR = sdRoundedCylinder(sub3(pUpper, v3(0.51, 0.56, 0)), 0.075, 0.01, 0.05);
-    addPart(Math.min(dStud, dShL, dShR), [250, 204, 21], 0.18, 4);
+    hit.add(Math.min(dStud, dShL, dShR), [250, 204, 21], 0.18, 4);
   }
 
   if (driftMode === "none") {
     if (pal.hairColor) {
       const dHair = evalHairSDF(pHeadLocal, pal.hairStyle, driftMode);
-      addPart(dHair, pal.hairColor, 0.34, 5);
+      hit.add(dHair, pal.hairColor, 0.34, 5);
+      if (pal.hairStyle === "pigtails") {
+        const dTieL = sdSphere(sub3(pHeadLocal, v3(-0.23, 0.13, -0.01)), 0.048);
+        const dTieR = sdSphere(sub3(pHeadLocal, v3(0.23, 0.13, -0.01)), 0.048);
+        hit.add(Math.min(dTieL, dTieR), [244, 114, 182], 0.22, 5);
+      }
     }
     if (pal.hat === "cap_red") {
-      const dDome = sdRoundedCylinder(sub3(pHeadLocal, v3(0, 0.15, 0)), 0.238, 0.065, 0.085);
-      const dBrim = sdRoundBox(rotX(sub3(pHeadLocal, v3(0, 0.11, 0.19)), 0.12), v3(0.18, 0.018, 0.12), 0.012);
-      addPart(Math.min(dDome, dBrim), [225, 38, 38], 0.32, 5);
+      const dDome = sdRoundedCylinder(sub3(pHeadLocal, v3(0, 0.165, 0)), 0.246, 0.075, 0.105);
+      const dBrim = sdRoundBox(rotX(sub3(pHeadLocal, v3(0, 0.105, 0.20)), 0.12), v3(0.185, 0.020, 0.125), 0.012);
+      hit.add(Math.min(dDome, dBrim), [225, 38, 38], 0.30, 5);
     } else if (pal.hat === "hardhat_yellow") {
-      const dDome = sdRoundedCylinder(sub3(pHeadLocal, v3(0, 0.16, 0)), 0.248, 0.08, 0.095);
-      const dRidge = sdRoundBox(sub3(pHeadLocal, v3(0, 0.25, 0)), v3(0.035, 0.025, 0.22), 0.01);
-      const dBrim = sdRoundedCylinder(sub3(pHeadLocal, v3(0, 0.10, 0.03)), 0.275, 0.015, 0.018);
-      addPart(Math.min(dDome, dRidge, dBrim), [250, 204, 21], 0.20, 5);
+      const dDome = sdRoundedCylinder(sub3(pHeadLocal, v3(0, 0.17, 0)), 0.252, 0.085, 0.105);
+      const dRidge = sdRoundBox(sub3(pHeadLocal, v3(0, 0.265, 0)), v3(0.036, 0.028, 0.22), 0.012);
+      const dBrim = sdRoundedCylinder(sub3(pHeadLocal, v3(0, 0.10, 0.03)), 0.278, 0.015, 0.018);
+      hit.add(Math.min(dDome, dRidge, dBrim), [250, 204, 21], 0.20, 5);
     } else if (pal.hat === "crown") {
-      const dRing = Math.max(
-        sdRoundedCylinder(sub3(pHeadLocal, v3(0, 0.23, 0)), 0.155, 0.015, 0.055),
-        -sdRoundedCylinder(sub3(pHeadLocal, v3(0, 0.24, 0)), 0.12, 0.01, 0.08)
+      const dBase = Math.max(
+        sdRoundedCylinder(sub3(pHeadLocal, v3(0, 0.235, 0.01)), 0.158, 0.012, 0.035),
+        -sdRoundedCylinder(sub3(pHeadLocal, v3(0, 0.245, 0.01)), 0.122, 0.008, 0.055)
       );
-      addPart(dRing, [250, 204, 21], 0.16, 5);
+      let dSpikes = dBase;
+      for (let k = 0; k < 5; k++) {
+        const a = (k * Math.PI * 2) / 5 + Math.PI / 2;
+        const bx = Math.cos(a) * 0.138;
+        const bz = Math.sin(a) * 0.138 + 0.01;
+        dSpikes = Math.min(dSpikes, sdTaperedCapsule(pHeadLocal, v3(bx, 0.24, bz), v3(bx * 1.06, 0.325, bz * 1.06), 0.034, 0.012));
+      }
+      hit.add(dSpikes, [250, 204, 21], 0.14, 5);
     } else if (pal.hat === "toque_white") {
-      const dBand = sdRoundedCylinder(sub3(pHeadLocal, v3(0, 0.19, 0)), 0.225, 0.02, 0.055);
-      const dPuff = sdRoundedCylinder(sub3(pHeadLocal, v3(0, 0.30, 0)), 0.26, 0.075, 0.11);
-      addPart(Math.min(dBand, dPuff), [255, 255, 255], 0.28, 5);
+      const dBand = sdRoundedCylinder(sub3(pHeadLocal, v3(0, 0.19, 0)), 0.228, 0.02, 0.058);
+      const dPuff = sdRoundedCylinder(sub3(pHeadLocal, v3(0, 0.31, 0)), 0.268, 0.082, 0.115);
+      hit.add(Math.min(dBand, dPuff), [255, 255, 255], 0.28, 5);
     } else if (pal.hat === "cap_navy") {
-      const dDome = sdRoundedCylinder(sub3(pHeadLocal, v3(0, 0.16, 0)), 0.242, 0.055, 0.09);
-      const dBrim = sdRoundBox(rotX(sub3(pHeadLocal, v3(0, 0.10, 0.19)), 0.14), v3(0.18, 0.018, 0.12), 0.012);
-      addPart(dDome, [30, 58, 138], 0.32, 5);
-      addPart(dBrim, [15, 23, 42], 0.20, 5);
+      const dDome = sdRoundedCylinder(sub3(pHeadLocal, v3(0, 0.168, 0)), 0.248, 0.068, 0.102);
+      const dBrim = sdRoundBox(rotX(sub3(pHeadLocal, v3(0, 0.10, 0.20)), 0.14), v3(0.185, 0.020, 0.125), 0.012);
+      const dBadge = sdSphere(sub3(pHeadLocal, v3(0, 0.18, 0.238)), 0.032);
+      hit.add(dDome, [30, 58, 138], 0.32, 5);
+      hit.add(dBrim, [15, 23, 42], 0.20, 5);
+      hit.add(dBadge, [250, 204, 21], 0.14, 5);
     }
   }
 
   // 5. Left & Right Arms
   for (const side of [-1, 1]) {
+    if (side === 1 && detachRightArm) continue;
     const pitch = side < 0 ? armLPitch : armRPitch;
     const pShoulder = sub3(pUpper, v3(side * 0.51, 0.38, 0));
     const pArmLocal = rotX(pShoulder, pitch);
     const pArm = sub3(pArmLocal, v3(0, -0.20, 0));
 
     if (pal.sleeves === "long") {
-      const dSleeve = sdRoundBox(sub3(pArm, v3(0, 0.05, 0)), v3(0.164, 0.28, 0.164), bevel * 0.85);
-      addPart(dSleeve, pal.top, 0.42, 6);
-      const dCuff = sdRoundBox(sub3(pArm, v3(0, -0.21, 0)), v3(0.168, 0.032, 0.168), 0.012);
-      addPart(dCuff, pal.trim, 0.45, 6);
-      const dHand = sdRoundBox(sub3(pArm, v3(0, -0.28, 0)), v3(0.158, 0.065, 0.158), bevel * 0.8);
-      addPart(dHand, pal.skin, 0.32, 7);
+      hit.add(sdRoundBox(sub3(pArm, v3(0, 0.05, 0)), v3(0.164, 0.28, 0.164), bevel * 0.85), pal.top, 0.42, 6);
+      hit.add(sdRoundBox(sub3(pArm, v3(0, -0.21, 0)), v3(0.168, 0.032, 0.168), 0.012), pal.trim, 0.45, 6);
+      hit.add(sdRoundBox(sub3(pArm, v3(0, -0.28, 0)), v3(0.158, 0.065, 0.158), bevel * 0.8), pal.skin, 0.32, 7);
     } else if (pal.sleeves === "short") {
-      const dShortSleeve = sdRoundBox(sub3(pArm, v3(0, 0.22, 0)), v3(0.172, 0.135, 0.172), bevel * 0.85);
-      addPart(dShortSleeve, pal.top, 0.42, 6);
-      const dBareArm = sdRoundBox(sub3(pArm, v3(0, -0.02, 0)), v3(0.162, 0.32, 0.162), bevel * 0.85);
-      addPart(dBareArm, pal.skin, 0.32, 6);
+      hit.add(sdRoundBox(sub3(pArm, v3(0, 0.22, 0)), v3(0.172, 0.135, 0.172), bevel * 0.85), pal.top, 0.42, 6);
+      hit.add(sdRoundBox(sub3(pArm, v3(0, -0.02, 0)), v3(0.162, 0.32, 0.162), bevel * 0.85), pal.skin, 0.32, 6);
     } else {
-      const dBareArm = sdRoundBox(pArm, v3(0.162, 0.34, 0.162), bevel * 0.85);
-      addPart(dBareArm, pal.skin, 0.32, 6);
+      hit.add(sdRoundBox(pArm, v3(0.162, 0.34, 0.162), bevel * 0.85), pal.skin, 0.32, 6);
     }
 
     if (pal.details.includes("speed_coil") && side === 1 && driftMode === "none") {
@@ -579,7 +668,7 @@ export function evalAvatarSDF(pWorld, cfg = {}) {
           sdRoundedCylinder(pCoil, 0.195, 0.018, 0.026),
           -sdRoundedCylinder(pCoil, 0.155, 0.01, 0.05)
         );
-        addPart(dCoil, [255, 45, 65], 0.08, 8);
+        hit.add(dCoil, [255, 45, 65], 0.08, 8);
       }
     }
 
@@ -590,16 +679,14 @@ export function evalAvatarSDF(pWorld, cfg = {}) {
         const pf = sub3(pHandEnd, v3(f * 0.04, -0.11, 0));
         dFingers = Math.min(dFingers, sdRoundBox(pf, v3(0.014, 0.07, 0.015), 0.007));
       }
-      addPart(dFingers, [235, 165, 130], 0.35, 7);
+      hit.add(dFingers, [235, 165, 130], 0.35, 7);
     } else if (driftMode === "lego-studs") {
-      const dClaw = sdLegoCClaw(sub3(pArmLocal, v3(0, -0.60, 0)), 0.85);
-      addPart(dClaw, [250, 204, 21], 0.18, 7);
+      hit.add(sdLegoCClaw(sub3(pArmLocal, v3(0, -0.60, 0)), 0.85), [250, 204, 21], 0.18, 7);
     }
 
-    if (hasMug && side === 1 && driftMode === "none") {
-      const pMug = sub3(pArmLocal, v3(0, -0.46, 0.22));
-      const dMug = sdRoundedCylinder(pMug, 0.105, 0.018, 0.135);
-      addPart(dMug, [239, 68, 68], 0.18, 8);
+    if (driftMode === "none") {
+      const activeProp = side < 0 ? handPropL : handPropR || (hasMug ? "mug" : null);
+      evalHandPropSDF(hit, pArmLocal, activeProp);
     }
   }
 
@@ -609,17 +696,101 @@ export function evalAvatarSDF(pWorld, cfg = {}) {
     const pHip = sub3(p, v3(side * 0.172, -0.16, 0));
     const pLegLocal = rotX(pHip, pitch);
     const pLeg = sub3(pLegLocal, v3(0, -0.34, 0));
-    const dLeg = sdRoundBox(pLeg, v3(0.165, 0.34, 0.168), bevel * 0.85);
-    addPart(dLeg, pal.pants, 0.45, 9);
+    hit.add(sdRoundBox(pLeg, v3(0.165, 0.34, 0.168), bevel * 0.85), pal.pants, 0.45, 9);
 
     if (pal.shoes) {
       const pShoe = sub3(pLegLocal, v3(0, -0.63, 0.012));
-      const dShoe = sdRoundBox(pShoe, v3(0.172, 0.058, 0.182), 0.022);
-      addPart(dShoe, pal.shoes, 0.32, 10);
+      hit.add(sdRoundBox(pShoe, v3(0.172, 0.058, 0.182), 0.022), pal.shoes, 0.32, 10);
     }
   }
 
-  return { d: bestD, color: bestColor, roughness: bestRough, id: bestId };
+  return hit;
+}
+
+// ---------- Smooth Architectural Floor Shaders (Zero Circular Lego Floor Studs!) ----------
+function evalFloorSurface(fp, floorStyle, col1, col2, phase = 0.5) {
+  if (floorStyle === "wood_planks") {
+    const plankW = 0.26;
+    const row = Math.floor(fp.z / plankW);
+    const fz = fp.z / plankW - row;
+    const stagger = (row & 1) * 0.52;
+    const colIdx = Math.floor((fp.x + stagger) / 1.05);
+    const fx = (fp.x + stagger) / 1.05 - colIdx;
+    const isSeam = fz < 0.045 || fz > 0.955 || fx < 0.022 || fx > 0.978;
+    const grain = Math.sin(fp.x * 16 + row * 2.7) * 5;
+    const base = (row + colIdx) & 1 ? col1 : col2;
+    const mul = isSeam ? 0.76 : 1.0;
+    return [clamp((base[0] + grain) * mul, 0, 255), clamp((base[1] + grain * 0.8) * mul, 0, 255), clamp((base[2] + grain * 0.5) * mul, 0, 255)];
+  }
+  if (floorStyle === "checker_tile") {
+    const sz = 0.42;
+    const gx = Math.floor(fp.x / sz);
+    const gz = Math.floor(fp.z / sz);
+    const fx = fp.x / sz - gx;
+    const fz = fp.z / sz - gz;
+    const isGrout = fx < 0.035 || fx > 0.965 || fz < 0.035 || fz > 0.965;
+    const base = (gx + gz) & 1 ? col1 : col2;
+    return isGrout ? [base[0] * 0.84, base[1] * 0.84, base[2] * 0.84] : base;
+  }
+  if (floorStyle === "asphalt_street") {
+    if (fp.z < -0.58) {
+      const isCurb = fp.z > -0.68;
+      if (isCurb) return [203, 213, 225];
+      const seam = Math.abs((fp.x / 0.65) - Math.round(fp.x / 0.65)) < 0.025;
+      return seam ? [168, 178, 192] : [214, 222, 232];
+    }
+    if (Math.abs(fp.z - 0.16) < 0.042 && Math.abs(((fp.x + phase * 0.4) % 0.68 + 0.68) % 0.68 - 0.34) < 0.19) {
+      return [250, 204, 21];
+    }
+    if (Math.abs(fp.z + 0.52) < 0.028) return [241, 245, 249];
+    const noise = Math.sin(fp.x * 23) * Math.cos(fp.z * 23) * 3;
+    return [col1[0] + noise, col1[1] + noise, col1[2] + noise];
+  }
+  if (floorStyle === "hotel_carpet") {
+    const ax = Math.abs(fp.x);
+    if (ax > 0.82) {
+      const seam = Math.abs((fp.x / 0.22) - Math.round(fp.x / 0.22)) < 0.05;
+      return seam ? [68, 36, 18] : [96, 52, 26];
+    }
+    if (ax > 0.73) return [234, 179, 8];
+    const pat = Math.abs(Math.sin(fp.x * 9) * Math.sin(fp.z * 9)) > 0.55;
+    return pat ? [153, 27, 27] : [127, 29, 29];
+  }
+  if (floorStyle === "molten_lava") {
+    const w = Math.sin(fp.x * 3.8 + phase * 6.28) + Math.cos(fp.z * 3.4 - phase * 6.28);
+    if (w > 0.65) return [254, 240, 138];
+    if (w > -0.25) return [249, 115, 22];
+    return [220, 38, 38];
+  }
+  if (floorStyle === "grass_lawn") {
+    const patch = Math.sin(fp.x * 2.6) * Math.cos(fp.z * 2.4) > 0;
+    return patch ? col1 : col2;
+  }
+  if (floorStyle === "runway_gloss") {
+    const ax = Math.abs(fp.x);
+    if (ax > 0.88 && ax < 0.98) return [244, 114, 182];
+    if (ax >= 0.98) return [30, 27, 75];
+    const panel = Math.floor(fp.z / 0.65) & 1;
+    return panel ? col1 : col2;
+  }
+  if (floorStyle === "sand_court") {
+    if (fp.z > 0.44 && fp.z < 0.64) {
+      const cx = Math.floor(fp.x / 0.16);
+      const cz = Math.floor((fp.z - 0.44) / 0.10);
+      return (cx + cz) & 1 ? [248, 250, 252] : [225, 29, 72];
+    }
+    if (Math.abs(Math.abs(fp.x) - 1.15) < 0.03) return [254, 249, 195];
+    const ripple = Math.sin(fp.x * 5 + fp.z * 7) * 4;
+    return [col1[0] + ripple, col1[1] + ripple, col1[2] + ripple];
+  }
+  const cellSize = floorStyle === "plaza_pavers" ? 0.48 : 0.34;
+  const gx = Math.floor(fp.x / cellSize);
+  const gz = Math.floor(fp.z / cellSize);
+  const fx = fp.x / cellSize - gx - 0.5;
+  const fz = fp.z / cellSize - gz - 0.5;
+  const base = (gx + gz) & 1 ? col1 : col2;
+  const isSeam = Math.abs(fx) > 0.468 || Math.abs(fz) > 0.468;
+  return isSeam ? [base[0] * 0.88, base[1] * 0.88, base[2] * 0.88] : base;
 }
 
 export function render3DViewport(width, height, sceneFn, camCfg = {}) {
@@ -629,9 +800,11 @@ export function render3DViewport(width, height, sceneFn, camCfg = {}) {
   const fov = camCfg.fov || 1.9;
   const bgTop = camCfg.bgTop || [125, 198, 252];
   const bgBot = camCfg.bgBot || [224, 242, 254];
-  const floorY = camCfg.floorY ?? -0.86;
-  const floorColor1 = camCfg.floorColor1 || [148, 163, 184];
-  const floorColor2 = camCfg.floorColor2 || [132, 148, 170];
+  const floorY = camCfg.floorY === undefined ? -0.86 : camCfg.floorY;
+  const floorStyle = camCfg.floorStyle || "studio_grid";
+  const floorPhase = camCfg.phase ?? 0.5;
+  const floorColor1 = camCfg.floorColor1 || [154, 168, 188];
+  const floorColor2 = camCfg.floorColor2 || [142, 156, 178];
 
   const fw = norm3(sub3(ta, ro));
   const rt = norm3(cross3(fw, v3(0, 1, 0)));
@@ -653,7 +826,7 @@ export function render3DViewport(width, height, sceneFn, camCfg = {}) {
   const calcSoftShadow = (orig, dir) => {
     const h1 = sceneFn(add3(orig, mul3(dir, 0.12))).d;
     const h2 = sceneFn(add3(orig, mul3(dir, 0.28))).d;
-    return clamp(0.55 + 0.45 * Math.min(h1 * 8.0, h2 * 4.5), 0.55, 1.0);
+    return clamp(0.56 + 0.44 * Math.min(h1 * 8.0, h2 * 4.5), 0.56, 1.0);
   };
 
   for (let py = 0; py < height; py++) {
@@ -671,18 +844,26 @@ export function render3DViewport(width, height, sceneFn, camCfg = {}) {
       const ocy = ro.y - 0.05;
       const ocz = ro.z;
       const bSphere = ocx * rd.x + ocy * rd.y + ocz * rd.z;
-      const cSphere = ocx * ocx + ocy * ocy + ocz * ocz - 2.45 * 2.45;
+      const cSphere = ocx * ocx + ocy * ocy + ocz * ocz - 4.4 * 4.4;
       const disc = bSphere * bSphere - cSphere;
 
       let t = disc > 0 ? Math.max(0.2, -bSphere - Math.sqrt(disc)) : 99.0;
-      const tMax = disc > 0 ? Math.min(8.0, -bSphere + Math.sqrt(disc)) : 0.0;
+      let tMax = disc > 0 ? Math.min(9.5, -bSphere + Math.sqrt(disc)) : 0.0;
+      let tf = -1;
+      if (floorY !== null && rd.y < -0.001) {
+        tf = (floorY - ro.y) / rd.y;
+        if (tf > 0 && tf < tMax) {
+          tMax = tf + 0.01;
+        }
+      }
+
       let hit = null;
       if (disc > 0 && tMax > 0.2) {
-        for (let step = 0; step < 36; step++) {
+        for (let step = 0; step < 34; step++) {
           if (t > tMax) break;
           const pos = add3(ro, mul3(rd, t));
           const res = sceneFn(pos);
-          if (res.d < 0.003) {
+          if (res.d < 0.0045) {
             hit = { pos, res, t };
             break;
           }
@@ -690,63 +871,59 @@ export function render3DViewport(width, height, sceneFn, camCfg = {}) {
         }
       }
 
-      if (hit) {
-        const N = calcNormal(hit.pos, hit.res.d);
-        const V = mul3(rd, -1);
-        const sh = dot3(N, keyLight) > 0 ? calcSoftShadow(add3(hit.pos, mul3(N, 0.015)), keyLight) : 0.55;
-        const keyDiff = Math.max(0, dot3(N, keyLight)) * sh;
-        const fillDiff = Math.max(0, dot3(N, fillLight)) * 0.28;
-        const skyAmb = 0.36 + 0.14 * (0.5 + 0.5 * N.y);
-        const aoSample = sceneFn(add3(hit.pos, mul3(N, 0.065))).d / 0.065;
-        const ao = clamp(0.68 + 0.32 * aoSample, 0.62, 1.0);
-
-        const lighting = (skyAmb + keyDiff * 0.62 + fillDiff) * ao;
-
-        const H = norm3(add3(keyLight, V));
+      if (hit && (tf <= 0 || hit.t <= tf)) {
         const rough = hit.res.roughness ?? 0.32;
-        const specPow = rough < 0.25 ? 36 : 18;
-        const specStrength = (rough < 0.25 ? 0.38 : 0.16) * sh;
-        const spec = Math.pow(Math.max(0, dot3(N, H)), specPow) * specStrength;
+        if (rough <= 0.06) {
+          const base = hit.res.color;
+          r = clamp(base[0] * 1.06 + 18, 0, 255);
+          g = clamp(base[1] * 1.06 + 18, 0, 255);
+          b = clamp(base[2] * 1.06 + 18, 0, 255);
+        } else if (hit.res.id === 19 || hit.res.id === 38 || hit.res.id === 44 || hit.res.id === 63 || hit.res.id === 89 || hit.res.id === 114 || hit.res.id === 121) {
+          // Flat architectural backdrop walls: fast analytical +Z normal lighting (skips 4 extra SDF evaluations per pixel!)
+          const sh = calcSoftShadow(v3(hit.pos.x, hit.pos.y, hit.pos.z + 0.03), keyLight);
+          const wallLit = 0.52 + 0.44 * sh;
+          const base = hit.res.color;
+          r = clamp(base[0] * wallLit, 0, 255);
+          g = clamp(base[1] * wallLit, 0, 255);
+          b = clamp(base[2] * wallLit, 0, 255);
+        } else {
+          const N = calcNormal(hit.pos, hit.res.d);
+          const V = mul3(rd, -1);
+          const sh = dot3(N, keyLight) > 0 ? calcSoftShadow(add3(hit.pos, mul3(N, 0.015)), keyLight) : 0.56;
+          const keyDiff = Math.max(0, dot3(N, keyLight)) * sh;
+          const fillDiff = Math.max(0, dot3(N, fillLight)) * 0.28;
+          const skyAmb = 0.38 + 0.14 * (0.5 + 0.5 * N.y);
+          const aoSample = sceneFn(add3(hit.pos, mul3(N, 0.065))).d / 0.065;
+          const ao = clamp(0.68 + 0.32 * aoSample, 0.62, 1.0);
 
-        const fresnel = Math.pow(1 - Math.max(0, dot3(N, V)), 3.0);
-        const rim = fresnel * Math.max(0, dot3(N, rimLight)) * 0.28;
+          const lighting = (skyAmb + keyDiff * 0.62 + fillDiff) * ao;
 
-        const base = hit.res.color;
-        r = clamp(base[0] * lighting + 255 * spec + 245 * rim, 0, 255);
-        g = clamp(base[1] * lighting + 252 * spec + 248 * rim, 0, 255);
-        b = clamp(base[2] * lighting + 245 * spec + 255 * rim, 0, 255);
-      } else if (rd.y < -0.001 && floorY !== null) {
-        const tf = (floorY - ro.y) / rd.y;
-        if (tf > 0 && tf < 14.0) {
-          const fp = add3(ro, mul3(rd, tf));
-          const cellSize = 0.34;
-          const gx = Math.floor(fp.x / cellSize);
-          const gz = Math.floor(fp.z / cellSize);
-          const fx = fp.x / cellSize - gx - 0.5;
-          const fz = fp.z / cellSize - gz - 0.5;
+          const H = norm3(add3(keyLight, V));
+          const specPow = rough < 0.25 ? 36 : 18;
+          const specStrength = (rough < 0.25 ? 0.36 : 0.15) * sh;
+          const spec = Math.pow(Math.max(0, dot3(N, H)), specPow) * specStrength;
 
-          let tileCol = (gx + gz) & 1 ? [...floorColor1] : [...floorColor2];
+          const fresnel = Math.pow(1 - Math.max(0, dot3(N, V)), 3.0);
+          const rim = fresnel * Math.max(0, dot3(N, rimLight)) * 0.26;
 
-          const isGridBorder = Math.abs(fx) > 0.45 || Math.abs(fz) > 0.45;
-          const studR = Math.hypot(fx, fz);
-          if (isGridBorder) {
-            tileCol = [tileCol[0] * 0.84, tileCol[1] * 0.84, tileCol[2] * 0.84];
-          } else if (studR < 0.23 && studR > 0.17) {
-            const bump = fx + fz > 0 ? 1.14 : 0.82;
-            tileCol = [tileCol[0] * bump, tileCol[1] * bump, tileCol[2] * bump];
-          } else if (studR <= 0.17) {
-            tileCol = [tileCol[0] * 1.05, tileCol[1] * 1.05, tileCol[2] * 1.05];
-          }
-
-          const floorShadow =
-            Math.abs(fp.x) < 1.35 && Math.abs(fp.z) < 1.35
-              ? calcSoftShadow(v3(fp.x, floorY + 0.02, fp.z), keyLight)
-              : 1.0;
-          const fade = Math.exp(-0.065 * tf * tf);
-          r = mix(r, clamp(tileCol[0] * floorShadow, 0, 255), fade);
-          g = mix(g, clamp(tileCol[1] * floorShadow, 0, 255), fade);
-          b = mix(b, clamp(tileCol[2] * floorShadow, 0, 255), fade);
+          const base = hit.res.color;
+          r = clamp(base[0] * lighting + 255 * spec + 245 * rim, 0, 255);
+          g = clamp(base[1] * lighting + 252 * spec + 248 * rim, 0, 255);
+          b = clamp(base[2] * lighting + 245 * spec + 255 * rim, 0, 255);
         }
+      } else if (tf > 0 && tf < 14.0 && floorY !== null) {
+        const fp = add3(ro, mul3(rd, tf));
+        const tileCol = evalFloorSurface(fp, floorStyle, floorColor1, floorColor2, floorPhase);
+        const floorShadow =
+          floorStyle === "molten_lava"
+            ? 1.0
+            : Math.abs(fp.x) < 1.8 && Math.abs(fp.z) < 1.6
+            ? calcSoftShadow(v3(fp.x, floorY + 0.02, fp.z), keyLight)
+            : 1.0;
+        const fade = Math.exp(-0.052 * tf * tf);
+        r = mix(r, clamp(tileCol[0] * floorShadow, 0, 255), fade);
+        g = mix(g, clamp(tileCol[1] * floorShadow, 0, 255), fade);
+        b = mix(b, clamp(tileCol[2] * floorShadow, 0, 255), fade);
       }
 
       const idx = (py * width + px) * 4;
@@ -815,58 +992,141 @@ export function encodePNG(width, height, rgba) {
   ]);
 }
 
+// ---------- Multi-Part Architectural & Prop Helpers (100% Lipschitz-Continuous SDF Bounds!) ----------
+function addBedroomBackdrop(hit, p) {
+  if (p.z - (-0.75) > hit.d) return;
+  const dWall = sdRoundBox(sub3(p, v3(0, 0.35, -1.05)), v3(2.8, 1.55, 0.06), 0.01);
+  if (dWall < hit.d) {
+    const wCol = p.y < -0.22 ? [241, 245, 249] : [219, 234, 254];
+    hit.add(dWall, wCol, 0.48, 19);
+  }
+  const pw = sub3(p, v3(-0.78, 0.56, -0.97));
+  if (len3(pw) - 0.62 <= hit.d) {
+    hit.add(sdRoundBox(pw, v3(0.38, 0.38, 0.03), 0.015), [255, 255, 255], 0.30, 19);
+    const dGlass = sdRoundBox(sub3(pw, v3(0, 0, 0.014)), v3(0.32, 0.32, 0.022), 0.008);
+    if (dGlass < hit.d) {
+      const isMullion = Math.abs(pw.x) < 0.026 || Math.abs(pw.y) < 0.026;
+      hit.add(dGlass, isMullion ? [255, 255, 255] : [125, 211, 252], isMullion ? 0.30 : 0.05, 19);
+    }
+  }
+  const ps = sub3(p, v3(0.76, 0.62, -0.90));
+  if (len3(ps) - 0.52 <= hit.d) {
+    hit.add(sdRoundBox(ps, v3(0.34, 0.028, 0.11), 0.01), [180, 124, 78], 0.38, 19);
+    hit.add(sdRoundBox(sub3(ps, v3(-0.16, 0.11, 0)), v3(0.038, 0.085, 0.08), 0.008), [239, 68, 68], 0.32, 19);
+    hit.add(sdRoundBox(sub3(ps, v3(-0.07, 0.12, 0)), v3(0.038, 0.095, 0.08), 0.008), [59, 130, 246], 0.32, 19);
+    hit.add(sdRoundBox(sub3(ps, v3(0.02, 0.10, 0)), v3(0.038, 0.075, 0.08), 0.008), [16, 185, 129], 0.32, 19);
+  }
+}
+
+function addDetailedDesk(hit, p, deskY = -0.40) {
+  const pd = sub3(p, v3(0, deskY, 0.42));
+  if (len3(pd) - 1.65 > hit.d) return;
+  hit.add(sdRoundBox(pd, v3(1.32, 0.052, 0.56), 0.02), [176, 120, 74], 0.38, 20);
+  hit.add(sdRoundBox(sub3(pd, v3(0, -0.09, -0.02)), v3(1.22, 0.055, 0.48), 0.015), [146, 96, 56], 0.42, 20);
+  const lx = Math.abs(pd.x) - 1.14;
+  const lz = Math.abs(pd.z) - 0.42;
+  hit.add(sdRoundBox(v3(lx, pd.y + 0.26, lz), v3(0.055, 0.24, 0.055), 0.012), [226, 232, 240], 0.30, 20);
+  hit.add(sdRoundBox(sub3(pd, v3(0.72, -0.09, 0.47)), v3(0.14, 0.02, 0.02), 0.008), [250, 204, 21], 0.18, 20);
+  const pm = sub3(pd, v3(0.86, 0.14, -0.06));
+  if (len3(pm) - 0.22 <= hit.d) {
+    hit.add(sdRoundedCylinder(pm, 0.085, 0.015, 0.095), [239, 68, 68], 0.18, 20);
+    hit.add(sdRoundedCylinder(sub3(pm, v3(0, 0.085, 0)), 0.068, 0.006, 0.015), [68, 36, 20], 0.35, 20);
+  }
+}
+
+function addTwinBellAlarmClock(hit, p, center, squash = 1.0, tilt = 0.0) {
+  const q0 = sub3(p, center);
+  if (len3(q0) - 0.38 > hit.d) return;
+  const q = rotZ(q0, tilt);
+  const qs = v3(q.x, q.y / squash, q.z);
+  const qCyl = rotX(qs, Math.PI / 2);
+  hit.add(sdRoundedCylinder(qCyl, 0.175, 0.026, 0.072), [225, 29, 72], 0.22, 21);
+  // Note: rotX(qs, PI/2) maps +Z (toward camera) to -Y in cylinder coords!
+  const dDial = sdRoundedCylinder(add3(qCyl, v3(0, 0.018, 0)), 0.138, 0.008, 0.068);
+  if (dDial < hit.d) {
+    let dCol = [255, 255, 255];
+    if (qs.z > 0.05) {
+      const r = Math.hypot(qs.x, qs.y);
+      const handMin = Math.abs(qs.x) < 0.015 && qs.y > -0.01 && qs.y < 0.105;
+      const handHr = Math.abs(qs.x * 0.65 - qs.y * 0.76) < 0.016 && qs.x < 0.01 && qs.y < 0.01 && r < 0.084;
+      const ticks = r > 0.106 && r < 0.126 && (Math.abs(qs.x) < 0.015 || Math.abs(qs.y) < 0.015);
+      if (handMin || handHr || r < 0.022 || ticks) dCol = [15, 23, 42];
+    }
+    hit.add(dDial, dCol, 0.18, 22);
+  }
+  const dBellL = sdSphere(sub3(q, v3(-0.125, 0.195 * squash, 0)), 0.058);
+  const dBellR = sdSphere(sub3(q, v3(0.125, 0.195 * squash, 0)), 0.058);
+  hit.add(Math.min(dBellL, dBellR), [250, 204, 21], 0.12, 23);
+  hit.add(sdRoundedCylinder(sub3(q, v3(0, 0.205 * squash, 0)), 0.016, 0.005, 0.045), [226, 232, 240], 0.16, 23);
+  const dFootL = sdRoundedCylinder(rotZ(sub3(q, v3(-0.10, -0.175 * squash, 0)), 0.45), 0.022, 0.006, 0.042);
+  const dFootR = sdRoundedCylinder(rotZ(sub3(q, v3(0.10, -0.175 * squash, 0)), -0.45), 0.022, 0.006, 0.042);
+  hit.add(Math.min(dFootL, dFootR), [226, 232, 240], 0.20, 23);
+}
+
+function addOpenLaptop(hit, p, baseCenter) {
+  const q = sub3(p, baseCenter);
+  if (len3(q) - 0.62 > hit.d) return;
+  const dBase = sdRoundBox(q, v3(0.35, 0.020, 0.24), 0.012);
+  if (dBase < hit.d) {
+    let bCol = [226, 232, 240];
+    if (q.y > 0.012 && Math.abs(q.x) < 0.28 && q.z > -0.16 && q.z < 0.08) {
+      const kx = Math.abs(((q.x + 1) * 18) % 1 - 0.5);
+      const kz = Math.abs(((q.z + 1) * 18) % 1 - 0.5);
+      if (kx < 0.38 && kz < 0.38) bCol = [30, 41, 59];
+    }
+    hit.add(dBase, bCol, 0.22, 24);
+  }
+  const pScr = rotX(sub3(q, v3(0, 0.22, 0.22)), -0.22);
+  const dLid = sdRoundBox(pScr, v3(0.35, 0.22, 0.016), 0.012);
+  if (dLid < hit.d) {
+    let sCol = [51, 65, 85];
+    if (pScr.z < -0.008 && Math.abs(pScr.x) < 0.31 && Math.abs(pScr.y) < 0.18) {
+      sCol = [224, 242, 254];
+      if (Math.abs(pScr.x) < 0.24 && (Math.abs(pScr.y - 0.08) < 0.026 || Math.abs(pScr.y) < 0.026 || Math.abs(pScr.y + 0.08) < 0.026)) {
+        sCol = [244, 63, 94];
+      }
+    }
+    hit.add(dLid, sCol, pScr.z < -0.008 ? 0.06 : 0.25, 25);
+  }
+}
+
 export function buildAlarmMeltdownScene(shotIndex, phase = 0.5) {
   const bedroomBgTop = [147, 197, 253];
   const bedroomBgBot = [241, 245, 249];
-  const woodFloor1 = [194, 142, 92];
-  const woodFloor2 = [178, 126, 78];
-
-  const evalAlarmClock = (p, center, squash = 1.0, tilt = 0.0) => {
-    const q = rotZ(sub3(p, center), tilt);
-    const rBody = 0.17;
-    const qCyl = rotX(v3(q.x, q.y / squash, q.z), Math.PI / 2);
-    const dBody = sdRoundedCylinder(qCyl, rBody, 0.025, 0.075);
-    const dDial = sdRoundedCylinder(sub3(qCyl, v3(0, 0.02, 0)), rBody * 0.78, 0.01, 0.078);
-    const dBellL = sdSphere(sub3(q, v3(-0.12, 0.19 * squash, 0)), 0.055);
-    const dBellR = sdSphere(sub3(q, v3(0.12, 0.19 * squash, 0)), 0.055);
-    let best = { d: dBody, color: [239, 68, 68], roughness: 0.22, id: 21 };
-    if (dDial < best.d) best = { d: dDial, color: [255, 255, 255], roughness: 0.2, id: 22 };
-    if (Math.min(dBellL, dBellR) < best.d) {
-      best = { d: Math.min(dBellL, dBellR), color: [250, 204, 21], roughness: 0.12, id: 23 };
-    }
-    return best;
-  };
+  const woodFloor1 = [198, 146, 96];
+  const woodFloor2 = [182, 130, 82];
 
   if (shotIndex === 0) {
     const shake = Math.sin(phase * Math.PI * 8) * 0.05;
-    const popY = mix(-0.18, 0.04, smoothstep(0, 0.65, phase));
+    const popY = mix(-0.16, 0.04, smoothstep(0, 0.65, phase));
     return {
       cam: {
-        ro: v3(0.12 + shake * 0.3, 0.52, 2.35 - phase * 0.18),
-        ta: v3(0, 0.34, 0.15),
-        fov: 1.95,
+        ro: v3(0.12 + shake * 0.25, 0.54, 2.52 - phase * 0.16),
+        ta: v3(0, 0.30, 0.12),
+        fov: 1.9,
         bgTop: bedroomBgTop,
         bgBot: bedroomBgBot,
         floorY: -0.86,
+        floorStyle: "wood_planks",
         floorColor1: woodFloor1,
         floorColor2: woodFloor2
       },
       sceneFn: (p) => {
-        const av = evalAvatarSDF(p, {
-          pos: v3(0.14, popY, -0.12),
-          yaw: -0.14,
-          armLPitch: -0.85,
-          armRPitch: -0.85,
-          expression: "shocked",
-          theme: "theo"
-        });
-        if (p.y > 0.38 && av.d < p.y - 0.22) return av;
-        const dDesk = sdRoundBox(sub3(p, v3(0, -0.36, 0.42)), v3(1.35, 0.06, 0.65), 0.02);
-        const clk = evalAlarmClock(p, v3(-0.28, -0.11 + Math.abs(shake) * 1.1, 0.48), 1.0, shake * 2.0);
-        let best = av;
-        if (dDesk < best.d) best = { d: dDesk, color: [161, 108, 68], roughness: 0.42, id: 20 };
-        if (clk.d < best.d) best = clk;
-        return best;
+        const hit = new SceneHit();
+        hit.merge(
+          evalAvatarSDF(p, {
+            pos: v3(0.18, popY, -0.10),
+            yaw: -0.16,
+            armLPitch: -0.85,
+            armRPitch: -0.85,
+            expression: "shocked",
+            theme: "theo"
+          })
+        );
+        addBedroomBackdrop(hit, p);
+        addDetailedDesk(hit, p, -0.38);
+        addTwinBellAlarmClock(hit, p, v3(-0.34, -0.13 + Math.abs(shake) * 1.1, 0.48), 1.0, shake * 2.0);
+        return hit;
       }
     };
   }
@@ -874,34 +1134,36 @@ export function buildAlarmMeltdownScene(shotIndex, phase = 0.5) {
   if (shotIndex === 1) {
     const slamT = smoothstep(0.1, 0.65, phase);
     const armAngle = mix(-2.0, -0.82, slamT);
-    const squash = mix(1.0, 0.42, slamT);
+    const squash = mix(1.0, 0.45, slamT);
     return {
       cam: {
-        ro: v3(0.95, 0.42, 2.55),
-        ta: v3(-0.04, 0.16, 0.18),
+        ro: v3(0.88, 0.46, 2.62),
+        ta: v3(-0.02, 0.16, 0.15),
         fov: 1.9,
         bgTop: bedroomBgTop,
         bgBot: bedroomBgBot,
         floorY: -0.86,
+        floorStyle: "wood_planks",
         floorColor1: woodFloor1,
         floorColor2: woodFloor2
       },
       sceneFn: (p) => {
-        const av = evalAvatarSDF(p, {
-          pos: v3(0.22, 0.0, 0.0),
-          yaw: -0.42,
-          waistPitch: slamT * 0.18,
-          armRPitch: armAngle,
-          armLPitch: -0.25,
-          expression: "slam",
-          theme: "theo"
-        });
-        const dDesk = sdRoundBox(sub3(p, v3(0, -0.42, 0.42)), v3(1.35, 0.06, 0.65), 0.02);
-        const clk = evalAlarmClock(p, v3(-0.22, -0.24, 0.45), squash, 0);
-        let best = av;
-        if (dDesk < best.d) best = { d: dDesk, color: [161, 108, 68], roughness: 0.42, id: 20 };
-        if (clk.d < best.d) best = clk;
-        return best;
+        const hit = new SceneHit();
+        hit.merge(
+          evalAvatarSDF(p, {
+            pos: v3(0.24, 0.0, -0.02),
+            yaw: -0.38,
+            waistPitch: slamT * 0.18,
+            armRPitch: armAngle,
+            armLPitch: -0.25,
+            expression: "slam",
+            theme: "theo"
+          })
+        );
+        addBedroomBackdrop(hit, p);
+        addDetailedDesk(hit, p, -0.42);
+        addTwinBellAlarmClock(hit, p, v3(-0.24, -0.24, 0.46), squash, 0);
+        return hit;
       }
     };
   }
@@ -909,68 +1171,69 @@ export function buildAlarmMeltdownScene(shotIndex, phase = 0.5) {
   if (shotIndex === 2) {
     return {
       cam: {
-        ro: v3(Math.sin(phase * 0.6 - 0.3) * 0.42, 0.48, 2.38),
-        ta: v3(0, 0.28, 0.12),
-        fov: 1.95,
+        ro: v3(Math.sin(phase * 0.6 - 0.3) * 0.38, 0.52, 2.52),
+        ta: v3(0, 0.24, 0.12),
+        fov: 1.9,
         bgTop: bedroomBgTop,
         bgBot: bedroomBgBot,
         floorY: -0.86,
+        floorStyle: "wood_planks",
         floorColor1: woodFloor1,
         floorColor2: woodFloor2
       },
       sceneFn: (p) => {
-        const av = evalAvatarSDF(p, {
-          pos: v3(0, -0.02, -0.08),
-          yaw: 0,
-          headPitch: Math.sin(phase * Math.PI * 4) * 0.04,
-          armLPitch: -0.78,
-          armRPitch: -0.78,
-          expression: "tears",
-          theme: "theo"
-        });
-        const dDesk = sdRoundBox(sub3(p, v3(0, -0.42, 0.42)), v3(1.35, 0.06, 0.65), 0.02);
-        const dLapBase = sdRoundBox(sub3(p, v3(0, -0.33, 0.40)), v3(0.32, 0.022, 0.22), 0.012);
-        const pScreen = rotX(sub3(p, v3(0, -0.11, 0.56)), -0.24);
-        const dLapScreen = sdRoundBox(pScreen, v3(0.32, 0.21, 0.018), 0.012);
-        let best = av;
-        if (dDesk < best.d) best = { d: dDesk, color: [161, 108, 68], roughness: 0.42, id: 20 };
-        if (dLapBase < best.d) best = { d: dLapBase, color: [226, 232, 240], roughness: 0.22, id: 24 };
-        if (dLapScreen < best.d) best = { d: dLapScreen, color: [56, 189, 248], roughness: 0.12, id: 25 };
-        return best;
+        const hit = new SceneHit();
+        hit.merge(
+          evalAvatarSDF(p, {
+            pos: v3(0, -0.02, -0.10),
+            yaw: 0,
+            headPitch: Math.sin(phase * Math.PI * 4) * 0.04,
+            armLPitch: -0.78,
+            armRPitch: -0.78,
+            expression: "tears",
+            theme: "theo"
+          })
+        );
+        addBedroomBackdrop(hit, p);
+        addDetailedDesk(hit, p, -0.42);
+        addOpenLaptop(hit, p, v3(-0.04, -0.34, 0.38));
+        return hit;
       }
     };
   }
 
   const dropT = smoothstep(0.05, 0.55, phase);
   const bounce = phase > 0.55 ? Math.abs(Math.sin((phase - 0.55) * Math.PI * 5)) * 0.1 * (1 - phase) : 0;
-  const pitch90 = mix(0.1, 1.25, dropT) - bounce;
+  const pitch90 = mix(0.1, 1.22, dropT) - bounce;
   return {
     cam: {
-      ro: v3(1.05, 1.15, 2.55),
-      ta: v3(0, 0.06, 0.20),
+      ro: v3(0.95, 1.08, 2.62),
+      ta: v3(0, 0.06, 0.18),
       fov: 1.9,
       bgTop: bedroomBgTop,
       bgBot: bedroomBgBot,
       floorY: -0.86,
+      floorStyle: "wood_planks",
       floorColor1: woodFloor1,
       floorColor2: woodFloor2
     },
     sceneFn: (p) => {
-      const av = evalAvatarSDF(p, {
-        pos: v3(0, -0.02, -0.10),
-        yaw: 0,
-        waistPitch: pitch90,
-        armLPitch: -0.38,
-        armRPitch: -0.38,
-        expression: "dizzy",
-        theme: "theo"
-      });
-      const dDesk = sdRoundBox(sub3(p, v3(0, -0.42, 0.42)), v3(1.35, 0.06, 0.65), 0.02);
-      const dKeyb = sdRoundBox(sub3(p, v3(0, -0.33, 0.38)), v3(0.34, 0.025, 0.16), 0.012);
-      let best = av;
-      if (dDesk < best.d) best = { d: dDesk, color: [161, 108, 68], roughness: 0.42, id: 20 };
-      if (dKeyb < best.d) best = { d: dKeyb, color: [248, 250, 252], roughness: 0.22, id: 24 };
-      return best;
+      const hit = new SceneHit();
+      hit.merge(
+        evalAvatarSDF(p, {
+          pos: v3(0, -0.02, -0.12),
+          yaw: 0,
+          waistPitch: pitch90,
+          armLPitch: -0.38,
+          armRPitch: -0.38,
+          expression: "dizzy",
+          theme: "theo"
+        })
+      );
+      addBedroomBackdrop(hit, p);
+      addDetailedDesk(hit, p, -0.42);
+      addOpenLaptop(hit, p, v3(-0.04, -0.34, 0.42));
+      return hit;
     }
   };
 }
@@ -980,79 +1243,125 @@ export function buildObbySkyScene(shotIndex, phase = 0.5) {
   const runSwing = Math.sin(phase * Math.PI * 2) * 0.68;
   return {
     cam: {
-      ro: v3(shotIndex === 1 ? 1.35 : -0.58, 0.55 + shotIndex * 0.06, 2.75),
-      ta: v3(0, 0.06, 0),
-      fov: 1.9,
-      bgTop: [56, 189, 248],
-      bgBot: [224, 242, 254],
-      floorY: -1.28,
-      floorColor1: [241, 245, 249],
-      floorColor2: [226, 232, 240]
+      ro: v3(shotIndex === 1 ? 1.25 : -0.55, 0.56 + shotIndex * 0.05, 2.95),
+      ta: v3(0, 0.04, 0),
+      fov: 1.88,
+      bgTop: [38, 166, 242],
+      bgBot: [219, 240, 255],
+      floorY: null
     },
     sceneFn: (p) => {
-      const av = evalAvatarSDF(p, {
-        pos: v3(mix(-0.34, 0.34, phase), jumpArc, 0),
-        yaw: 0.48,
-        armLPitch: runSwing,
-        armRPitch: -runSwing,
-        legLPitch: -runSwing,
-        legRPitch: runSwing,
-        expression: shotIndex === 2 ? "shocked" : "grin",
-        theme: "obby"
-      });
-      const dPad1 = sdRoundBox(sub3(p, v3(-0.52, -0.84, 0)), v3(0.48, 0.11, 0.48), 0.03);
-      const dPad2 = sdRoundBox(sub3(p, v3(0.52, -0.68, 0)), v3(0.48, 0.11, 0.48), 0.03);
-      const dKillBrick = sdRoundBox(sub3(p, v3(0.16, -0.54, 0)), v3(0.075, 0.038, 0.44), 0.012);
-      let best = av;
-      if (dPad1 < best.d) best = { d: dPad1, color: [244, 114, 182], roughness: 0.22, id: 30 };
-      if (dPad2 < best.d) {
-        const c2 = shotIndex === 3 ? [56, 189, 248] : [74, 222, 128];
-        best = { d: dPad2, color: c2, roughness: 0.22, id: 31 };
+      const hit = new SceneHit();
+      hit.merge(
+        evalAvatarSDF(p, {
+          pos: v3(mix(-0.36, 0.36, phase), jumpArc, 0),
+          yaw: 0.48,
+          armLPitch: runSwing,
+          armRPitch: -runSwing,
+          legLPitch: -runSwing,
+          legRPitch: runSwing,
+          expression: shotIndex === 2 ? "shocked" : "grin",
+          theme: "obby",
+          backProp: "jetpack"
+        })
+      );
+      const p1 = sub3(p, v3(-0.56, -0.84, 0));
+      hit.add(sdRoundBox(p1, v3(0.50, 0.075, 0.50), 0.025), [244, 114, 182], 0.22, 30);
+      hit.add(sdRoundBox(sub3(p1, v3(0, -0.08, 0)), v3(0.46, 0.045, 0.46), 0.018), [248, 250, 252], 0.28, 30);
+
+      const p2 = sub3(p, v3(0.56, -0.68, 0));
+      const c2 = shotIndex === 3 ? [51, 65, 85] : [52, 211, 153];
+      hit.add(sdRoundBox(p2, v3(0.52, 0.075, 0.52), 0.025), c2, 0.22, 31);
+      hit.add(sdRoundBox(sub3(p2, v3(0, -0.08, 0)), v3(0.48, 0.045, 0.48), 0.018), [248, 250, 252], 0.28, 31);
+
+      if (shotIndex >= 2) {
+        const pr = sub3(p2, v3(0, 0.08, 0));
+        const dRing = Math.max(sdRoundedCylinder(pr, 0.30, 0.01, 0.014), -sdRoundedCylinder(pr, 0.21, 0.008, 0.03));
+        hit.add(dRing, [56, 189, 248], 0.05, 31);
+        const pole = sub3(p2, v3(0.36, 0.52, -0.32));
+        hit.add(sdRoundedCylinder(pole, 0.024, 0.005, 0.46), [226, 232, 240], 0.2, 31);
+        hit.add(sdSphere(sub3(pole, v3(0, 0.48, 0)), 0.045), [250, 204, 21], 0.14, 31);
+        const waveZ = Math.sin(phase * Math.PI * 4 + p.x * 6) * 0.03;
+        hit.add(sdRoundBox(sub3(pole, v3(0.16, 0.32, waveZ)), v3(0.15, 0.10, 0.016), 0.008), [34, 197, 94], 0.25, 31);
       }
-      if (shotIndex === 2 && dKillBrick < best.d) {
-        best = { d: dKillBrick, color: [255, 42, 62], roughness: 0.05, id: 32 };
+
+      if (shotIndex === 2) {
+        hit.add(sdRoundBox(sub3(p, v3(0.06, -0.54, 0)), v3(0.075, 0.042, 0.48), 0.014), [255, 42, 62], 0.04, 32);
       }
-      return best;
+
+      if (Math.min(p.z - (-0.75), p.y - (-1.10)) <= hit.d) {
+        hit.add(sdRoundBox(sub3(p, v3(-1.25, -0.35, -1.25)), v3(0.36, 0.06, 0.36), 0.02), [250, 204, 21], 0.25, 33);
+        hit.add(sdRoundBox(sub3(p, v3(1.30, 0.05, -1.35)), v3(0.36, 0.06, 0.36), 0.02), [168, 85, 247], 0.25, 33);
+        const pc1 = sub3(p, v3(-0.75, -1.35, -0.65));
+        hit.add(Math.min(sdRoundBox(pc1, v3(0.45, 0.12, 0.28), 0.08), sdRoundBox(sub3(pc1, v3(0.12, 0.10, 0)), v3(0.26, 0.11, 0.22), 0.07)), [255, 255, 255], 0.45, 34);
+        const pc2 = sub3(p, v3(0.85, -1.42, -0.85));
+        hit.add(sdRoundBox(pc2, v3(0.48, 0.12, 0.28), 0.08), [255, 255, 255], 0.45, 34);
+      }
+      return hit;
     }
   };
 }
 
 export function buildDuoComedyScene(shotIndex, phase = 0.5) {
-  const spinY = shotIndex === 1 ? phase * Math.PI * 2 : 0.20;
+  const spinY = shotIndex === 1 ? phase * Math.PI * 2 : 0.24;
+  const leftX = shotIndex === 1 ? -0.48 : -0.64;
+  const rightX = shotIndex === 1 ? 0.52 : 0.64;
   return {
     cam: {
-      ro: v3(0, 0.28, 3.15),
+      ro: v3(0, 0.30, 3.48),
       ta: v3(0, 0.06, 0),
-      fov: 1.92,
+      fov: 1.9,
       bgTop: [165, 180, 252],
       bgBot: [238, 242, 255],
       floorY: -0.86,
-      floorColor1: [148, 163, 184],
-      floorColor2: [128, 144, 168]
+      floorStyle: "plaza_pavers",
+      floorColor1: [226, 232, 240],
+      floorColor2: [208, 218, 232]
     },
     sceneFn: (p) => {
-      const leftAv = evalAvatarSDF(p, {
-        pos: v3(-0.54, 0, 0),
-        yaw: spinY,
-        armLPitch: -0.38,
-        armRPitch: -0.62,
-        expression: shotIndex === 2 ? "shocked" : shotIndex === 3 ? "deadpan" : "smirk",
-        theme: "y2k",
-        hasMug: true
-      });
-      const rightAv = evalAvatarSDF(p, {
-        pos: v3(0.48, 0, 0),
-        yaw: -0.20,
-        roll: shotIndex === 2 ? -0.22 : shotIndex === 3 ? -0.16 : 0,
-        headYaw: shotIndex === 3 ? 0.20 : 0,
-        armLPitch: 0,
-        armRPitch: 0,
-        legLPitch: 0,
-        legRPitch: 0,
-        expression: shotIndex === 3 ? "deadpan" : "smile",
-        theme: "noob"
-      });
-      return leftAv.d < rightAv.d ? leftAv : rightAv;
+      const hit = new SceneHit();
+      hit.merge(
+        evalAvatarSDF(p, {
+          pos: v3(leftX, 0, 0.05),
+          yaw: spinY,
+          armLPitch: -0.32,
+          armRPitch: -0.68,
+          expression: shotIndex === 2 ? "shocked" : shotIndex === 3 ? "deadpan" : "smirk",
+          theme: "y2k",
+          handPropR: "boba",
+          backProp: "backpack_purple"
+        })
+      );
+      hit.merge(
+        evalAvatarSDF(p, {
+          pos: v3(rightX, 0, 0),
+          yaw: -0.22,
+          roll: shotIndex === 2 ? -0.24 : shotIndex === 3 ? -0.16 : 0,
+          headYaw: shotIndex === 3 ? 0.20 : 0,
+          armLPitch: 0,
+          armRPitch: 0,
+          legLPitch: 0,
+          legRPitch: 0,
+          expression: shotIndex === 3 ? "deadpan" : "smile",
+          theme: "noob"
+        })
+      );
+      if (p.z - (-0.60) <= hit.d) {
+        hit.add(sdRoundBox(sub3(p, v3(0, 0.35, -1.18)), v3(2.8, 1.5, 0.06), 0.01), [254, 249, 242], 0.45, 38);
+        const pAwning = rotX(sub3(p, v3(-0.35, 0.98, -0.96)), 0.38);
+        const dAwn = sdRoundBox(pAwning, v3(0.95, 0.05, 0.24), 0.02);
+        if (dAwn < hit.d) {
+          const stripe = Math.floor((p.x + 2) / 0.18) & 1;
+          hit.add(dAwn, stripe ? [244, 114, 182] : [255, 255, 255], 0.32, 38);
+        }
+        hit.add(sdRoundBox(sub3(p, v3(-0.35, 0.18, -1.10)), v3(0.62, 0.62, 0.03), 0.02), [186, 230, 253], 0.14, 38);
+        const pt = sub3(p, v3(1.28, -0.64, -0.88));
+        if (len3(pt) - 0.65 <= hit.d) {
+          hit.add(sdRoundedCylinder(pt, 0.16, 0.02, 0.18), [194, 106, 62], 0.42, 39);
+          hit.add(sdSphere(sub3(pt, v3(0, 0.34, 0)), 0.24), [74, 222, 128], 0.38, 39);
+        }
+      }
+      return hit;
     }
   };
 }
@@ -1062,40 +1371,84 @@ export function buildCozyCafeScene(shotIndex, phase = 0.5) {
   const armWave = shotIndex === 3 ? -0.95 - Math.sin(phase * Math.PI * 4) * 0.25 : -0.72;
   return {
     cam: {
-      ro: v3(shotIndex === 1 ? 0.55 : -0.35, 0.52, 2.55),
+      ro: v3(shotIndex === 1 ? 0.52 : -0.32, 0.54, 2.65),
       ta: v3(0, 0.18, 0.15),
-      fov: 1.92,
+      fov: 1.9,
       bgTop: [254, 243, 199],
       bgBot: [255, 251, 235],
       floorY: -0.86,
+      floorStyle: "wood_planks",
       floorColor1: [214, 178, 138],
       floorColor2: [196, 158, 118]
     },
     sceneFn: (p) => {
-      const av = evalAvatarSDF(p, {
-        pos: v3(0, popY, -0.10),
-        yaw: shotIndex === 1 ? -0.25 : 0.12,
-        armLPitch: -0.55,
-        armRPitch: armWave,
-        expression: shotIndex === 3 ? "grin" : "smile",
-        theme: "chef",
-        hasMug: shotIndex === 2
-      });
-      // Bakery counter + Pastel tray + Golden croissant block + Floating gold coins
-      const dCounter = sdRoundBox(sub3(p, v3(0, -0.44, 0.42)), v3(1.25, 0.14, 0.45), 0.025);
-      const dTray = sdRoundBox(sub3(p, v3(-0.08, -0.28, 0.42)), v3(0.32, 0.02, 0.22), 0.012);
-      const dCroissant = sdRoundBox(rotY(sub3(p, v3(-0.08, -0.21, 0.42)), 0.35), v3(0.14, 0.055, 0.085), 0.035);
-      let best = av;
-      if (dCounter < best.d) best = { d: dCounter, color: [180, 124, 82], roughness: 0.38, id: 40 };
-      if (dTray < best.d) best = { d: dTray, color: [251, 207, 232], roughness: 0.22, id: 41 };
-      if (dCroissant < best.d) best = { d: dCroissant, color: [245, 158, 11], roughness: 0.24, id: 42 };
-      if (shotIndex === 3) {
-        for (const cx of [-0.32, 0.0, 0.32]) {
-          const dCoin = sdRoundedCylinder(rotX(sub3(p, v3(cx, 1.08 + Math.sin(phase * 6 + cx) * 0.06, 0.1)), Math.PI / 2), 0.085, 0.015, 0.025);
-          if (dCoin < best.d) best = { d: dCoin, color: [250, 204, 21], roughness: 0.12, id: 43 };
+      const hit = new SceneHit();
+      hit.merge(
+        evalAvatarSDF(p, {
+          pos: v3(0, popY, -0.12),
+          yaw: shotIndex === 1 ? -0.22 : 0.12,
+          armLPitch: -0.55,
+          armRPitch: armWave,
+          expression: shotIndex === 3 ? "grin" : "smile",
+          theme: "chef"
+        })
+      );
+      if (p.z - (-0.48) <= hit.d) {
+        hit.add(sdRoundBox(sub3(p, v3(0, 0.35, -1.02)), v3(2.8, 1.5, 0.06), 0.01), [254, 243, 199], 0.48, 44);
+        const pm = sub3(p, v3(0.68, 0.62, -0.93));
+        hit.add(sdRoundBox(pm, v3(0.42, 0.28, 0.025), 0.012), [146, 96, 56], 0.38, 44);
+        hit.add(sdRoundBox(sub3(pm, v3(0, 0, 0.015)), v3(0.36, 0.22, 0.015), 0.008), [30, 41, 59], 0.42, 44);
+        for (const lx of [-0.68, 0.68]) {
+          hit.add(sdRoundedCylinder(sub3(p, v3(lx, 1.18, -0.62)), 0.012, 0.003, 0.24), [71, 85, 105], 0.3, 44);
+          hit.add(sdRoundedCylinder(sub3(p, v3(lx, 0.96, -0.62)), 0.12, 0.03, 0.055), [251, 191, 36], 0.05, 44);
         }
       }
-      return best;
+      hit.add(sdRoundBox(sub3(p, v3(0, -0.56, 0.44)), v3(1.32, 0.26, 0.42), 0.022), [180, 124, 82], 0.38, 40);
+      hit.add(sdRoundBox(sub3(p, v3(0, -0.30, 0.44)), v3(1.36, 0.035, 0.45), 0.015), [255, 251, 235], 0.22, 40);
+
+      const pe = sub3(p, v3(-0.76, -0.09, 0.42));
+      if (len3(pe) - 0.42 <= hit.d) {
+        hit.add(sdRoundBox(pe, v3(0.20, 0.18, 0.18), 0.025), [110, 231, 183], 0.20, 45);
+        hit.add(sdRoundBox(sub3(pe, v3(0, 0.06, 0.16)), v3(0.15, 0.05, 0.04), 0.01), [226, 232, 240], 0.12, 45);
+        hit.add(sdRoundedCylinder(rotX(sub3(pe, v3(0, -0.02, 0.24)), Math.PI / 2), 0.022, 0.006, 0.08), [30, 41, 59], 0.25, 45);
+      }
+
+      const pdc = sub3(p, v3(0.76, -0.14, 0.44));
+      if (len3(pdc) - 0.40 <= hit.d) {
+        hit.add(sdRoundBox(pdc, v3(0.24, 0.13, 0.18), 0.018), [224, 242, 254], 0.10, 45);
+        hit.add(sdRoundedCylinder(sub3(pdc, v3(0, -0.03, 0)), 0.11, 0.018, 0.055), [244, 114, 182], 0.25, 45);
+      }
+
+      hit.add(sdRoundBox(sub3(p, v3(-0.08, -0.25, 0.44)), v3(0.32, 0.018, 0.22), 0.01), [251, 207, 232], 0.22, 41);
+      const pc = rotY(sub3(p, v3(-0.14, -0.19, 0.44)), 0.35);
+      if (len3(pc) - 0.24 <= hit.d) {
+        const dCr = Math.min(
+          sdRoundBox(pc, v3(0.085, 0.048, 0.062), 0.028),
+          Math.min(
+            sdRoundBox(rotY(sub3(pc, v3(-0.09, -0.005, 0.035)), 0.45), v3(0.065, 0.038, 0.048), 0.022),
+            sdRoundBox(rotY(sub3(pc, v3(0.09, -0.005, 0.035)), -0.45), v3(0.065, 0.038, 0.048), 0.022)
+          )
+        );
+        hit.add(dCr, [245, 158, 11], 0.24, 42);
+      }
+
+      const cupX = shotIndex === 2 ? mix(0.10, 0.32, phase) : 0.14;
+      const pl = sub3(p, v3(cupX, -0.15, 0.46));
+      if (len3(pl) - 0.20 <= hit.d) {
+        const dCup = sdRoundedCylinder(pl, 0.072, 0.012, 0.092);
+        const cCol = Math.abs(pl.y) < 0.038 ? [180, 124, 78] : [255, 255, 255];
+        hit.add(dCup, cCol, 0.20, 42);
+        hit.add(sdRoundedCylinder(sub3(pl, v3(0, 0.088, 0)), 0.064, 0.006, 0.012), [245, 222, 179], 0.30, 42);
+      }
+
+      if (shotIndex === 3) {
+        for (const cx of [-0.36, 0.0, 0.36]) {
+          const pc2 = rotY(sub3(p, v3(cx, 1.05 + Math.sin(phase * 6 + cx) * 0.06, 0.12)), phase * 3.14);
+          const dCoin = sdRoundedCylinder(rotX(pc2, Math.PI / 2), 0.095, 0.015, 0.026);
+          hit.add(dCoin, [250, 204, 21], 0.10, 43);
+        }
+      }
+      return hit;
     }
   };
 }
@@ -1105,31 +1458,51 @@ export function buildRunwayDropScene(shotIndex, phase = 0.5) {
   const jumpY = shotIndex === 1 ? Math.sin(phase * Math.PI) * 0.45 : 0.0;
   return {
     cam: {
-      ro: v3(shotIndex === 3 ? 0.65 : 0, shotIndex === 2 ? 0.08 : 0.28, 2.75),
-      ta: v3(0, 0.12, 0),
-      fov: 1.92,
-      bgTop: isTransformed ? [192, 132, 252] : [203, 213, 225],
-      bgBot: isTransformed ? [244, 114, 182] : [241, 245, 249],
+      ro: v3(shotIndex === 3 ? 0.58 : 0, shotIndex === 2 ? 0.10 : 0.28, 2.95),
+      ta: v3(0, 0.14, 0),
+      fov: 1.9,
+      bgTop: isTransformed ? [126, 34, 206] : [148, 163, 184],
+      bgBot: isTransformed ? [244, 114, 182] : [226, 232, 240],
       floorY: -0.86,
-      floorColor1: isTransformed ? [216, 180, 254] : [148, 163, 184],
-      floorColor2: isTransformed ? [192, 132, 252] : [128, 144, 168]
+      floorStyle: "runway_gloss",
+      floorColor1: isTransformed ? [232, 196, 255] : [186, 198, 214],
+      floorColor2: isTransformed ? [216, 172, 252] : [168, 182, 200]
     },
     sceneFn: (p) => {
-      const av = evalAvatarSDF(p, {
-        pos: v3(0, jumpY, 0),
-        yaw: shotIndex === 1 ? phase * Math.PI * 2 : shotIndex === 3 ? 0.35 : 0,
-        headPitch: shotIndex === 0 ? 0.18 : 0,
-        armLPitch: isTransformed ? -0.45 : 0,
-        armRPitch: isTransformed ? -0.85 : 0,
-        expression: shotIndex === 0 ? "deadpan" : shotIndex === 1 ? "shocked" : "smirk",
-        theme: isTransformed ? "y2k" : "base-gray"
-      });
-      const dPodium = sdRoundedCylinder(sub3(p, v3(0, -0.78, 0)), 0.72, 0.03, 0.08);
-      let best = av;
-      if (dPodium < best.d) {
-        best = { d: dPodium, color: isTransformed ? [244, 114, 182] : [226, 232, 240], roughness: 0.18, id: 50 };
+      const hit = new SceneHit();
+      hit.merge(
+        evalAvatarSDF(p, {
+          pos: v3(0, jumpY, 0.05),
+          yaw: shotIndex === 1 ? phase * Math.PI * 2 : shotIndex === 3 ? 0.32 : 0,
+          headPitch: shotIndex === 0 ? 0.16 : 0,
+          armLPitch: isTransformed ? -0.45 : 0,
+          armRPitch: isTransformed ? -0.82 : 0,
+          expression: shotIndex === 0 ? "deadpan" : shotIndex === 1 ? "shocked" : "smirk",
+          theme: isTransformed ? "y2k" : "base-gray",
+          handPropR: isTransformed ? "boba" : null
+        })
+      );
+      hit.add(sdRoundedCylinder(sub3(p, v3(0, -0.80, 0.05)), 0.78, 0.025, 0.055), [30, 41, 59], 0.22, 50);
+      hit.add(sdRoundedCylinder(sub3(p, v3(0, -0.74, 0.05)), 0.68, 0.022, 0.038), isTransformed ? [244, 114, 182] : [226, 232, 240], isTransformed ? 0.08 : 0.22, 50);
+
+      if (p.z - (-0.82) <= hit.d) {
+        const pa = sub3(p, v3(0, 0.25, -1.05));
+        const dArch = Math.max(
+          sdRoundedCylinder(rotX(pa, Math.PI / 2), 1.18, 0.03, 0.05),
+          -sdRoundedCylinder(rotX(pa, Math.PI / 2), 1.02, 0.02, 0.09),
+          -(pa.y + 0.85)
+        );
+        hit.add(dArch, isTransformed ? [56, 189, 248] : [203, 213, 225], isTransformed ? 0.04 : 0.28, 51);
+        const psb = sub3(p, v3(0, 1.22, -0.92));
+        if (len3(psb) - 0.68 <= hit.d) {
+          hit.add(sdRoundBox(psb, v3(0.58, 0.11, 0.035), 0.02), [30, 27, 75], 0.25, 52);
+          for (let i = -2; i <= 2; i++) {
+            const dStar = sdSphere(sub3(psb, v3(i * 0.20, 0, 0.035)), 0.055);
+            hit.add(dStar, isTransformed ? [250, 204, 21] : [100, 116, 139], isTransformed ? 0.04 : 0.35, 52);
+          }
+        }
       }
-      return best;
+      return hit;
     }
   };
 }
@@ -1138,304 +1511,487 @@ export function buildBurntPizzaScene(shotIndex, phase = 0.5) {
   const fallRoll = shotIndex === 3 ? smoothstep(0, 0.65, phase) * 1.38 : 0;
   return {
     cam: {
-      ro: v3(shotIndex === 3 ? -0.35 : 0, shotIndex === 1 ? 0.45 : shotIndex === 3 ? 0.55 : 0.32, shotIndex === 1 ? 2.15 : shotIndex === 3 ? 3.45 : 2.85),
-      ta: v3(shotIndex === 3 ? -0.38 : 0, shotIndex === 3 ? -0.22 : 0.16, 0.1),
-      fov: 1.92,
-      bgTop: shotIndex === 1 ? [100, 116, 139] : [186, 230, 253],
-      bgBot: shotIndex === 1 ? [148, 163, 184] : [241, 245, 249],
+      ro: v3(shotIndex === 3 ? -0.28 : 0, shotIndex === 1 ? 0.45 : shotIndex === 3 ? 0.56 : 0.36, shotIndex === 1 ? 2.25 : shotIndex === 3 ? 3.45 : 2.88),
+      ta: v3(shotIndex === 3 ? -0.25 : 0, shotIndex === 3 ? -0.18 : 0.16, 0.1),
+      fov: 1.9,
+      bgTop: shotIndex === 1 ? [51, 65, 85] : [186, 230, 253],
+      bgBot: shotIndex === 1 ? [100, 116, 139] : [241, 245, 249],
       floorY: -0.86,
-      floorColor1: [203, 213, 225],
-      floorColor2: [178, 190, 206]
+      floorStyle: "checker_tile",
+      floorColor1: [241, 245, 249],
+      floorColor2: [148, 163, 184]
     },
     sceneFn: (p) => {
-      const av = evalAvatarSDF(p, {
-        pos: v3(shotIndex === 3 ? 0.65 : 0, 0, -0.05),
-        yaw: 0,
-        roll: fallRoll,
-        armLPitch: shotIndex >= 2 ? 0.45 : -0.85,
-        armRPitch: -0.85,
-        expression: "smile",
-        theme: "bacon"
-      });
-      // Kitchen table + Silver tray + Charred pitch-black blocky pizza
-      const dTable = sdRoundBox(sub3(p, v3(0, -0.44, 0.48)), v3(1.15, 0.06, 0.45), 0.02);
-      const dTray = sdRoundedCylinder(sub3(p, v3(0, -0.35, 0.45)), 0.28, 0.015, 0.02);
-      const dPizza = sdRoundedCylinder(sub3(p, v3(0, -0.32, 0.45)), 0.23, 0.02, 0.032);
-      let best = av;
-      if (dTable < best.d) best = { d: dTable, color: [226, 232, 240], roughness: 0.32, id: 60 };
-      if (dTray < best.d) best = { d: dTray, color: [148, 163, 184], roughness: 0.18, id: 61 };
-      if (dPizza < best.d) best = { d: dPizza, color: [28, 25, 23], roughness: 0.65, id: 62 };
-      return best;
+      const hit = new SceneHit();
+      const detachArm = shotIndex === 2;
+      hit.merge(
+        evalAvatarSDF(p, {
+          pos: v3(shotIndex === 3 ? 0.62 : 0, 0, -0.06),
+          yaw: 0,
+          roll: fallRoll,
+          armLPitch: -0.85,
+          armRPitch: -0.85,
+          expression: "smile",
+          theme: "chef",
+          detachRightArm: detachArm
+        })
+      );
+      if (p.z - (-0.62) <= hit.d) {
+        hit.add(sdRoundBox(sub3(p, v3(0, 0.35, -1.08)), v3(2.8, 1.5, 0.06), 0.01), shotIndex === 1 ? [71, 85, 105] : [226, 232, 240], 0.42, 63);
+        const po = sub3(p, v3(-0.78, 0.05, -0.88));
+        if (len3(po) - 1.12 <= hit.d) {
+          hit.add(sdRoundBox(po, v3(0.46, 0.58, 0.20), 0.025), [180, 83, 52], 0.48, 63);
+          hit.add(sdRoundedCylinder(sub3(po, v3(0, 0.78, -0.02)), 0.11, 0.015, 0.25), [100, 116, 139], 0.35, 63);
+          hit.add(sdRoundBox(sub3(po, v3(0, 0.02, 0.16)), v3(0.28, 0.20, 0.08), 0.03), [24, 24, 27], 0.5, 63);
+          hit.add(sdRoundBox(sub3(po, v3(0, -0.08, 0.17)), v3(0.20, 0.06, 0.06), 0.02), [251, 146, 60], 0.04, 63);
+        }
+      }
+
+      hit.add(sdRoundBox(sub3(p, v3(0, -0.58, 0.48)), v3(1.18, 0.26, 0.42), 0.02), [203, 213, 225], 0.34, 60);
+      hit.add(sdRoundBox(sub3(p, v3(0, -0.34, 0.48)), v3(1.22, 0.035, 0.45), 0.015), [248, 250, 252], 0.22, 60);
+      hit.add(sdRoundBox(sub3(p, v3(-0.72, -0.28, 0.46)), v3(0.24, 0.028, 0.24), 0.008), [217, 164, 108], 0.45, 60);
+
+      const pp = sub3(p, v3(-0.04, -0.28, 0.46));
+      hit.add(sdRoundedCylinder(pp, 0.28, 0.014, 0.018), [148, 163, 184], 0.16, 61);
+      hit.add(sdRoundedCylinder(sub3(pp, v3(0, 0.028, 0)), 0.235, 0.024, 0.028), [38, 32, 28], 0.62, 62);
+      hit.add(sdRoundedCylinder(sub3(pp, v3(0, 0.036, 0)), 0.185, 0.012, 0.024), [20, 18, 16], 0.68, 62);
+      for (const [tx, tz] of [[-0.08, -0.05], [0.07, -0.06], [0.02, 0.08], [-0.06, 0.07]]) {
+        hit.add(sdRoundedCylinder(sub3(pp, v3(tx, 0.054, tz)), 0.038, 0.006, 0.010), [68, 28, 24], 0.55, 62);
+      }
+      if (shotIndex !== 1) {
+        for (let k = 0; k < 3; k++) {
+          const sy = 0.18 + ((phase * 0.45 + k * 0.22) % 0.65);
+          const sx = Math.sin(phase * 5 + k * 2) * 0.05;
+          hit.add(sdRoundBox(sub3(pp, v3(sx, sy, 0)), v3(0.045, 0.045, 0.045), 0.018), [148, 163, 184], 0.52, 62);
+        }
+      }
+      if (detachArm) {
+        const pa = rotY(rotZ(sub3(p, v3(0.54, -0.20, 0.48)), 1.48), 0.35);
+        hit.add(sdRoundBox(pa, v3(0.155, 0.26, 0.155), 0.022), [255, 251, 235], 0.40, 6);
+        hit.add(sdRoundBox(sub3(pa, v3(0, -0.28, 0)), v3(0.15, 0.065, 0.15), 0.02), [252, 208, 162], 0.32, 7);
+      }
+      return hit;
     }
   };
 }
 
 export function buildTornadoTowerScene(shotIndex, phase = 0.5) {
-  const sway = shotIndex === 3 ? 0 : Math.sin(phase * Math.PI * 4) * 0.08;
+  const sway = shotIndex === 3 ? 0 : Math.sin(phase * Math.PI * 4) * 0.07;
   const hopY = shotIndex === 2 ? Math.sin(phase * Math.PI) * 0.38 : 0;
   return {
     cam: {
-      ro: v3(shotIndex === 1 ? 0.65 : -0.35, 0.48, 2.95),
-      ta: v3(0, 0.12, 0),
-      fov: 1.9,
-      bgTop: shotIndex === 3 ? [56, 189, 248] : [71, 85, 105],
+      ro: v3(shotIndex === 1 ? 0.62 : -0.32, 0.48, 3.12),
+      ta: v3(0, 0.08, 0),
+      fov: 1.88,
+      bgTop: shotIndex === 3 ? [56, 189, 248] : [51, 65, 85],
       bgBot: shotIndex === 3 ? [224, 242, 254] : [148, 163, 184],
-      floorY: -1.25,
+      floorY: -1.32,
+      floorStyle: "grass_lawn",
       floorColor1: [74, 222, 128],
       floorColor2: [34, 197, 94]
     },
     sceneFn: (p) => {
-      const av = evalAvatarSDF(p, {
-        pos: v3(sway, hopY + 0.05, 0),
-        yaw: shotIndex === 0 ? -0.35 : 0.15,
-        armLPitch: shotIndex === 3 ? -2.4 : -0.65,
-        armRPitch: shotIndex === 0 ? -1.45 : -0.85,
-        legLPitch: shotIndex === 2 ? -0.45 : 0,
-        legRPitch: shotIndex === 2 ? 0.45 : 0,
-        expression: shotIndex === 3 ? "grin" : shotIndex === 2 ? "tears" : "shocked",
-        theme: "guest"
-      });
-      // Green Disaster Survival Tower Platform + Yellow Railing + Background Spinning Tornado Funnel
-      const dTower = sdRoundBox(sub3(p, v3(sway * 0.5, -0.82, 0)), v3(0.68, 0.22, 0.62), 0.025);
-      const dRail = sdRoundBox(sub3(p, v3(sway * 0.5, -0.45, 0.52)), v3(0.62, 0.05, 0.05), 0.015);
-      let best = av;
-      if (dTower < best.d) best = { d: dTower, color: [34, 197, 94], roughness: 0.32, id: 70 };
-      if (shotIndex < 2 && dRail < best.d) best = { d: dRail, color: [250, 204, 21], roughness: 0.24, id: 71 };
-      if (shotIndex < 3) {
-        const funnelR = clamp(0.12 + (p.y + 0.9) * 0.24, 0.08, 0.58);
-        const pFunnel = sub3(p, v3(-0.95 + Math.sin(p.y * 5 + phase * 10) * 0.08, 0.25, -1.15));
-        const dTornado = sdRoundedCylinder(pFunnel, funnelR, 0.04, 1.35);
-        if (dTornado < best.d) best = { d: dTornado, color: [51, 65, 85], roughness: 0.6, id: 72 };
+      const hit = new SceneHit();
+      hit.merge(
+        evalAvatarSDF(p, {
+          pos: v3(sway, hopY + 0.05, 0),
+          yaw: shotIndex === 0 ? -0.35 : 0.15,
+          armLPitch: shotIndex === 3 ? -2.4 : -0.65,
+          armRPitch: shotIndex === 0 ? -1.45 : -0.85,
+          legLPitch: shotIndex === 2 ? -0.45 : 0,
+          legRPitch: shotIndex === 2 ? 0.45 : 0,
+          expression: shotIndex === 3 ? "grin" : shotIndex === 2 ? "tears" : "shocked",
+          theme: "guest"
+        })
+      );
+      const tx = sway * 0.5;
+      const deckW = shotIndex >= 2 ? 0.42 : 0.72;
+      hit.add(sdRoundBox(sub3(p, v3(tx, -0.74, 0)), v3(deckW, 0.08, 0.62), 0.022), [34, 197, 94], 0.32, 70);
+      for (const sx of [-1, 1]) {
+        for (const sz of [-1, 1]) {
+          hit.add(sdRoundBox(sub3(p, v3(tx + sx * (deckW - 0.08), -1.06, sz * 0.48)), v3(0.065, 0.32, 0.065), 0.012), [146, 96, 56], 0.42, 70);
+        }
       }
-      return best;
+      if (shotIndex < 2) {
+        hit.add(sdRoundBox(sub3(p, v3(tx, -0.44, 0.54)), v3(0.66, 0.042, 0.042), 0.012), [250, 204, 21], 0.24, 71);
+        hit.add(sdRoundBox(sub3(p, v3(tx - 0.58, -0.55, 0.54)), v3(0.04, 0.14, 0.04), 0.01), [250, 204, 21], 0.24, 71);
+        hit.add(sdRoundBox(sub3(p, v3(tx + 0.58, -0.55, 0.54)), v3(0.04, 0.14, 0.04), 0.01), [250, 204, 21], 0.24, 71);
+      }
+      if (shotIndex < 3 && p.z - (-0.42) <= hit.d) {
+        for (let i = 0; i < 6; i++) {
+          const ry = -0.75 + i * 0.38;
+          const rad = 0.16 + i * 0.085;
+          const ox = -0.98 + Math.sin(phase * Math.PI * 4 + i * 1.1) * 0.11;
+          hit.add(sdRoundedCylinder(sub3(p, v3(ox, ry, -1.18)), rad, 0.055, 0.14), i & 1 ? [51, 65, 85] : [71, 85, 105], 0.55, 72);
+        }
+        const ang = phase * Math.PI * 4;
+        const deb1 = rotZ(sub3(p, v3(-0.95 + Math.cos(ang) * 0.55, 0.45, -0.95 + Math.sin(ang) * 0.35)), ang);
+        hit.add(sdRoundBox(deb1, v3(0.18, 0.04, 0.08), 0.01), [250, 204, 21], 0.3, 72);
+        const deb2 = rotX(sub3(p, v3(-0.55, 0.85, -0.85)), -ang);
+        hit.add(sdRoundBox(deb2, v3(0.16, 0.04, 0.12), 0.01), [34, 197, 94], 0.3, 72);
+      }
+      const pt = sub3(p, v3(1.22, -0.95, -0.92));
+      if (len3(pt) - 0.65 <= hit.d) {
+        hit.add(sdRoundedCylinder(sub3(pt, v3(0, -0.18, 0)), 0.075, 0.01, 0.20), [120, 72, 42], 0.45, 73);
+        hit.add(sdTaperedCapsule(pt, v3(0, -0.02, 0), v3(0, 0.42, 0), 0.28, 0.04), [22, 163, 74], 0.4, 73);
+      }
+      return hit;
     }
   };
 }
 
 export function buildPoliceChaseScene(shotIndex, phase = 0.5) {
-  const runSwing = Math.sin(phase * Math.PI * 4) * 0.78;
+  const runSwing = Math.sin(phase * Math.PI * 4) * 0.76;
   const tripPitch = shotIndex === 2 ? smoothstep(0.1, 0.7, phase) * 1.15 : shotIndex === 3 ? 1.45 : 0;
   const sirenFlash = Math.sin(phase * Math.PI * 6) > 0;
   return {
     cam: {
-      ro: v3(shotIndex === 1 ? 0.2 : 0, 0.34, 3.25),
+      ro: v3(shotIndex === 1 ? 0.18 : 0, 0.36, 3.52),
       ta: v3(0, 0.04, 0),
-      fov: 1.9,
+      fov: 1.88,
       bgTop: sirenFlash && shotIndex < 3 ? [96, 165, 250] : [147, 197, 253],
       bgBot: [226, 232, 240],
       floorY: -0.86,
-      floorColor1: [71, 85, 105],
+      floorStyle: "asphalt_street",
+      phase,
+      floorColor1: [64, 76, 94],
       floorColor2: [51, 65, 85]
     },
     sceneFn: (p) => {
-      // Right: Classic Noob fleeing with green cash block
-      const noob = evalAvatarSDF(p, {
-        pos: v3(0.46, shotIndex === 3 ? -0.35 : 0, 0.12),
-        yaw: shotIndex === 3 ? 0 : 0.45,
-        waistPitch: tripPitch,
-        armLPitch: shotIndex >= 2 ? -0.5 : runSwing,
-        armRPitch: -0.95,
-        legLPitch: shotIndex >= 2 ? 0 : -runSwing,
-        legRPitch: shotIndex >= 2 ? 0 : runSwing,
-        expression: shotIndex === 0 ? "smirk" : shotIndex === 3 ? "deadpan" : "shocked",
-        theme: "noob"
-      });
-      // Left: Police Officer chasing
-      const cop = evalAvatarSDF(p, {
-        pos: v3(-0.52, 0, -0.08),
-        yaw: 0.38,
-        armLPitch: shotIndex === 3 ? 0 : -runSwing,
-        armRPitch: shotIndex === 3 ? -0.4 : runSwing,
-        legLPitch: shotIndex === 3 ? 0 : runSwing,
-        legRPitch: shotIndex === 3 ? 0 : -runSwing,
-        expression: "angry",
-        theme: "police"
-      });
-      // Green cash bag block + Yellow fire hydrant in Shot 2
-      const cashY = shotIndex === 2 ? 0.55 + phase * 0.35 : 0.05;
-      const dCash = sdRoundBox(sub3(p, v3(0.66, cashY, 0.36)), v3(0.15, 0.12, 0.12), 0.025);
-      let best = noob.d < cop.d ? noob : cop;
-      if (shotIndex < 3 && dCash < best.d) best = { d: dCash, color: [34, 197, 94], roughness: 0.28, id: 80 };
-      if (shotIndex === 2) {
-        const dHydrant = sdRoundedCylinder(sub3(p, v3(0.82, -0.62, 0.25)), 0.11, 0.02, 0.22);
-        if (dHydrant < best.d) best = { d: dHydrant, color: [250, 204, 21], roughness: 0.22, id: 81 };
+      const hit = new SceneHit();
+      hit.merge(
+        evalAvatarSDF(p, {
+          pos: v3(0.62, shotIndex === 3 ? -0.35 : 0, 0.14),
+          yaw: shotIndex === 3 ? 0 : 0.45,
+          waistPitch: tripPitch,
+          armLPitch: shotIndex >= 2 ? -0.5 : runSwing,
+          armRPitch: -0.95,
+          legLPitch: shotIndex >= 2 ? 0 : -runSwing,
+          legRPitch: shotIndex >= 2 ? 0 : runSwing,
+          expression: shotIndex === 0 ? "smirk" : shotIndex === 3 ? "deadpan" : "shocked",
+          theme: "noob"
+        })
+      );
+      hit.merge(
+        evalAvatarSDF(p, {
+          pos: v3(-0.66, 0, -0.04),
+          yaw: 0.38,
+          armLPitch: shotIndex === 3 ? 0 : -runSwing,
+          armRPitch: shotIndex === 3 ? -0.4 : runSwing,
+          legLPitch: shotIndex === 3 ? 0 : runSwing,
+          legRPitch: shotIndex === 3 ? 0 : -runSwing,
+          expression: "angry",
+          theme: "police"
+        })
+      );
+
+      const pc = sub3(p, v3(-1.05, -0.52, -0.92));
+      if (len3(pc) - 0.82 <= hit.d) {
+        hit.add(sdRoundBox(pc, v3(0.56, 0.18, 0.28), 0.03), [15, 23, 42], 0.22, 82);
+        hit.add(sdRoundBox(sub3(pc, v3(-0.04, 0.24, 0)), v3(0.32, 0.14, 0.25), 0.028), [248, 250, 252], 0.22, 82);
+        hit.add(sdRoundBox(sub3(pc, v3(0.14, 0.23, 0)), v3(0.16, 0.10, 0.255), 0.015), [125, 211, 252], 0.10, 82);
+        hit.add(sdRoundBox(sub3(pc, v3(-0.06, 0.40, 0.08)), v3(0.06, 0.035, 0.06), 0.01), [239, 68, 68], sirenFlash ? 0.03 : 0.3, 82);
+        hit.add(sdRoundBox(sub3(pc, v3(-0.06, 0.40, -0.08)), v3(0.06, 0.035, 0.06), 0.01), [59, 130, 246], !sirenFlash ? 0.03 : 0.3, 82);
+        for (const wx of [-0.34, 0.34]) {
+          const pw = rotX(sub3(pc, v3(wx, -0.18, 0.26)), Math.PI / 2);
+          hit.add(sdRoundedCylinder(pw, 0.13, 0.02, 0.05), [15, 23, 42], 0.45, 82);
+        }
       }
-      return best;
+      const ph = sub3(p, v3(1.15, 0.02, -1.25));
+      if (len3(ph) - 1.05 <= hit.d) {
+        hit.add(sdRoundBox(ph, v3(0.58, 0.52, 0.28), 0.02), [254, 243, 199], 0.45, 83);
+        hit.add(sdRoundBox(sub3(ph, v3(0, 0.62, 0)), v3(0.64, 0.14, 0.32), 0.03), [239, 68, 68], 0.38, 83);
+        hit.add(sdRoundBox(sub3(ph, v3(-0.18, 0.08, 0.27)), v3(0.16, 0.16, 0.02), 0.01), [125, 211, 252], 0.12, 83);
+      }
+
+      if (shotIndex < 3) {
+        const cashY = shotIndex === 2 ? 0.58 + phase * 0.32 : 0.06;
+        const pb = sub3(p, v3(0.84, cashY, 0.38));
+        if (len3(pb) - 0.30 <= hit.d) {
+          hit.add(sdRoundBox(pb, v3(0.145, 0.13, 0.12), 0.045), [34, 197, 94], 0.28, 80);
+          hit.add(sdRoundBox(sub3(pb, v3(0, 0, 0.105)), v3(0.08, 0.04, 0.025), 0.008), [254, 240, 138], 0.22, 80);
+          hit.add(sdRoundedCylinder(sub3(pb, v3(0, 0.15, 0)), 0.055, 0.012, 0.035), [22, 163, 74], 0.32, 80);
+        }
+      }
+      if (shotIndex >= 2) {
+        const phy = sub3(p, v3(0.98, -0.62, 0.28));
+        if (len3(phy) - 0.38 <= hit.d) {
+          hit.add(sdRoundedCylinder(phy, 0.105, 0.02, 0.21), [239, 68, 68], 0.22, 81);
+          hit.add(sdSphere(sub3(phy, v3(0, 0.21, 0)), 0.098), [250, 204, 21], 0.18, 81);
+          hit.add(sdRoundedCylinder(rotZ(sub3(phy, v3(0, 0.06, 0)), Math.PI / 2), 0.042, 0.008, 0.155), [250, 204, 21], 0.18, 81);
+        }
+      }
+      if (shotIndex === 3 && Math.abs(p.z - 0.80) - 0.08 <= hit.d) {
+        for (const bx of [-0.9, -0.45, 0.0, 0.45, 0.9]) {
+          hit.add(sdRoundedCylinder(sub3(p, v3(bx, 0.15, 0.80)), 0.028, 0.005, 1.15), [100, 116, 139], 0.18, 84);
+        }
+        hit.add(sdRoundBox(sub3(p, v3(0, 0.72, 0.80)), v3(1.15, 0.032, 0.035), 0.008), [71, 85, 105], 0.2, 84);
+      }
+      return hit;
     }
   };
 }
 
 export function buildDoorsHallwayScene(shotIndex, phase = 0.5) {
   const flickerDark = shotIndex === 1 && Math.sin(phase * Math.PI * 6) < 0;
+  const isDark = flickerDark || shotIndex >= 2;
   return {
     cam: {
-      ro: v3(0.15, 0.32, 2.72),
+      ro: v3(0.12, 0.34, 2.88),
       ta: v3(0, 0.12, 0),
-      fov: 1.92,
-      bgTop: flickerDark || shotIndex >= 2 ? [15, 23, 42] : [51, 38, 32],
-      bgBot: flickerDark || shotIndex >= 2 ? [30, 41, 59] : [92, 64, 51],
+      fov: 1.9,
+      bgTop: isDark ? [15, 23, 42] : [58, 40, 32],
+      bgBot: isDark ? [30, 41, 59] : [98, 68, 52],
       floorY: -0.86,
+      floorStyle: "hotel_carpet",
       floorColor1: [120, 53, 15],
       floorColor2: [96, 42, 12]
     },
     sceneFn: (p) => {
-      const av = evalAvatarSDF(p, {
-        pos: v3(shotIndex === 3 ? 0.32 : -0.12, 0, 0.08),
-        yaw: shotIndex === 3 ? 2.8 : -0.15,
-        headYaw: shotIndex === 2 ? -0.65 : 0,
-        armLPitch: -0.25,
-        armRPitch: -1.25,
-        expression: shotIndex >= 1 ? "shocked" : "deadpan",
-        theme: "theo"
-      });
-      // Wooden Door / Wardrobe in background + Glowing Flashlight Cylinder + Scary Eyes in Shot 2
-      const dDoor = sdRoundBox(sub3(p, v3(0.38, 0.05, -0.58)), v3(0.46, 0.88, 0.08), 0.02);
-      const dKnob = sdSphere(sub3(p, v3(0.68, 0.0, -0.48)), 0.05);
-      const dFlash = sdRoundedCylinder(rotX(sub3(p, v3(-0.62, 0.22, 0.42)), Math.PI / 2), 0.065, 0.01, 0.14);
-      let best = av;
-      if (dDoor < best.d) best = { d: dDoor, color: [120, 72, 42], roughness: 0.45, id: 90 };
-      if (dKnob < best.d) best = { d: dKnob, color: [250, 204, 21], roughness: 0.15, id: 91 };
-      if (shotIndex < 3 && dFlash < best.d) best = { d: dFlash, color: [253, 224, 71], roughness: 0.08, id: 92 };
-      if (shotIndex === 2) {
-        const dEyeL = sdSphere(sub3(p, v3(0.38, 0.62, -0.35)), 0.048);
-        const dEyeR = sdSphere(sub3(p, v3(0.58, 0.62, -0.35)), 0.048);
-        if (Math.min(dEyeL, dEyeR) < best.d) best = { d: Math.min(dEyeL, dEyeR), color: [255, 255, 255], roughness: 0.02, id: 93 };
+      const hit = new SceneHit();
+      hit.merge(
+        evalAvatarSDF(p, {
+          pos: v3(shotIndex === 3 ? 0.56 : -0.22, 0, 0.12),
+          yaw: shotIndex === 3 ? 2.65 : -0.18,
+          headYaw: shotIndex === 2 ? -0.68 : 0,
+          armLPitch: -0.15,
+          armRPitch: shotIndex === 3 ? 0.45 : 1.18,
+          expression: shotIndex >= 1 ? "shocked" : "deadpan",
+          theme: "theo",
+          handPropR: shotIndex < 3 ? "flashlight" : null
+        })
+      );
+      if (p.z - (-0.45) <= hit.d) {
+        hit.add(sdRoundBox(sub3(p, v3(0, 0.32, -0.92)), v3(2.8, 1.5, 0.06), 0.01), isDark ? [38, 28, 26] : [78, 52, 38], 0.48, 89);
+        const pd = sub3(p, v3(-0.22, 0.06, -0.78));
+        if (len3(pd) - 1.12 <= hit.d) {
+          hit.add(sdRoundBox(pd, v3(0.48, 0.92, 0.065), 0.018), [92, 52, 28], 0.42, 90);
+          hit.add(sdRoundBox(sub3(pd, v3(0, 0, 0.025)), v3(0.40, 0.84, 0.055), 0.015), [128, 76, 44], 0.42, 90);
+          hit.add(sdRoundBox(sub3(pd, v3(0, 0.62, 0.075)), v3(0.14, 0.065, 0.018), 0.01), [250, 204, 21], 0.14, 91);
+          hit.add(sdSphere(sub3(pd, v3(0.30, -0.04, 0.095)), 0.046), [250, 204, 21], 0.14, 91);
+        }
+        const pw = sub3(p, v3(0.76, 0.08, -0.68));
+        if (len3(pw) - 1.12 <= hit.d) {
+          const dCloset = sdRoundBox(pw, v3(0.42, 0.94, 0.18), 0.02);
+          const louver = Math.sin(pw.y * 28) > 0.35 && Math.abs(pw.x) < 0.34 && Math.abs(pw.y) < 0.72;
+          hit.add(dCloset, louver ? [68, 38, 22] : [110, 66, 38], 0.44, 90);
+        }
+        const ps = sub3(p, v3(-0.92, 0.68, -0.82));
+        hit.add(sdRoundedCylinder(ps, 0.075, 0.015, 0.09), isDark ? [71, 85, 105] : [254, 240, 138], isDark ? 0.35 : 0.04, 91);
       }
-      return best;
+      if (shotIndex === 2) {
+        const pe = sub3(p, v3(0.36, 0.56, -0.45));
+        hit.add(sdSphere(pe, 0.28), [15, 23, 42], 0.65, 93);
+        const dEyeL = sdSphere(sub3(pe, v3(-0.085, 0.04, 0.25)), 0.045);
+        const dEyeR = sdSphere(sub3(pe, v3(0.085, 0.04, 0.25)), 0.045);
+        hit.add(Math.min(dEyeL, dEyeR), [255, 255, 255], 0.02, 93);
+      }
+      return hit;
     }
   };
 }
 
 export function buildSwordDuelScene(shotIndex, phase = 0.5) {
   const jumpY = shotIndex === 1 ? Math.sin(phase * Math.PI) * 0.36 : 0;
-  const slashPitch = shotIndex === 1 ? -1.85 + Math.sin(phase * Math.PI * 2) * 0.55 : shotIndex === 3 ? -1.1 : -1.45;
+  const slashPitch = shotIndex === 1 ? 1.28 + Math.sin(phase * Math.PI * 2) * 0.28 : shotIndex === 3 ? 0.95 : 1.15;
+  const leftX = shotIndex === 1 ? -0.52 : -0.68;
+  const rightX = shotIndex === 1 ? 0.52 : shotIndex === 2 ? 0.80 : 0.68;
   return {
     cam: {
-      ro: v3(0, 0.32, 3.25),
+      ro: v3(0, 0.34, 3.62),
       ta: v3(0, 0.08, 0),
-      fov: 1.9,
-      bgTop: [251, 146, 60],
+      fov: 1.88,
+      bgTop: [249, 115, 22],
       bgBot: [254, 215, 170],
-      floorY: -0.96,
+      floorY: -1.04,
+      floorStyle: "molten_lava",
+      phase,
       floorColor1: [239, 68, 68],
       floorColor2: [249, 115, 22]
     },
     sceneFn: (p) => {
-      const leftX = shotIndex === 1 ? -0.34 : -0.56;
-      const rightX = shotIndex === 1 ? 0.34 : shotIndex === 2 ? 0.72 : 0.56;
-      const leftAv = evalAvatarSDF(p, {
-        pos: v3(leftX, jumpY, 0),
-        yaw: 0.65,
-        armRPitch: slashPitch,
-        expression: shotIndex === 3 ? "smile" : shotIndex === 1 ? "angry" : "smirk",
-        theme: "builderman",
-        hasMug: shotIndex === 3
-      });
-      const rightAv = evalAvatarSDF(p, {
-        pos: v3(rightX, jumpY, 0),
-        yaw: -0.65,
-        roll: shotIndex === 2 ? -0.18 : 0,
-        armLPitch: slashPitch,
-        expression: shotIndex === 2 ? "shocked" : shotIndex === 3 ? "smile" : "grin",
-        theme: "noob",
-        hasMug: shotIndex === 3
-      });
-      // Studded Stone Bridge Slab + Two Metallic Linked Swords
-      const dBridge = sdRoundBox(sub3(p, v3(0, -0.82, 0)), v3(1.15, 0.12, 0.52), 0.02);
-      let best = leftAv.d < rightAv.d ? leftAv : rightAv;
-      if (dBridge < best.d) best = { d: dBridge, color: [148, 163, 184], roughness: 0.38, id: 100 };
-      if (shotIndex < 3) {
-        const dBlade1 = sdRoundBox(rotZ(sub3(p, v3(leftX + 0.38, 0.35 + jumpY, 0.18)), -0.55), v3(0.03, 0.34, 0.015), 0.008);
-        const dBlade2 = sdRoundBox(rotZ(sub3(p, v3(rightX - 0.38, 0.35 + jumpY, 0.18)), 0.55), v3(0.03, 0.34, 0.015), 0.008);
-        const dSwords = Math.min(dBlade1, dBlade2);
-        if (dSwords < best.d) best = { d: dSwords, color: [226, 232, 240], roughness: 0.12, id: 101 };
+      const hit = new SceneHit();
+      hit.merge(
+        evalAvatarSDF(p, {
+          pos: v3(leftX, jumpY, 0),
+          yaw: 0.72,
+          armRPitch: slashPitch,
+          expression: shotIndex === 3 ? "smile" : shotIndex === 1 ? "angry" : "smirk",
+          theme: "builderman",
+          handPropR: shotIndex === 3 ? "cola" : "sword"
+        })
+      );
+      hit.merge(
+        evalAvatarSDF(p, {
+          pos: v3(rightX, jumpY, 0),
+          yaw: -0.72,
+          roll: shotIndex === 2 ? -0.18 : 0,
+          armLPitch: slashPitch,
+          expression: shotIndex === 2 ? "shocked" : shotIndex === 3 ? "smile" : "grin",
+          theme: "noob",
+          handPropL: shotIndex === 3 ? "cola" : "sword"
+        })
+      );
+      hit.add(sdRoundBox(sub3(p, v3(0, -0.82, 0)), v3(1.32, 0.12, 0.54), 0.022), [148, 163, 184], 0.36, 100);
+      hit.add(sdRoundBox(sub3(p, v3(0, -0.70, -0.48)), v3(1.32, 0.05, 0.05), 0.012), [100, 116, 139], 0.38, 100);
+      for (const side of [-1, 1]) {
+        const pt = sub3(p, v3(side * 1.38, -0.22, -0.62));
+        if (len3(pt) - 0.95 <= hit.d) {
+          hit.add(sdRoundBox(pt, v3(0.28, 0.68, 0.28), 0.02), [100, 116, 139], 0.42, 100);
+          hit.add(sdRoundBox(sub3(pt, v3(-0.14, 0.74, 0.14)), v3(0.08, 0.08, 0.08), 0.01), [148, 163, 184], 0.4, 100);
+          hit.add(sdRoundBox(sub3(pt, v3(0.14, 0.74, 0.14)), v3(0.08, 0.08, 0.08), 0.01), [148, 163, 184], 0.4, 100);
+        }
       }
-      return best;
+      if (shotIndex === 1) {
+        const ps = sub3(p, v3(0, 0.46 + jumpY, 0.22));
+        const dSpark = Math.min(
+          sdRoundBox(rotZ(ps, 0.78), v3(0.16, 0.028, 0.028), 0.01),
+          sdRoundBox(rotZ(ps, -0.78), v3(0.16, 0.028, 0.028), 0.01)
+        );
+        hit.add(dSpark, [254, 240, 138], 0.02, 102);
+      }
+      return hit;
     }
   };
 }
 
 export function buildExamPanicScene(shotIndex, phase = 0.5) {
-  const scribble = shotIndex === 2 ? Math.sin(phase * Math.PI * 8) * 0.25 : 0;
-  const slumpPitch = shotIndex === 3 ? -0.38 : 0.08;
+  const scribble = shotIndex === 2 ? Math.sin(phase * Math.PI * 8) * 0.24 : 0;
+  const slumpPitch = shotIndex === 3 ? -0.34 : 0.08;
   return {
     cam: {
-      ro: v3(shotIndex === 2 ? 0.65 : 0, 0.48, 2.55),
+      ro: v3(shotIndex === 2 ? 0.58 : 0, 0.50, 2.65),
       ta: v3(0, 0.18, 0.12),
-      fov: 1.92,
-      bgTop: [186, 230, 253],
+      fov: 1.9,
+      bgTop: [219, 234, 254],
       bgBot: [254, 249, 195],
       floorY: -0.86,
-      floorColor1: [203, 213, 225],
-      floorColor2: [186, 198, 214]
+      floorStyle: "checker_tile",
+      floorColor1: [226, 232, 240],
+      floorColor2: [208, 216, 228]
     },
     sceneFn: (p) => {
-      const av = evalAvatarSDF(p, {
-        pos: v3(0, -0.02, -0.08),
-        yaw: scribble * 0.3,
-        waistPitch: slumpPitch,
-        armLPitch: shotIndex === 1 ? -2.2 : shotIndex === 3 ? 0 : -0.85,
-        armRPitch: shotIndex === 1 ? -2.2 : shotIndex === 3 ? 0 : -0.85 + scribble,
-        expression: shotIndex === 0 ? "smile" : shotIndex === 1 ? "shocked" : shotIndex === 2 ? "angry" : "dizzy",
-        theme: "bacon"
-      });
-      const dDesk = sdRoundBox(sub3(p, v3(0, -0.40, 0.42)), v3(1.15, 0.055, 0.52), 0.02);
-      const dPaper = sdRoundBox(sub3(p, v3(0, -0.335, 0.40)), v3(0.26, 0.008, 0.32), 0.004);
-      const dClock = sdRoundedCylinder(rotX(sub3(p, v3(0.55, 0.82, -0.55)), Math.PI / 2), 0.18, 0.015, 0.03);
-      const dClockDial = sdRoundedCylinder(rotX(sub3(p, v3(0.55, 0.82, -0.53)), Math.PI / 2), 0.135, 0.01, 0.032);
-      let best = av;
-      if (dDesk < best.d) best = { d: dDesk, color: [180, 124, 78], roughness: 0.38, id: 110 };
-      if (dPaper < best.d) best = { d: dPaper, color: [255, 255, 255], roughness: 0.25, id: 111 };
-      if (dClock < best.d) best = { d: dClock, color: [239, 68, 68], roughness: 0.22, id: 112 };
-      if (dClockDial < best.d) best = { d: dClockDial, color: [255, 255, 255], roughness: 0.2, id: 113 };
-      return best;
+      const hit = new SceneHit();
+      hit.merge(
+        evalAvatarSDF(p, {
+          pos: v3(0, -0.02, -0.08),
+          yaw: scribble * 0.3,
+          waistPitch: slumpPitch,
+          armLPitch: shotIndex === 1 ? -2.2 : shotIndex === 3 ? 0 : -0.85,
+          armRPitch: shotIndex === 1 ? -2.2 : shotIndex === 3 ? 0 : -0.85 + scribble,
+          expression: shotIndex === 0 ? "smile" : shotIndex === 1 ? "shocked" : shotIndex === 2 ? "angry" : "dizzy",
+          theme: "bacon",
+          handPropR: shotIndex === 2 ? "pencil" : null
+        })
+      );
+      if (p.z - (-0.75) <= hit.d) {
+        hit.add(sdRoundBox(sub3(p, v3(0, 0.35, -0.96)), v3(2.8, 1.5, 0.06), 0.01), [254, 249, 232], 0.48, 114);
+        const pcb = sub3(p, v3(-0.28, 0.52, -0.88));
+        if (len3(pcb) - 0.98 <= hit.d) {
+          hit.add(sdRoundBox(pcb, v3(0.84, 0.42, 0.028), 0.012), [146, 96, 56], 0.4, 114);
+          const dSlate = sdRoundBox(sub3(pcb, v3(0, 0, 0.016)), v3(0.78, 0.36, 0.018), 0.008);
+          if (dSlate < hit.d) {
+            const chalkLine = Math.abs(pcb.x + 0.25) < 0.36 && (Math.abs(pcb.y - 0.12) < 0.012 || Math.abs(pcb.y - 0.02) < 0.012);
+            hit.add(dSlate, chalkLine ? [241, 245, 249] : [20, 83, 45], 0.45, 114);
+          }
+        }
+        const pck = sub3(p, v3(0.82, 0.78, -0.86));
+        if (len3(pck) - 0.26 <= hit.d) {
+          const qc = rotX(pck, Math.PI / 2);
+          hit.add(sdRoundedCylinder(qc, 0.17, 0.015, 0.028), [225, 29, 72], 0.22, 112);
+          const dDial = sdRoundedCylinder(add3(qc, v3(0, 0.014, 0)), 0.135, 0.008, 0.026);
+          if (dDial < hit.d) {
+            const hand = (Math.abs(pck.x) < 0.012 && pck.y > -0.01 && pck.y < 0.095) || (Math.abs(pck.y) < 0.012 && pck.x > -0.01 && pck.x < 0.075);
+            hit.add(dDial, hand ? [15, 23, 42] : [255, 255, 255], 0.18, 113);
+          }
+        }
+      }
+
+      addDetailedDesk(hit, p, -0.40);
+      const pbk = sub3(p, v3(-0.74, -0.29, 0.36));
+      if (len3(pbk) - 0.34 <= hit.d) {
+        hit.add(sdRoundBox(pbk, v3(0.18, 0.038, 0.22), 0.01), [37, 99, 235], 0.32, 115);
+        hit.add(sdRoundBox(sub3(pbk, v3(0.02, 0.075, -0.01)), v3(0.17, 0.035, 0.21), 0.01), [225, 29, 72], 0.32, 115);
+      }
+      const pp = sub3(p, v3(0, -0.335, 0.42));
+      const dPaper = sdRoundBox(pp, v3(0.28, 0.009, 0.32), 0.004);
+      if (dPaper < hit.d) {
+        let pCol = [255, 255, 255];
+        if (pp.y > 0.004 && Math.abs(pp.x) < 0.22) {
+          if (pp.z < -0.20 && pp.z > -0.25 && pp.x > 0.08) pCol = [239, 68, 68];
+          else if (Math.abs(((pp.z + 1) * 18) % 1 - 0.5) < 0.16 && Math.abs(pp.z) < 0.20) pCol = [100, 116, 139];
+        }
+        hit.add(dPaper, pCol, 0.26, 111);
+      }
+      if (shotIndex !== 2) {
+        const pPen = rotY(rotZ(sub3(p, v3(0.36, -0.32, 0.42)), Math.PI / 2), 0.25);
+        hit.add(sdRoundedCylinder(pPen, 0.018, 0.004, 0.14), [250, 204, 21], 0.28, 115);
+      }
+      if (shotIndex === 1) {
+        hit.add(sdRoundBox(rotZ(sub3(p, v3(-0.62, 0.72, 0.12)), 0.2), v3(0.085, 0.085, 0.085), 0.02), [250, 204, 21], 0.12, 116);
+        hit.add(sdRoundBox(rotZ(sub3(p, v3(0.62, 0.76, 0.12)), -0.2), v3(0.085, 0.085, 0.085), 0.02), [250, 204, 21], 0.12, 116);
+      }
+      return hit;
     }
   };
 }
 
 export function buildRedLightScene(shotIndex, phase = 0.5) {
   const isRed = shotIndex === 1 || shotIndex === 2;
-  const stride = isRed ? 0.68 : Math.sin(phase * Math.PI * 4) * 0.65;
-  const wobble = shotIndex === 2 ? Math.sin(phase * Math.PI * 6) * 0.09 : 0;
+  const stride = isRed ? 0.64 : Math.sin(phase * Math.PI * 4) * 0.62;
+  const wobble = shotIndex === 2 ? Math.sin(phase * Math.PI * 6) * 0.08 : 0;
   return {
     cam: {
-      ro: v3(0, 0.32, 3.18),
+      ro: v3(0, 0.36, 3.92),
       ta: v3(0, 0.06, 0),
-      fov: 1.9,
+      fov: 1.88,
       bgTop: isRed ? [244, 63, 94] : [52, 211, 153],
       bgBot: [254, 243, 199],
       floorY: -0.86,
+      floorStyle: "sand_court",
       floorColor1: [234, 198, 138],
       floorColor2: [218, 180, 118]
     },
     sceneFn: (p) => {
-      const runner1 = evalAvatarSDF(p, {
-        pos: v3(-0.48, isRed ? 0.14 : 0, 0),
-        yaw: 0.18,
-        waistPitch: shotIndex === 3 ? 0.45 : 0,
-        armLPitch: -stride,
-        armRPitch: stride,
-        legLPitch: stride,
-        legRPitch: -stride * 0.5,
-        expression: isRed ? "shocked" : "grin",
-        theme: "obby"
-      });
-      const runner2 = evalAvatarSDF(p, {
-        pos: v3(0.48, isRed ? 0.12 : 0, 0),
-        yaw: -0.15,
-        roll: wobble,
-        waistPitch: shotIndex === 3 ? 0.45 : 0,
-        armLPitch: stride,
-        armRPitch: -stride,
-        legLPitch: -stride * 0.5,
-        legRPitch: stride,
-        expression: isRed ? "shocked" : "grin",
-        theme: "noob"
-      });
-      const dFinish = sdRoundBox(sub3(p, v3(0, -0.84, 0.55)), v3(1.35, 0.02, 0.12), 0.008);
-      let best = runner1.d < runner2.d ? runner1 : runner2;
-      if (dFinish < best.d) best = { d: dFinish, color: [225, 29, 72], roughness: 0.22, id: 120 };
-      return best;
+      const hit = new SceneHit();
+      hit.merge(
+        evalAvatarSDF(p, {
+          pos: v3(-0.78, isRed ? 0.14 : 0, 0.05),
+          yaw: 0.12,
+          waistPitch: shotIndex === 3 ? 0.42 : 0,
+          armLPitch: -stride,
+          armRPitch: stride,
+          legLPitch: stride,
+          legRPitch: -stride * 0.5,
+          expression: isRed ? "shocked" : "grin",
+          theme: "obby"
+        })
+      );
+      hit.merge(
+        evalAvatarSDF(p, {
+          pos: v3(0.78, isRed ? 0.12 : 0, 0.05),
+          yaw: -0.12,
+          roll: wobble,
+          waistPitch: shotIndex === 3 ? 0.42 : 0,
+          armLPitch: stride,
+          armRPitch: -stride,
+          legLPitch: -stride * 0.5,
+          legRPitch: stride,
+          expression: isRed ? "shocked" : "grin",
+          theme: "noob"
+        })
+      );
+      if (p.z - (-0.75) <= hit.d) {
+        hit.add(sdRoundBox(sub3(p, v3(0, 0.25, -1.32)), v3(2.8, 1.5, 0.06), 0.01), isRed ? [254, 205, 211] : [186, 230, 253], 0.48, 121);
+        const psig = sub3(p, v3(0, 0.35, -0.95));
+        if (len3(psig) - 1.25 <= hit.d) {
+          hit.add(sdRoundedCylinder(sub3(psig, v3(0, -0.45, 0)), 0.042, 0.008, 0.78), [51, 65, 85], 0.3, 122);
+          hit.add(sdRoundBox(sub3(psig, v3(0, 0.42, 0)), v3(0.16, 0.26, 0.11), 0.025), [15, 23, 42], 0.25, 122);
+          hit.add(sdSphere(sub3(psig, v3(0, 0.53, 0.095)), 0.075), isRed ? [255, 42, 62] : [71, 24, 32], isRed ? 0.02 : 0.45, 122);
+          hit.add(sdSphere(sub3(psig, v3(0, 0.31, 0.095)), 0.075), !isRed ? [34, 238, 128] : [20, 64, 42], !isRed ? 0.02 : 0.45, 122);
+        }
+      }
+      return hit;
     }
   };
 }
@@ -1460,8 +2016,9 @@ export function renderRawPanelSet(tmpDir, force = false, shardIdx = 0, shardCoun
     bgTop: [219, 234, 254],
     bgBot: [241, 245, 249],
     floorY: -0.86,
-    floorColor1: [162, 174, 192],
-    floorColor2: [144, 158, 178]
+    floorStyle: "studio_grid",
+    floorColor1: [182, 194, 210],
+    floorColor2: [168, 182, 198]
   };
 
   const turnAngles = [
@@ -1506,7 +2063,6 @@ export function renderRawPanelSet(tmpDir, force = false, shardIdx = 0, shardCoun
     );
   }
 
-  // Classic Roblox Avatars Lineup (6 iconic characters, 260x340 each)
   const classicAvatars = [
     ["avatar_noob.png", "noob", "smile", false],
     ["avatar_guest.png", "guest", "grin", false],
@@ -1526,7 +2082,6 @@ export function renderRawPanelSet(tmpDir, force = false, shardIdx = 0, shardCoun
     );
   }
 
-  // Classic Roblox Face Decal Atlas (8 iconic expressions close-up on Bright Yellow head, 220x220 each)
   const classicFaces = [
     ["face_smile.png", "smile"],
     ["face_deadpan.png", "deadpan"],
@@ -1626,7 +2181,7 @@ export function buildBoardsManifest(rawDir) {
         { file: "drift_1_fingers.png", labelZh: "× 真人手指 / 鼻子", labelEn: "× Human Fingers / Nose", r: 225, g: 29, b: 72 },
         { file: "drift_2_lego.png", labelZh: "× 乐高圆粒 / C型爪", labelEn: "× Lego Studs / C-Claw", r: 217, g: 119, b: 6 },
         { file: "drift_3_voxel.png", labelZh: "× MC 直角像素块", labelEn: "× Voxel Cube Head", r: 124, g: 58, b: 237 },
-        { file: "drift_4_locked.png", labelZh: "✓ 标准 Roblox R6", labelEn: "✓ Roblox R6 Blocky", r: 5, g: 150, b: 105 }
+        { file: "drift_4_locked.png", labelZh: "✓ 标准 R6 方块比例", labelEn: "✓ Blocky R6 Rig", r: 5, g: 150, b: 105 }
       ]
     },
     classicAssetSheet: {
@@ -1637,10 +2192,10 @@ export function buildBoardsManifest(rawDir) {
       facesOutEn: path.join(showcaseDir, "classic_faces_atlas.en.png"),
       facesOutDefault: path.join(showcaseDir, "classic_faces_atlas.png"),
       avatars: [
-        { file: "avatar_noob.png", labelZh: "Classic Noob · 经典新手", labelEn: "Classic Noob (2006)" },
-        { file: "avatar_guest.png", labelZh: "Classic Guest · 经典游客", labelEn: "Classic Guest (2008)" },
-        { file: "avatar_bacon.png", labelZh: "Bacon Hair · 培根头", labelEn: "Bacon Hair (2014)" },
-        { file: "avatar_builderman.png", labelZh: "Builderman · 安全帽", labelEn: "Builder's Club Hat" },
+        { file: "avatar_noob.png", labelZh: "Classic Noob · 经典新手", labelEn: "Classic Noob" },
+        { file: "avatar_guest.png", labelZh: "Classic Guest · 三角标夹克", labelEn: "Classic Guest" },
+        { file: "avatar_bacon.png", labelZh: "Bacon Hair · 培根头", labelEn: "Bacon Hair" },
+        { file: "avatar_builderman.png", labelZh: "Builder Hat · 安全帽", labelEn: "Builder Hard Hat" },
         { file: "avatar_obby.png", labelZh: "Speedrunner · 加速弹簧", labelEn: "Obby + Speed Coil" },
         { file: "avatar_theo.png", labelZh: "Story Hero · 连帽卫衣", labelEn: "Storytime Hoodie" }
       ],
@@ -1669,7 +2224,7 @@ export function buildBoardsManifest(rawDir) {
             labelEn: "01 · 7:59 AM Hook (0–3.5s)",
             chatZh: "7:59?!",
             chatEn: "7:59?!",
-            bubbleX: 182,
+            bubbleX: 186,
             bubbleY: 36,
             savePath: path.join(alarmDir, "shot_01_hook.png")
           },
@@ -1678,7 +2233,7 @@ export function buildBoardsManifest(rawDir) {
             labelEn: "02 · Snooze Slam (3.5–7.5s)",
             chatZh: "再睡5分钟",
             chatEn: "5 more mins",
-            bubbleX: 180,
+            bubbleX: 182,
             bubbleY: 38,
             savePath: path.join(alarmDir, "shot_02_slam.png")
           },
@@ -1696,7 +2251,7 @@ export function buildBoardsManifest(rawDir) {
             labelEn: "04 · Faceplant Loop (11.5–15s)",
             chatZh: "oof.",
             chatEn: "oof.",
-            bubbleX: 152,
+            bubbleX: 156,
             bubbleY: 88,
             savePath: path.join(alarmDir, "shot_04_faceplant.png")
           }
@@ -1711,9 +2266,9 @@ export function buildBoardsManifest(rawDir) {
         mp4Path: path.join(obbyDir, "obby_sky_run.mp4"),
         shots: [
           { labelZh: "01 · 加速弹簧起跳", labelEn: "01 · Speed Coil Jump", chatZh: "加速起飞!", chatEn: "Speed Coil!", bubbleX: 155, bubbleY: 36 },
-          { labelZh: "02 · 连续方格跳台", labelEn: "02 · Rhythm Hops", chatZh: "稳住!", chatEn: "ez jumps", bubbleX: 160, bubbleY: 38 },
-          { labelZh: "03 · 激光块前急停", labelEn: "03 · Killbrick Stop", chatZh: "红砖别踩!", chatEn: "KILLBRICK!", bubbleX: 162, bubbleY: 38 },
-          { labelZh: "04 · 存档点无缝循环", labelEn: "04 · Checkpoint Loop", chatZh: "通关 GG!", chatEn: "GG!", bubbleX: 162, bubbleY: 36 }
+          { labelZh: "02 · 连续浮台跳跃", labelEn: "02 · Rhythm Hops", chatZh: "稳住!", chatEn: "ez jumps", bubbleX: 160, bubbleY: 38 },
+          { labelZh: "03 · 激光砖前急停", labelEn: "03 · Killbrick Stop", chatZh: "红砖别踩!", chatEn: "KILLBRICK!", bubbleX: 162, bubbleY: 38 },
+          { labelZh: "04 · 旗帜点循环", labelEn: "04 · Checkpoint Loop", chatZh: "通关 GG!", chatEn: "GG!", bubbleX: 162, bubbleY: 36 }
         ]
       },
       {
@@ -1725,7 +2280,7 @@ export function buildBoardsManifest(rawDir) {
         mp4Path: path.join(duoDir, "duo_bestie_contrast.mp4"),
         shots: [
           { labelZh: "01 · 潮人闺蜜 vs 新手", labelEn: "01 · Y2K vs. Classic Noob", chatZh: "看镜头!", chatEn: "pose!", bubbleX: 98, bubbleY: 38 },
-          { labelZh: "02 · 转身误撞新手", labelEn: "02 · 180° Spin Bump", chatZh: "哎呀!", chatEn: "oops!", bubbleX: 102, bubbleY: 38 },
+          { labelZh: "02 · 书包转身撞人", labelEn: "02 · Backpack Bump", chatZh: "哎呀!", chatEn: "oops!", bubbleX: 108, bubbleY: 38 },
           { labelZh: "03 · R6 刚体直挺侧倒", labelEn: "03 · Rigid Plank Tilt", chatZh: "oof", chatEn: "oof", bubbleX: 215, bubbleY: 56 },
           { labelZh: "04 · 同步死鱼眼盯镜", labelEn: "04 · Deadpan Stare", chatZh: "...", chatEn: "bruh...", bubbleX: 160, bubbleY: 40 }
         ]
@@ -1738,7 +2293,7 @@ export function buildBoardsManifest(rawDir) {
         gifPath: path.join(cafeDir, "cozy_cafe_tycoon.gif"),
         mp4Path: path.join(cafeDir, "cozy_cafe_tycoon.mp4"),
         shots: [
-          { labelZh: "01 · 甜点柜台登场", labelEn: "01 · Counter Pop-Up", chatZh: "欢迎光临!", chatEn: "Fresh croissants!", bubbleX: 160, bubbleY: 36 },
+          { labelZh: "01 · 甜点吧台登场", labelEn: "01 · Counter Pop-Up", chatZh: "欢迎光临!", chatEn: "Fresh croissants!", bubbleX: 160, bubbleY: 36 },
           { labelZh: "02 · 羊角包摆盘", labelEn: "02 · Croissant Snap", chatZh: "刚出炉!", chatEn: "Hot & crispy", bubbleX: 160, bubbleY: 38 },
           { labelZh: "03 · 递出热拿铁", labelEn: "03 · Latte Slide", chatZh: "您的拿铁!", chatEn: "One latte!", bubbleX: 160, bubbleY: 38 },
           { labelZh: "04 · 金币弹出循环", labelEn: "04 · +999 Coins Loop", chatZh: "+999 金币!", chatEn: "+999 Coins!", bubbleX: 160, bubbleY: 36 }
@@ -1752,10 +2307,10 @@ export function buildBoardsManifest(rawDir) {
         gifPath: path.join(runwayDir, "runway_outfit_drop.gif"),
         mp4Path: path.join(runwayDir, "runway_outfit_drop.mp4"),
         shots: [
-          { labelZh: "01 · 灰模初始状态", labelEn: "01 · Plain Base Avatar", chatZh: "还没穿搭...", chatEn: "0 stars...", bubbleX: 160, bubbleY: 38 },
-          { labelZh: "02 · 蓄力旋转起跳", labelEn: "02 · Beat-Drop Spin", chatZh: "3, 2, 1!", chatEn: "Wait for it!", bubbleX: 160, bubbleY: 34 },
-          { labelZh: "03 · 重音落地换装", labelEn: "03 · Y2K Crown Reveal", chatZh: "全套换装!", chatEn: "5 Stars!!", bubbleX: 160, bubbleY: 38 },
-          { labelZh: "04 · T台定格循环", labelEn: "04 · Runway Pose", chatZh: "拿下全场!", chatEn: "Top Model!", bubbleX: 160, bubbleY: 38 }
+          { labelZh: "01 · 灰模初始状态", labelEn: "01 · Plain Base Avatar", chatZh: "还没穿搭...", chatEn: "0 stars...", bubbleX: 160, bubbleY: 48 },
+          { labelZh: "02 · 蓄力旋转起跳", labelEn: "02 · Beat-Drop Spin", chatZh: "3, 2, 1!", chatEn: "Wait for it!", bubbleX: 160, bubbleY: 44 },
+          { labelZh: "03 · 重音落地换装", labelEn: "03 · Y2K Crown Reveal", chatZh: "五星换装!", chatEn: "5 Stars!!", bubbleX: 160, bubbleY: 48 },
+          { labelZh: "04 · T台定格亮相", labelEn: "04 · Runway Pose", chatZh: "全场最佳!", chatEn: "Top Model!", bubbleX: 160, bubbleY: 48 }
         ]
       },
       {
@@ -1794,10 +2349,10 @@ export function buildBoardsManifest(rawDir) {
         gifPath: path.join(chaseDir, "brookhaven_police_chase.gif"),
         mp4Path: path.join(chaseDir, "brookhaven_police_chase.mp4"),
         shots: [
-          { labelZh: "01 · 抱钱袋狂奔", labelEn: "01 · Bank Heist Dash", chatZh: "溜了溜了!", chatEn: "Catch me!", bubbleX: 195, bubbleY: 38 },
-          { labelZh: "02 · 警灯追击", labelEn: "02 · Siren Pursuit", chatZh: "站住!!", chatEn: "STOP!!", bubbleX: 105, bubbleY: 38 },
-          { labelZh: "03 · 绊倒飞扑", labelEn: "03 · Hydrant Trip", chatZh: "哎哟!", chatEn: "WHOA!", bubbleX: 185, bubbleY: 38 },
-          { labelZh: "04 · 当场拿下", labelEn: "04 · Busted!", chatZh: "已老实...", chatEn: "busted...", bubbleX: 190, bubbleY: 64 }
+          { labelZh: "01 · 抱钱袋狂奔", labelEn: "01 · Bank Heist Dash", chatZh: "溜了溜了!", chatEn: "Catch me!", bubbleX: 205, bubbleY: 38 },
+          { labelZh: "02 · 警车警灯追击", labelEn: "02 · Siren Pursuit", chatZh: "站住!!", chatEn: "STOP!!", bubbleX: 105, bubbleY: 38 },
+          { labelZh: "03 · 消防栓绊倒", labelEn: "03 · Hydrant Trip", chatZh: "哎哟!", chatEn: "WHOA!", bubbleX: 195, bubbleY: 38 },
+          { labelZh: "04 · 铁窗拿下", labelEn: "04 · Busted!", chatZh: "已老实...", chatEn: "busted...", bubbleX: 190, bubbleY: 64 }
         ]
       },
       {
@@ -1808,10 +2363,10 @@ export function buildBoardsManifest(rawDir) {
         gifPath: path.join(doorsDir, "doors_flashlight_hallway.gif"),
         mp4Path: path.join(doorsDir, "doors_flashlight_hallway.mp4"),
         shots: [
-          { labelZh: "01 · 50号门探索", labelEn: "01 · Door 050 Check", chatZh: "第50号门...", chatEn: "Door 50...", bubbleX: 145, bubbleY: 38 },
-          { labelZh: "02 · 走廊闪灯", labelEn: "02 · Lights Flicker", chatZh: "灯闪了?!", chatEn: "Flicker?!", bubbleX: 145, bubbleY: 38 },
-          { labelZh: "03 · 身后白眼", labelEn: "03 · Eyes Behind", chatZh: "身后有东西!", chatEn: "BEHIND ME!", bubbleX: 145, bubbleY: 38 },
-          { labelZh: "04 · 极限躲柜", labelEn: "04 · Closet Hide", chatZh: "快躲衣柜!", chatEn: "HIDE!!", bubbleX: 175, bubbleY: 38 }
+          { labelZh: "01 · 50号门探索", labelEn: "01 · Door 050 Check", chatZh: "第50号门...", chatEn: "Door 50...", bubbleX: 138, bubbleY: 38 },
+          { labelZh: "02 · 走廊闪灯", labelEn: "02 · Lights Flicker", chatZh: "灯闪了?!", chatEn: "Flicker?!", bubbleX: 138, bubbleY: 38 },
+          { labelZh: "03 · 身后白眼", labelEn: "03 · Eyes Behind", chatZh: "身后有东西!", chatEn: "BEHIND ME!", bubbleX: 138, bubbleY: 38 },
+          { labelZh: "04 · 极限躲木柜", labelEn: "04 · Closet Hide", chatZh: "快躲衣柜!", chatEn: "HIDE!!", bubbleX: 195, bubbleY: 38 }
         ]
       },
       {
@@ -1822,10 +2377,10 @@ export function buildBoardsManifest(rawDir) {
         gifPath: path.join(swordDir, "crossroads_sword_duel.gif"),
         mp4Path: path.join(swordDir, "crossroads_sword_duel.mp4"),
         shots: [
-          { labelZh: "01 · 石桥拔剑", labelEn: "01 · Bridge Standoff", chatZh: "来1v1!", chatEn: "1v1 SFOTH!", bubbleX: 110, bubbleY: 38 },
-          { labelZh: "02 · 空中拼刀", labelEn: "02 · Mid-Air Clash", chatZh: "当!!", chatEn: "CLANG!!", bubbleX: 160, bubbleY: 32 },
+          { labelZh: "01 · 石桥拔剑", labelEn: "01 · Bridge Standoff", chatZh: "来1v1!", chatEn: "1v1 Duel!", bubbleX: 105, bubbleY: 38 },
+          { labelZh: "02 · 空中拼刀火花", labelEn: "02 · Mid-Air Clash", chatZh: "当!!", chatEn: "CLANG!!", bubbleX: 160, bubbleY: 32 },
           { labelZh: "03 · 悬崖险情", labelEn: "03 · Ledge Knockback", chatZh: "要掉岩浆了!", chatEn: "WHOA!", bubbleX: 215, bubbleY: 38 },
-          { labelZh: "04 · 可乐言和", labelEn: "04 · Bloxy Cola Truce", chatZh: "干杯 GG!", chatEn: "GG Truce!", bubbleX: 160, bubbleY: 38 }
+          { labelZh: "04 · 汽水言和", labelEn: "04 · Soda Truce", chatZh: "干杯 GG!", chatEn: "GG Truce!", bubbleX: 160, bubbleY: 38 }
         ]
       },
       {
@@ -1838,7 +2393,7 @@ export function buildBoardsManifest(rawDir) {
         shots: [
           { labelZh: "01 · 自信接卷", labelEn: "01 · Confident Start", chatZh: "稳拿满分!", chatEn: "Easy A+!", bubbleX: 160, bubbleY: 38 },
           { labelZh: "02 · 看题傻眼", labelEn: "02 · Question 1 Shock", chatZh: "这考的啥?!", chatEn: "WHAT IS THIS?!", bubbleX: 160, bubbleY: 36 },
-          { labelZh: "03 · 疯狂疾书", labelEn: "03 · 2x Speed Scribble", chatZh: "先写个解!", chatEn: "2 mins left!", bubbleX: 160, bubbleY: 38 },
+          { labelZh: "03 · 握笔狂写", labelEn: "03 · 2x Speed Scribble", chatZh: "先写个解!", chatEn: "2 mins left!", bubbleX: 160, bubbleY: 38 },
           { labelZh: "04 · 交卷宕机", labelEn: "04 · Brain KO", chatZh: "大脑已空...", chatEn: "brain empty", bubbleX: 160, bubbleY: 42 }
         ]
       },
@@ -1863,7 +2418,7 @@ export function buildBoardsManifest(rawDir) {
 const isMain = process.argv[1] && process.argv[1].endsWith("render_preview.mjs");
 if (isMain) {
   if (process.argv.includes("--help") || process.argv.includes("-h")) {
-    console.log(`Usage: node scripts/render_preview.mjs [--raw-dir <dir>] [--force]`);
+    console.log(`Usage: node scripts/render_preview.mjs [--raw-dir <dir>] [--force] [--only <prefixes>]`);
     process.exit(0);
   }
   const rawIdx = process.argv.indexOf("--raw-dir");
@@ -1883,7 +2438,6 @@ if (isMain) {
     process.exit(0);
   }
 
-  // Spawn 6 parallel shard workers to render all 3D panels rapidly
   fs.mkdirSync(rawDir, { recursive: true });
   const workers = 6;
   await Promise.all(
