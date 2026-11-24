@@ -56,6 +56,7 @@ const requiredFiles = [
   "templates/character_card_template.md",
   "templates/storyboard_template.md",
   "templates/shot_prompt_template.md",
+  "templates/custom_story_spec.json",
   "scripts/avatar_spec.mjs",
   "scripts/shot_compiler.mjs",
   "scripts/drift_check.mjs",

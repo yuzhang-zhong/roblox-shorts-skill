@@ -236,23 +236,36 @@ if ($manifest.classicAssetSheet -and (Test-Path (Join-Path $rawDir "avatar_theo.
   }
 }
 
-# 3. Clean 4-Shot 9:16 Storyboard Contact Sheets (.zh.png and .en.png) + Keyframes + GIF + MP4
+# 3. Clean Multi-Shot 9:16 Storyboard Contact Sheets (.zh.png and .en.png) + Keyframes + GIF + MP4
 foreach ($case in $manifest.cases) {
-  if (-not (Test-Path (Join-Path $rawDir ($case.prefix + "_shot_3.png")))) { continue }
+  $shotCount = $case.shots.Count
+  if ($shotCount -lt 1) { continue }
+  $lastShotIdx = $shotCount - 1
+  if (-not (Test-Path (Join-Path $rawDir ($case.prefix + "_shot_" + $lastShotIdx + ".png")))) { continue }
+
+  $cols = [Math]::Min(4, $shotCount)
+  $rows = [Math]::Ceiling($shotCount / 4.0)
+  $boardW = 24 + $cols * 340
+  $boardH = 20 + $rows * 628
+
   foreach ($lang in @("zh", "en")) {
-    $bmp = New-Object System.Drawing.Bitmap(1384, 648)
+    if ($lang -eq "zh" -and -not $case.sheetZh) { continue }
+    if ($lang -eq "en" -and -not $case.sheetEn) { continue }
+
+    $bmp = New-Object System.Drawing.Bitmap([int]$boardW, [int]$boardH)
     $g = [System.Drawing.Graphics]::FromImage($bmp)
     $g.SmoothingMode = [System.Drawing.Drawing2D.SmoothingMode]::AntiAlias
     $g.TextRenderingHint = [System.Drawing.Text.TextRenderingHint]::ClearTypeGridFit
-    $g.FillRectangle($bBg, 0, 0, 1384, 648)
+    $g.FillRectangle($bBg, 0, 0, [int]$boardW, [int]$boardH)
 
     $fontLabel = if ($lang -eq "zh") { $fLabelZh } else { $fLabelEn }
-    $fontBub = if ($lang -eq "zh") { $fBubbleZh } else { $fBubbleEn }
 
-    for ($s = 0; $s -lt 4; $s++) {
+    for ($s = 0; $s -lt $shotCount; $s++) {
       $sh = $case.shots[$s]
-      $sx = 20 + $s * 340
-      $sy = 18
+      $cIdx = $s % 4
+      $rIdx = [Math]::Floor($s / 4)
+      $sx = 20 + $cIdx * 340
+      $sy = 18 + $rIdx * 626
       Fill-RoundedRect $g $bCard $sx $sy 324 612 14
       Draw-RoundedRect $g $pCardBorder $sx $sy 324 612 14
 
@@ -260,6 +273,8 @@ foreach ($case in $manifest.cases) {
       $img = [System.Drawing.Image]::FromFile($rawShotPath)
       # Speech bubbles inside all storyboard frames are always in English
       $chatText = $sh.chatEn
+      $bx = if ($sh.bubbleX) { [float]$sh.bubbleX } else { 160.0 }
+      $by = if ($sh.bubbleY) { [float]$sh.bubbleY } else { 38.0 }
 
       if ($lang -eq "en" -and $sh.savePath) {
         $shotBmp = New-Object System.Drawing.Bitmap(360, 640)
@@ -267,7 +282,7 @@ foreach ($case in $manifest.cases) {
         $sg.SmoothingMode = [System.Drawing.Drawing2D.SmoothingMode]::AntiAlias
         $sg.TextRenderingHint = [System.Drawing.Text.TextRenderingHint]::ClearTypeGridFit
         $sg.DrawImage($img, 0, 0, 360, 640)
-        Draw-CleanChatBubble $sg ($sh.bubbleX * 1.1) ($sh.bubbleY * 1.1) $chatText $fBubbleEn
+        Draw-CleanChatBubble $sg ($bx * 1.1) ($by * 1.1) $chatText $fBubbleEn
         $shotBmp.Save($sh.savePath, [System.Drawing.Imaging.ImageFormat]::Png)
         $sg.Dispose()
         $shotBmp.Dispose()
@@ -276,7 +291,7 @@ foreach ($case in $manifest.cases) {
       $g.DrawImage($img, ($sx + 6), ($sy + 6), 312, 554)
       $img.Dispose()
 
-      Draw-CleanChatBubble $g ($sx + $sh.bubbleX) ($sy + $sh.bubbleY) $chatText $fBubbleEn
+      Draw-CleanChatBubble $g ($sx + $bx) ($sy + $by) $chatText $fBubbleEn
 
       $label = if ($lang -eq "zh") { $sh.labelZh } else { $sh.labelEn }
       $lsz = $g.MeasureString($label, $fontLabel)
@@ -285,22 +300,45 @@ foreach ($case in $manifest.cases) {
 
     $outSheet = if ($lang -eq "zh") { $case.sheetZh } else { $case.sheetEn }
     $bmp.Save($outSheet, [System.Drawing.Imaging.ImageFormat]::Png)
-    if ($lang -eq "en") {
+    if ($lang -eq "en" -and $case.sheetDefault) {
       $bmp.Save($case.sheetDefault, [System.Drawing.Imaging.ImageFormat]::Png)
     }
     $g.Dispose()
     $bmp.Dispose()
   }
 
-  # Render clean 24-frame animation when anim frames exist
-  if (Test-Path (Join-Path $rawDir ($case.prefix + "_anim_23.png"))) {
-    $hudDir = Join-Path $rootDir ("tmp\hud_" + $case.prefix)
+  $framesPerShot = if ($case.framesPerShot) { [int]$case.framesPerShot } else { 6 }
+  $padWidth = if ($case.framePadWidth) { [int]$case.framePadWidth } else { 2 }
+  $padFmt = "0" * $padWidth
+  $totalFrames = if ($case.totalFrames) { [int]$case.totalFrames } else { $shotCount * $framesPerShot }
+  $lastAnimName = $case.prefix + "_anim_" + ($totalFrames - 1).ToString($padFmt) + ".png"
+
+  if (Test-Path (Join-Path $rawDir $lastAnimName)) {
+    # Isolate HUD frame staging inside $rawDir so parallel sessions never collide
+    $hudDir = Join-Path $rawDir ("hud_" + $case.prefix)
     New-Item -ItemType Directory -Force -Path $hudDir | Out-Null
 
-    for ($f = 0; $f -lt 24; $f++) {
-      $sIdx = [Math]::Floor($f / 6)
+    # Build per-frame shot lookup supporting variable per-shot frameCount
+    $shotIndexByFrame = New-Object int[] $totalFrames
+    $cursorF = 0
+    for ($si = 0; $si -lt $shotCount; $si++) {
+      $fc = if ($case.shots[$si].frameCount) { [int]$case.shots[$si].frameCount } else { $framesPerShot }
+      for ($k = 0; $k -lt $fc -and $cursorF -lt $totalFrames; $k++) {
+        $shotIndexByFrame[$cursorF] = $si
+        $cursorF++
+      }
+    }
+    while ($cursorF -lt $totalFrames) {
+      $shotIndexByFrame[$cursorF] = $shotCount - 1
+      $cursorF++
+    }
+
+    for ($f = 0; $f -lt $totalFrames; $f++) {
+      $sIdx = $shotIndexByFrame[$f]
       $sh = $case.shots[$sIdx]
-      $fname = $case.prefix + "_anim_" + $f.ToString("00") + ".png"
+      $bx = if ($sh.bubbleX) { [float]$sh.bubbleX } else { 160.0 }
+      $by = if ($sh.bubbleY) { [float]$sh.bubbleY } else { 38.0 }
+      $fname = $case.prefix + "_anim_" + $f.ToString($padFmt) + ".png"
       $srcImg = [System.Drawing.Image]::FromFile((Join-Path $rawDir $fname))
       $frameBmp = New-Object System.Drawing.Bitmap(270, 480)
       $fg = [System.Drawing.Graphics]::FromImage($frameBmp)
@@ -309,19 +347,25 @@ foreach ($case in $manifest.cases) {
       $fg.DrawImage($srcImg, 0, 0, 270, 480)
       $srcImg.Dispose()
 
-      Draw-CleanChatBubble $fg ($sh.bubbleX * 0.84) ($sh.bubbleY * 0.84) $sh.chatEn $fBubbleEn
+      Draw-CleanChatBubble $fg ($bx * 0.84) ($by * 0.84) $sh.chatEn $fBubbleEn
 
-      $outFrame = Join-Path $hudDir ("frame_" + $f.ToString("00") + ".png")
+      $outFrame = Join-Path $hudDir ("frame_" + $f.ToString($padFmt) + ".png")
       $frameBmp.Save($outFrame, [System.Drawing.Imaging.ImageFormat]::Png)
       $fg.Dispose()
       $frameBmp.Dispose()
     }
 
-    $inPattern = Join-Path $hudDir "frame_%02d.png"
+    $inFps = if ($case.inFps) { [string]$case.inFps } else { "6" }
+    $inPattern = Join-Path $hudDir ("frame_%0" + $padWidth + "d.png")
     $palPath = Join-Path $hudDir "palette.png"
-    & ffmpeg -y -loglevel error -framerate 6 -i $inPattern -vf "palettegen=max_colors=128" $palPath
-    & ffmpeg -y -loglevel error -framerate 6 -i $inPattern -i $palPath -lavfi "paletteuse=dither=bayer" $case.gifPath
-    & ffmpeg -y -loglevel error -framerate 6 -i $inPattern -f lavfi -i "sine=frequency=520:beep_factor=4:duration=4" -c:v libx264 -pix_fmt yuv420p -vf "fps=24" -c:a aac -b:a 96k -shortest $case.mp4Path
+    & ffmpeg -y -loglevel error -framerate $inFps -i $inPattern -vf "palettegen=max_colors=128" $palPath
+    & ffmpeg -y -loglevel error -framerate $inFps -i $inPattern -i $palPath -lavfi "paletteuse=dither=bayer" $case.gifPath
+    if ($case.wavPath -and (Test-Path $case.wavPath)) {
+      & ffmpeg -y -loglevel error -framerate $inFps -i $inPattern -i $case.wavPath -c:v libx264 -pix_fmt yuv420p -vf "scale=540:960:flags=lanczos,fps=24" -c:a aac -b:a 128k -shortest $case.mp4Path
+    } else {
+      $durSec = [Math]::Max(4, [Math]::Round($totalFrames / [double]$inFps))
+      & ffmpeg -y -loglevel error -framerate $inFps -i $inPattern -f lavfi -i ("sine=frequency=520:beep_factor=4:duration=" + $durSec) -c:v libx264 -pix_fmt yuv420p -vf "fps=24" -c:a aac -b:a 96k -shortest $case.mp4Path
+    }
   }
 }
 Write-Output "All bilingual .zh.png / .en.png boards, keyframes, GIFs, and MP4s generated!"

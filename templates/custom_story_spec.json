@@ -1,0 +1,102 @@
+{
+  "slug": "subway_seat_scramble",
+  "titleEn": "Morning Rush-Hour Subway Seat Scramble",
+  "titleZh": "早高峰地铁抢座大战",
+  "rig": "chibi-blocky",
+  "material": "smooth-plastic",
+  "aspect": "9:16",
+  "durationSeconds": 15,
+  "loop": false,
+  "backdrop": "subway_car",
+  "constraints": {
+    "noCheckpoint": true,
+    "noJetpack": true
+  },
+  "cast": [
+    {
+      "id": "mo",
+      "name": "Mo",
+      "archetype": "chibi-plush",
+      "rig": "chibi-blocky",
+      "face": "sleepy",
+      "theme3d": "y2k"
+    },
+    {
+      "id": "noob",
+      "name": "Noob",
+      "archetype": "classic-noob",
+      "rig": "r6",
+      "face": "deadpan",
+      "noAccessories": true,
+      "theme3d": "noob"
+    }
+  ],
+  "environmentEn": "bright miniature subway carriage with smooth flat slate floor (zero raised circular Lego floor studs), teal commuter seat, steel-blue window band, and overhead amber strap handles",
+  "environmentZh": "明亮微缩地铁车厢，平整深灰无凸点地板（严禁乐高地面凸粒）、青绿色单人座位、冷蓝车窗带与琥珀色刚性吊环扶手",
+  "shots": [
+    {
+      "role": "Hook / 黄金前3秒",
+      "durationSec": 3.5,
+      "castIds": ["mo", "noob"],
+      "actionEn": "Mo pivots only its 1:1 cylindrical head toward the last empty teal subway seat on screen right while Noob stands still near the left edge",
+      "actionZh": "Mo仅沿颈部刚性转轴猛地转头盯向右侧最后一个青绿色空座位，左侧边缘Noob保持静止",
+      "faceEn": "Mo switches from sleepy eyes to wide hollow shocked ring eyes (O_O); Noob keeps flat Chill (-_-) decal",
+      "faceZh": "Mo切换为震惊白圈眼(O_O)2D贴图；Noob保持平面死鱼眼(-_-)",
+      "cameraEn": "Medium two-plane framing, crisp dolly push-in toward the empty teal seat",
+      "cameraZh": "中景双层构图，向青绿空座轻快推镜",
+      "hailuoTag": "[Push in]",
+      "chatEn": "ONE SEAT LEFT!",
+      "sfx": "地铁行驶低频声 + 清脆叮声",
+      "caption": "早高峰最后一个空座！",
+      "pose3d": { "primary": "idle", "secondary": "idle" }
+    },
+    {
+      "role": "Escalation 1 / 动作推进",
+      "durationSec": 4.0,
+      "castIds": ["mo"],
+      "actionEn": "Mo sprints two stiff Motor6D strides across the smooth subway aisle toward the empty teal seat as the carriage jolts",
+      "actionZh": "车厢微晃瞬间，Mo迈开两步干脆僵直的Motor6D方腿大步冲向青绿色空座位",
+      "faceEn": "determined focused 2D eyes with a single painted blue sweat drop",
+      "faceZh": "专注大眼配额角一滴2D蓝色汗珠贴图",
+      "cameraEn": "Static carriage-relative medium-full shot across the aisle",
+      "cameraZh": "横跨过道的车厢内固定中全景机位",
+      "hailuoTag": "[Shake, Static shot]",
+      "chatEn": "MINE!!",
+      "sfx": "车厢顿挫声 + 两声清脆塑料踏步声",
+      "caption": "冲啊！这把稳了",
+      "pose3d": { "primary": "run", "secondary": "idle" }
+    },
+    {
+      "role": "Escalation 2 / 反转截胡",
+      "durationSec": 4.0,
+      "castIds": ["noob", "mo"],
+      "actionEn": "Noob drops squarely onto the teal seat in one rigid 90-degree R6 hip pivot right before Mo reaches the cushion",
+      "actionZh": "就在Mo差半步够到坐垫前，Noob做一次干净的90度R6刚性髋轴折弯稳稳抢先落座",
+      "faceEn": "unchanging deadpan Chill (-_-) decal on Noob; frozen shocked O_O decal on Mo",
+      "faceZh": "Noob全程保持毫无波澜的死鱼眼(-_-)贴图；Mo定格为震惊圆圈眼(O_O)",
+      "cameraEn": "Locked-off medium shot centered on the teal seat",
+      "cameraZh": "聚焦青绿座位的固定中景机位",
+      "hailuoTag": "[Static shot]",
+      "chatEn": "Morning.",
+      "sfx": "清脆塑料落座声 (Clack!)",
+      "caption": "黄皮新手：丝滑截胡",
+      "pose3d": { "primary": "panic", "secondary": "sit" }
+    },
+    {
+      "role": "Payoff / 挂件收尾",
+      "durationSec": 3.5,
+      "castIds": ["mo", "noob"],
+      "actionEn": "suspended above the floor with its raised flat solid 1x2x1 block hand docked flush beneath the overhead amber strap handle, Mo swings once by 8 degrees like a rigid plastic keychain beside seated Noob",
+      "actionZh": "双脚离地悬空的Mo以高举的1x2x1实心平头方柱手刚性贴合车顶琥珀吊环底面，像一枚硬质塑料钥匙扣一样整体轻摆8度，身旁Noob淡定端坐",
+      "faceEn": "synchronized deadpan horizontal line eyes (-_-) on both Mo and Noob",
+      "faceZh": "Mo与Noob同步定格为沉默死鱼眼(-_-)2D贴图",
+      "cameraEn": "Locked-off medium-full two-shot showing overhead strap rail and gap under Mo's feet",
+      "cameraZh": "收入车顶吊环横杆与Mo脚下悬空缝隙的固定双人中全景",
+      "hailuoTag": "[Static shot]",
+      "chatEn": "Standing ticket...",
+      "sfx": "黑胶急停 + 塑料挂件轻晃叮声",
+      "caption": "喜提早高峰塑料挂件体验卡",
+      "pose3d": { "primary": "hang_strap", "secondary": "sit" }
+    }
+  ]
+}

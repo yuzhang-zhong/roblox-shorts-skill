@@ -81,9 +81,9 @@ git clone https://github.com/yuzhang-zhong/roblox-style-video.git ~/.codex/skill
 Skill 内附的四支脚本也可在普通克隆的仓库根目录独立运行，基于 Node.js 18+ 标准库，无需 `npm install` 或 API Key。
 
 ```bash
-node scripts/shot_compiler.mjs --template brookhaven-chase --duration 15 --engine hailuo --rig r6 --lang zh
-node scripts/drift_check.mjs --prompt "A cute Roblox girl with C-shaped claw hands drinks coffee with five fingers" --engine kling --mode t2v --lang zh
-node scripts/render_preview.mjs --only tornado,chase,doors
+node scripts/render_preview.mjs --spec templates/custom_story_spec.json --out-dir out/subway-demo --force
+node scripts/shot_compiler.mjs --spec templates/custom_story_spec.json --engine local3d --lang zh
+node scripts/drift_check.mjs --pack templates/custom_story_spec.json --engine local3d --lang zh
 ```
 
 ## Skill 脚本、防跑偏检查与参考文档
@@ -97,10 +97,10 @@ node scripts/render_preview.mjs --only tornado,chase,doors
 | Skill 组件 | 输出 |
 | --- | --- |
 | [`SKILL.md`](SKILL.md) | Agent Skill 主入口说明，定义 6 种工作模式（角色设定、分镜、提示词编译、翻车修复、二创、3D 预演）与 8 项几何防变形约束。 |
-| [`shot_compiler.mjs`](scripts/shot_compiler.mjs) | 内置 12 套短片模板，编译适配可灵、即梦、海螺、通义万相、Sora 和 Runway 的 9:16 分镜与 I2V/T2V 提示词。 |
-| [`avatar_spec.mjs`](scripts/avatar_spec.mjs) | 角色设定卡、`BrickColor` 色号、方块比例锁与首帧[三视图参考卡](assets/showcase/momo_turnaround_sheet.zh.png)提示词。 |
-| [`drift_check.mjs`](scripts/drift_check.mjs) | 检查真人手指、乐高圆粒/钩爪、品牌水印与单镜多动作超载，输出修补后的提示词。 |
-| [`render_preview.mjs`](scripts/render_preview.mjs) | 本地渲染分镜联系表、对比图、GIF 和 MP4 预览（Windows 合成使用 PowerShell `System.Drawing` 与 `ffmpeg`）。 |
+| [`shot_compiler.mjs`](scripts/shot_compiler.mjs) | 支持自定义 `--spec <episode.json>` 剧本或 12 套内置模板，生成零重复的 15s / 30s / 45s 竖屏分镜与多引擎提示词（`local3d`、可灵、即梦、海螺、万相、Sora、Runway）。 |
+| [`avatar_spec.mjs`](scripts/avatar_spec.mjs) | 角色设定卡、`BrickColor` 色号、`--cast` 多角色同框锁、`--companion` 方块神宠与首帧[三视图参考卡](assets/showcase/momo_turnaround_sheet.zh.png)。 |
+| [`drift_check.mjs`](scripts/drift_check.mjs) | 8 门中英 Unicode 防跑偏审查器（支持 `--prompt` 与 `--pack` 整包审计），拦截五指、乐高圆粒/钩爪、官方商标、写实鳞爪神宠、R15 面条臂及动作超载。 |
+| [`render_preview.mjs`](scripts/render_preview.mjs) | 本地 3D 视频直出引擎（`--spec <episode.json> --out-dir <dir>`），无需外部平台即可按分镜精确时长合成 H.264 `.mp4`（含复古合成音效）、`.gif` 与分镜表。 |
 
 [角色比例与材质](references/avatar-geometry-and-materials.md) · [经典道具词库](references/classic-roblox-catalog.md) · [各模型提示词](references/model-prompt-playbook.md) · [跑偏修复](references/rescue-and-anti-drift.md) · [镜头节奏与音效](references/short-video-beats-and-audio.md) · [12 套分镜模板](references/viral-archetypes-catalog.md)
 

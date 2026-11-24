@@ -4,9 +4,10 @@ import { execFileSync } from "node:child_process";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 
-import { buildAvatarSpec, formatAvatarSpecMarkdown, normalizeLang } from "../scripts/avatar_spec.mjs";
+import { buildAvatarSpec, buildCastSpec, formatAvatarSpecMarkdown, normalizeLang } from "../scripts/avatar_spec.mjs";
 import { compileStoryboard, formatStoryboardMarkdown } from "../scripts/shot_compiler.mjs";
-import { inspectPrompt, formatDriftCheckMarkdown } from "../scripts/drift_check.mjs";
+import { inspectPrompt, inspectPackageFile, formatDriftCheckMarkdown } from "../scripts/drift_check.mjs";
+import { computeEpisodeTimingPlan, buildEpisodeWavBuffer } from "../scripts/render_preview.mjs";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(__dirname, "..");
@@ -46,7 +47,102 @@ test("shot_compiler generates 4 shots for 15s and 8 shots for 30s with engine ta
     rig: "r6"
   });
   assert.equal(hailuoPlan.shotCount, 8);
+  assert.equal(new Set(hailuoPlan.shots.map((s) => s.actionEn)).size, 8);
+  assert.equal(hailuoPlan.shots[0].exactTimeWindow, "0.00s–3.75s");
   assert.match(hailuoPlan.shots[0].i2vPromptEn, /^\[Push in, Tilt up\]/);
+
+  const customPlan = compileStoryboard({
+    spec: path.join(ROOT, "templates", "custom_story_spec.json"),
+    engine: "local3d"
+  });
+  assert.equal(customPlan.shotCount, 4);
+  assert.equal(customPlan.cast.length, 2);
+  assert.match(customPlan.shots[3].actionEn, /plastic keychain/);
+});
+
+test("drift_check catches Chinese finger/overload bugs, R15 contradictions, trademarks, and organic pets without false positives", () => {
+  // 1. Chinese five-finger + overload must FAIL (fixes JS ASCII \b bug)
+  const zhBad = inspectPrompt({
+    prompt: "早高峰地铁里，用五根手指紧紧抓住水壶的通勤小人跑向座位，然后跳起，接着坐下，再挥手。",
+    engine: "kling",
+    mode: "i2v"
+  });
+  assert.equal(zhBad.overallStatus, "FAIL");
+  assert.equal(zhBad.checks[0].status, "FAIL");
+  assert.equal(zhBad.checks[3].status, "FAIL");
+
+  // 2. Contradictory R15 soft-body noodle arm must FAIL
+  const r15Bad = inspectPrompt({
+    prompt:
+      "Roblox R15 avatar with 1:1 barrel head, flat 2D decal face, fingerless solid 1x2x1 block hands, smooth studless SmoothPlastic floor softly bends and twists its noodle-like arm.",
+    engine: "hailuo",
+    mode: "i2v"
+  });
+  assert.equal(r15Bad.overallStatus, "FAIL");
+
+  // 3. Official trademark leak or organic scaly dragon must FAIL
+  const tmPetBad = inspectPrompt({
+    prompt:
+      "SmoothPlastic R6 avatar with 1:1 cylindrical head, flat 2D decal face, rigid Motor6D hinges, fingerless solid 1x2x1 block hands stands beside a realistic scaly dragon with sharp claws under an official Roblox tilted-square R logo.",
+    engine: "seedance",
+    mode: "i2v"
+  });
+  assert.equal(tmPetBad.overallStatus, "FAIL");
+  assert.equal(tmPetBad.checks.find((c) => c.gate.startsWith("Trademark")).status, "FAIL");
+  assert.equal(tmPetBad.checks.find((c) => c.gate.startsWith("Pet & Prop")).status, "FAIL");
+
+  // 4. "medium close-up", "pull-back", "cat-ear headphones", "open jacket", "open gasp mouth", "sweat drop", "right next to", and "zero fingers" must NOT false-positive
+  const cleanCloseUp = inspectPrompt({
+    prompt:
+      "Medium-close pull-back right next to the counter: an authentic Roblox R15 figure in an open jacket and cat-ear headphones with a smooth studless cylindrical head, flat 2D screen-printed face decal with open gasp mouth and sweat drop, 2x2x1 SmoothPlastic torso, and solid 1x2x1 block hands (zero fingers, clawless) pivots its rigid mechanical elbow hinge to wave.",
+    engine: "local3d",
+    mode: "local3d"
+  });
+  assert.equal(cleanCloseUp.overallStatus, "PASS");
+
+  // 5. Companion pet + multi-character cast spec + theme3d->archetype sync
+  const petAvatar = buildAvatarSpec({ archetype: "chibi-plush", companion: "neon-dragon", noAccessories: true });
+  assert.equal(petAvatar.companion.id, "neon-dragon");
+  assert.match(petAvatar.locks.accessoriesEn, /^none/);
+  const castSheet = buildCastSpec("classic-noob:Noob:r6,zombie-r6:Zombie:r6");
+  assert.equal(castSheet.castCount, 2);
+
+  const zombieSpecPlan = compileStoryboard({
+    specObject: {
+      titleEn: "Zombie Cart Test",
+      durationSeconds: 15,
+      constraints: { noCheckpoints: true },
+      cast: [
+        { id: "builder", theme3d: "builderman", name: "Builder" },
+        { id: "zed", theme3d: "zombie", name: "Zed" }
+      ],
+      shots: [{ durationSec: 3.5, actionEn: "pushes the cart forward", faceEn: "open gasp mouth decal", cameraEn: "Medium-close tracking" }]
+    },
+    engine: "local3d"
+  });
+  assert.equal(zombieSpecPlan.cast[0].archetype, "builderman");
+  assert.equal(zombieSpecPlan.cast[1].archetype, "zombie-r6");
+
+  // 6. Batch package audit on custom_story_spec.json + exact per-shot video/WAV timing plan
+  const packAudit = inspectPackageFile(path.join(ROOT, "templates", "custom_story_spec.json"), { engine: "local3d" });
+  assert.equal(packAudit.uniqueActionCount, 4);
+  assert.equal(packAudit.overallStatus, "PASS");
+
+  const timing15 = computeEpisodeTimingPlan({
+    durationSeconds: 15,
+    shots: [{ durationSec: 3.5 }, { durationSec: 4.0 }, { durationSec: 4.0 }, { durationSec: 3.5 }]
+  });
+  assert.equal(timing15.totalDurationSec, 15);
+  assert.ok(Math.abs(timing15.totalFrames / timing15.inFps - 15) < 0.02);
+  const wav15 = buildEpisodeWavBuffer([{}, {}, {}, {}], timing15.shotDurations);
+  assert.equal(wav15.length, 44 + Math.floor(22050 * 15) * 2);
+
+  const timing30 = computeEpisodeTimingPlan({
+    durationSeconds: 30,
+    shots: Array.from({ length: 8 }, () => ({ durationSec: 3.75 }))
+  });
+  assert.equal(timing30.totalDurationSec, 30);
+  assert.ok(Math.abs(timing30.totalFrames / timing30.inFps - 30) < 0.05);
 });
 
 test("drift_check flags human fingers and multi-verb overload as FAIL, and passes locked prompts", () => {
@@ -88,5 +184,5 @@ test("validate_skill CLI verifies repository files, versions, and manifests", ()
     cwd: ROOT,
     encoding: "utf8"
   });
-  assert.match(out, /roblox-style-video v1\.5\.0 package is valid/);
+  assert.match(out, /roblox-style-video v1\.6\.0 package is valid/);
 });

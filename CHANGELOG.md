@@ -1,5 +1,12 @@
 # Changelog
 
+## 1.6.0
+
+- Added a self-contained declarative 3D episode video engine (`node scripts/render_preview.mjs --spec <episode.json> --out-dir <dir>`) that directly renders custom multi-shot `540x960` H.264 `.mp4` videos (with synthesized retro Roblox audio), `.gif`s, bilingual 4/8-shot storyboard sheets, and 3-view character turnaround sheets for any custom story without requiring external video platforms.
+- Upgraded `scripts/shot_compiler.mjs` with `--spec <episode.json>`, multi-character `cast[]` identity injection, true 8-shot (`30s`) and 12-shot (`45s`) progressive beat expansion (zero modulo shot recycling), Seedance `lastFramePrompt` loop bridges, dedicated Sora vs. Runway formatters, strict CLI flag validation, and `--out <path>` UTF-8 output.
+- Upgraded `scripts/drift_check.mjs` from 5 coarse gates to an 8-gate Unicode-safe linter and `--pack` batch auditor (fixing Chinese `\b` boundary false negatives, `close-up`/`next to`/`zero fingers` false positives, R15 soft-body contradictions, trademark leak checks, blocky pet/prop weld checks, and rig-aware rescue rewrites).
+- Expanded `scripts/avatar_spec.mjs` with `zombie-r6`, `--face`, `--no-accessories` / `--replace-accessory`, `--companion` blocky pet DNA (`neon-dragon`, `blocky-shiba`, `floating-slime`, `cyber-drone`), and `--cast` multi-character sheets.
+
 ## 1.5.0
 
 - Replaced all tilted-square emblems in `assets/icon.svg`, character presets, prompt templates, and 3D renders with an original trademark-free geometric triangle badge, and removed the top-left `9:16 R6` HUD label from `assets/icon.svg`.

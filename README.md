@@ -81,9 +81,9 @@ Give me the character geometry lock, a 4-shot storyboard, and Sora / Kling I2V p
 Every helper script bundled inside the skill also runs standalone from the repository root on Node.js 18+ using only the standard library (no `npm install` or API keys).
 
 ```bash
-node scripts/shot_compiler.mjs --template brookhaven-chase --duration 15 --engine hailuo --rig r6 --lang en
-node scripts/drift_check.mjs --prompt "A cute Roblox girl with C-shaped claw hands drinks coffee with five fingers" --engine kling --mode t2v --lang en
-node scripts/render_preview.mjs --only tornado,chase,doors
+node scripts/render_preview.mjs --spec templates/custom_story_spec.json --out-dir out/subway-demo --force
+node scripts/shot_compiler.mjs --spec templates/custom_story_spec.json --engine local3d --lang en
+node scripts/drift_check.mjs --pack templates/custom_story_spec.json --engine local3d --lang en
 ```
 
 ## Skill scripts, anti-drift checks, and references
@@ -97,10 +97,10 @@ Generic video prompts often produce human fingers, circular Lego floor/head stud
 | Skill component | Output |
 | --- | --- |
 | [`SKILL.md`](SKILL.md) | Main Agent Skill entry point defining the 6 production modes (`Avatar`, `Storyboard`, `Prompt-Compile`, `Rescue`, `Remix`, `Render`) and 8 geometry invariants. |
-| [`shot_compiler.mjs`](scripts/shot_compiler.mjs) | 9:16 beat sheet and I2V/T2V prompts across 12 templates (`daily-meltdown`, `obby-storytime`, `duo-comedy`, `mini-tycoon`, `outfit-drop`, `meme-slapstick`, `disaster-survival`, `brookhaven-chase`, `doors-horror`, `sword-duel`, `school-panic`, `red-light-game`) for Kling, Seedance, Hailuo, Wan, Sora, and Runway. |
-| [`avatar_spec.mjs`](scripts/avatar_spec.mjs) | Character DNA card with `BrickColor` codes, stud proportions, and a [three-view turnaround](assets/showcase/momo_turnaround_sheet.en.png) prompt. |
-| [`drift_check.mjs`](scripts/drift_check.mjs) | Diagnostic report and patched prompt when a draft triggers finger growth, Lego claws/bumps, brand logos, or multi-verb overload. |
-| [`render_preview.mjs`](scripts/render_preview.mjs) | Offline 3D contact sheets, GIFs, and MP4 animatics (Windows board composition uses PowerShell `System.Drawing` and `ffmpeg`). |
+| [`shot_compiler.mjs`](scripts/shot_compiler.mjs) | Compiles custom `--spec <episode.json>` stories or 12 built-in templates into non-repeating 15s / 30s / 45s 9:16 beat sheets (`local3d`, Kling, Seedance, Hailuo, Wan, Sora, Runway). |
+| [`avatar_spec.mjs`](scripts/avatar_spec.mjs) | Character DNA card with `BrickColor` codes, `--cast` multi-character locks, `--companion` blocky pets, and a [three-view turnaround](assets/showcase/momo_turnaround_sheet.en.png) prompt. |
+| [`drift_check.mjs`](scripts/drift_check.mjs) | 8-gate Unicode-safe linter (`--prompt` or `--pack`) catching finger growth, Lego claws/bumps, brand logos, organic pet drift, R15 soft-body contradictions, and action overload. |
+| [`render_preview.mjs`](scripts/render_preview.mjs) | Direct local 3D `.mp4` / `.gif` / contact-sheet renderer (`--spec <episode.json> --out-dir <dir>`) with multi-part props, synthesized retro WAV audio, and exact per-shot timing. |
 
 [Avatar geometry and materials](references/avatar-geometry-and-materials.md) · [Classic gear and props](references/classic-roblox-catalog.md) · [Model prompt playbook](references/model-prompt-playbook.md) · [Drift fixes](references/rescue-and-anti-drift.md) · [Pacing and audio](references/short-video-beats-and-audio.md) · [12 story templates](references/viral-archetypes-catalog.md)
 

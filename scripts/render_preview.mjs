@@ -162,6 +162,10 @@ function evalFaceDecal(u, v, expression = "smile") {
 
   if (expression === "deadpan") {
     if (Math.abs(ex) < 0.068 && Math.abs(ey) < 0.018) return ink;
+  } else if (expression === "sleepy") {
+    if (Math.abs(ex) < 0.070 && Math.abs(ey + 0.008) < 0.016) return ink;
+    const lidR = Math.hypot(ex / 0.062, (ey + 0.008) / 0.038);
+    if (ey < -0.008 && lidR < 1.0 && lidR > 0.70) return ink;
   } else if (expression === "dizzy") {
     const d1 = Math.abs(ex - ey);
     const d2 = Math.abs(ex + ey);
@@ -205,6 +209,9 @@ function evalFaceDecal(u, v, expression = "smile") {
         return mouthIn;
       }
     }
+  } else if (expression === "sleepy") {
+    const rYawn = Math.hypot(u / 0.042, my / 0.048);
+    if (rYawn < 1.0) return rYawn > 0.72 ? ink : mouthIn;
   } else if (expression === "deadpan" || expression === "dizzy") {
     if (Math.abs(u) < 0.075 && Math.abs(my) < 0.016) return ink;
   } else if (expression === "slam" || expression === "smirk") {
@@ -356,6 +363,51 @@ function getCastPreset(theme = "theo") {
       details: ["cuffs", "star_gold"]
     };
   }
+  if (theme === "zombie") {
+    return {
+      skin: [116, 166, 98],
+      top: [105, 64, 40],
+      trim: [78, 46, 28],
+      accent: [132, 204, 22],
+      pants: [51, 65, 85],
+      shoes: null,
+      sleeves: "none",
+      hairStyle: "bald",
+      hairColor: null,
+      hat: null,
+      details: []
+    };
+  }
+  if (theme === "clerk") {
+    return {
+      skin: [252, 208, 162],
+      top: [16, 185, 129],
+      trim: [5, 150, 105],
+      accent: [255, 255, 255],
+      pants: [30, 41, 59],
+      shoes: [248, 250, 252],
+      sleeves: "short",
+      hairStyle: "bald",
+      hairColor: null,
+      hat: "cap_red",
+      details: ["triangle", "kangaroo"]
+    };
+  }
+  if (theme === "commuter") {
+    return {
+      skin: [253, 224, 145],
+      top: [244, 142, 178],
+      trim: [219, 108, 148],
+      accent: [255, 255, 255],
+      pants: [241, 245, 249],
+      shoes: [56, 189, 248],
+      sleeves: "long",
+      hairStyle: "messy",
+      hairColor: [94, 52, 42],
+      hat: null,
+      details: ["hood", "kangaroo", "cuffs", "triangle"]
+    };
+  }
   return {
     skin: [252, 208, 162],
     top: [56, 152, 242],
@@ -452,6 +504,31 @@ function evalHandPropSDF(hit, pArmLocal, propType) {
     hit.add(sdRoundedCylinder(pp, 0.024, 0.005, 0.14), [250, 204, 21], 0.28, 8);
     hit.add(sdRoundedCylinder(sub3(pp, v3(0, -0.15, 0)), 0.025, 0.006, 0.028), [244, 114, 182], 0.32, 8);
     hit.add(sdTaperedCapsule(pp, v3(0, 0.14, 0), v3(0, 0.20, 0), 0.024, 0.005), [30, 41, 59], 0.35, 8);
+  } else if (propType === "kettle") {
+    const pk = sub3(pArmLocal, v3(0, -0.48, 0.22));
+    hit.add(sdRoundedCylinder(pk, 0.115, 0.025, 0.13), [226, 232, 240], 0.14, 8);
+    hit.add(sdRoundedCylinder(sub3(pk, v3(0, 0.14, 0)), 0.085, 0.012, 0.022), [30, 41, 59], 0.25, 8);
+    hit.add(sdTaperedCapsule(pk, v3(0, 0.02, 0.08), v3(0, 0.14, 0.22), 0.028, 0.016), [203, 213, 225], 0.14, 8);
+  } else if (propType === "ramen_cup") {
+    const pr = sub3(pArmLocal, v3(0, -0.46, 0.22));
+    const dCup = sdRoundedCylinder(pr, 0.105, 0.018, 0.13);
+    const col = Math.abs(pr.y) < 0.045 ? [239, 68, 68] : [255, 255, 255];
+    hit.add(dCup, col, 0.22, 8);
+    hit.add(sdRoundedCylinder(sub3(pr, v3(0, 0.125, 0)), 0.092, 0.008, 0.015), [250, 204, 21], 0.32, 8);
+  } else if (propType === "mystery_egg") {
+    const pe = sub3(pArmLocal, v3(0, -0.48, 0.24));
+    const qEgg = v3(pe.x / 0.14, pe.y / 0.18, pe.z / 0.14);
+    const dEgg = (len3(qEgg) - 1.0) * 0.14;
+    const isStripe = Math.abs(pe.y) < 0.025 || Math.abs(pe.x) < 0.02;
+    hit.add(dEgg, isStripe ? [56, 189, 248] : [248, 250, 252], isStripe ? 0.04 : 0.16, 8);
+  } else if (propType === "soda_pack") {
+    const ps = sub3(pArmLocal, v3(0, -0.48, 0.22));
+    hit.add(sdRoundBox(ps, v3(0.14, 0.09, 0.10), 0.02), [14, 165, 233], 0.18, 8);
+    hit.add(sdRoundBox(sub3(ps, v3(0, 0.095, 0)), v3(0.12, 0.018, 0.08), 0.008), [250, 204, 21], 0.20, 8);
+  } else if (propType === "price_tag") {
+    const pt = sub3(pArmLocal, v3(0, -0.52, 0.18));
+    hit.add(sdRoundBox(pt, v3(0.09, 0.055, 0.015), 0.008), [250, 204, 21], 0.18, 8);
+    hit.add(sdRoundBox(sub3(pt, v3(0, 0, 0.012)), v3(0.065, 0.016, 0.008), 0.004), [239, 68, 68], 0.20, 8);
   }
 }
 
@@ -460,6 +537,7 @@ export function evalAvatarSDF(pWorld, cfg = {}) {
     pos = v3(0, 0, 0),
     yaw = 0,
     roll = 0,
+    bodyPitch = 0,
     waistPitch = 0,
     headYaw = 0,
     headPitch = 0,
@@ -469,6 +547,8 @@ export function evalAvatarSDF(pWorld, cfg = {}) {
     legRPitch = 0,
     expression = "smile",
     theme = "theo",
+    customPalette = null,
+    noAccessories = false,
     driftMode = "none",
     hasMug = false,
     handPropL = null,
@@ -477,12 +557,24 @@ export function evalAvatarSDF(pWorld, cfg = {}) {
     detachRightArm = false
   } = cfg;
 
-  const pal = getCastPreset(theme);
+  const basePal = getCastPreset(theme);
+  const mergedPal = customPalette ? { ...basePal, ...customPalette } : basePal;
+  const pal = noAccessories
+    ? {
+        ...mergedPal,
+        hat: null,
+        details: (mergedPal.details || []).filter((d) => d !== "speed_coil")
+      }
+    : mergedPal;
+  const effectiveBackProp = noAccessories ? null : backProp;
   let p = sub3(pWorld, pos);
   if (roll !== 0) {
     p = add3(rotZ(sub3(p, v3(0, -0.82, 0)), -roll), v3(0, -0.82, 0));
   }
   p = rotY(p, -yaw);
+  if (bodyPitch !== 0) {
+    p = add3(rotX(sub3(p, v3(0, -0.78, 0)), -bodyPitch), v3(0, -0.78, 0));
+  }
 
   const dBound = len3(p) - 2.35;
   if (dBound > 0.22) {
@@ -545,12 +637,13 @@ export function evalAvatarSDF(pWorld, cfg = {}) {
     hit.add(dKanga, pal.trim, 0.48, 2);
   }
 
-  if (backProp === "backpack_purple") {
+  if (effectiveBackProp === "backpack_purple" || effectiveBackProp === "backpack_cyan") {
+    const isCyan = effectiveBackProp === "backpack_cyan";
     const pBag = sub3(pUpper, v3(0, 0.18, -0.26));
-    hit.add(sdRoundBox(pBag, v3(0.23, 0.25, 0.11), 0.035), [168, 85, 247], 0.32, 3);
-    hit.add(sdRoundBox(sub3(pBag, v3(0, -0.07, -0.095)), v3(0.16, 0.11, 0.045), 0.022), [192, 132, 252], 0.28, 3);
+    hit.add(sdRoundBox(pBag, v3(0.23, 0.25, 0.11), 0.035), isCyan ? [14, 165, 233] : [168, 85, 247], 0.32, 3);
+    hit.add(sdRoundBox(sub3(pBag, v3(0, -0.07, -0.095)), v3(0.16, 0.11, 0.045), 0.022), isCyan ? [56, 189, 248] : [192, 132, 252], 0.28, 3);
     hit.add(sdRoundBox(sub3(pBag, v3(0, 0.26, 0)), v3(0.07, 0.03, 0.025), 0.01), [250, 204, 21], 0.2, 3);
-  } else if (backProp === "jetpack") {
+  } else if (effectiveBackProp === "jetpack") {
     const pjL = sub3(pUpper, v3(-0.12, 0.20, -0.25));
     const pjR = sub3(pUpper, v3(0.12, 0.20, -0.25));
     hit.add(Math.min(sdRoundedCylinder(pjL, 0.085, 0.02, 0.22), sdRoundedCylinder(pjR, 0.085, 0.02, 0.22)), [241, 245, 249], 0.22, 3);
@@ -858,8 +951,9 @@ export function render3DViewport(width, height, sceneFn, camCfg = {}) {
       }
 
       let hit = null;
+      const maxSteps = camCfg.maxSteps || 34;
       if (disc > 0 && tMax > 0.2) {
-        for (let step = 0; step < 34; step++) {
+        for (let step = 0; step < maxSteps; step++) {
           if (t > tMax) break;
           const pos = add3(ro, mul3(rd, t));
           const res = sceneFn(pos);
@@ -2416,32 +2510,902 @@ export function buildBoardsManifest(rawDir) {
   };
 }
 
-const isMain = process.argv[1] && process.argv[1].endsWith("render_preview.mjs");
+// ---------- Declarative Custom Episode 3D Video Engine (--spec <episode.json> --out-dir <dir>) ----------
+function vecFromArr(arr, fallback = v3(0, 0, 0)) {
+  if (!Array.isArray(arr) || arr.length < 3) return fallback;
+  return v3(Number(arr[0]) || 0, Number(arr[1]) || 0, Number(arr[2]) || 0);
+}
+
+function lerpVec(a, b, t) {
+  return v3(mix(a.x, b.x, t), mix(a.y, b.y, t), mix(a.z, b.z, t));
+}
+
+function mapArchetypeTo3DTheme(arch = "", explicitTheme = "") {
+  if (explicitTheme) return explicitTheme;
+  const map = {
+    "chibi-plush": "commuter",
+    "classic-noob": "noob",
+    "bacon-hair": "bacon",
+    "classic-guest": "guest",
+    builderman: "builderman",
+    "ugc-streetwear": "y2k",
+    "corporate-worker": "theo",
+    "cozy-chef": "chef",
+    "obby-runner": "obby",
+    "zombie-r6": "zombie"
+  };
+  return map[arch] || arch || "theo";
+}
+
+function addDeclarativeBackdrop(hit, p, backdrop = "studio", phase = 0.5) {
+  if (backdrop === "bedroom") {
+    addBedroomBackdrop(hit, p);
+  } else if (backdrop === "subway_car") {
+    // Lipschitz-exact bound covering seats out to z = -0.50 (prevents front-edge seat striping!)
+    if (p.z - (-0.42) <= hit.d) {
+      hit.add(sdRoundBox(sub3(p, v3(0, 0.42, -1.18)), v3(2.8, 1.48, 0.07), 0.01), [219, 228, 238], 0.44, 19);
+      hit.add(sdRoundBox(sub3(p, v3(0, 0.52, -1.08)), v3(2.7, 0.04, 0.03), 0.01), [249, 115, 22], 0.25, 20);
+      for (const wx of [-1.05, 0.0, 1.05]) {
+        const pw = sub3(p, v3(wx, 0.88, -1.08));
+        if (len3(pw) - 0.65 <= hit.d) {
+          hit.add(sdRoundBox(pw, v3(0.42, 0.26, 0.035), 0.03), [71, 85, 105], 0.22, 19);
+          hit.add(sdRoundBox(sub3(pw, v3(0, 0, 0.014)), v3(0.36, 0.20, 0.025), 0.02), [56, 189, 248], 0.06, 19);
+        }
+      }
+      // Teal & slate subway seats along back wall
+      hit.add(sdRoundBox(sub3(p, v3(0.62, -0.46, -0.78)), v3(0.48, 0.08, 0.26), 0.025), [13, 148, 136], 0.26, 20);
+      hit.add(sdRoundBox(sub3(p, v3(0.62, -0.20, -0.98)), v3(0.48, 0.24, 0.07), 0.025), [13, 148, 136], 0.26, 20);
+      hit.add(sdRoundBox(sub3(p, v3(-0.92, -0.46, -0.78)), v3(0.48, 0.08, 0.26), 0.025), [100, 116, 139], 0.34, 20);
+    }
+    // Overhead grab rail & 3 amber commuter straps (docked cleanly to raised 1x2x1 block hand height!)
+    if (Math.max(0.98 - p.y, Math.abs(p.z - 0.04) - 0.18) <= hit.d) {
+      hit.add(sdRoundBox(sub3(p, v3(0, 1.30, 0.04)), v3(2.2, 0.03, 0.03), 0.012), [203, 213, 225], 0.16, 20);
+      for (const sx of [-0.72, 0.0, 0.72]) {
+        const swing = sx === 0 ? Math.sin(phase * Math.PI * 2) * 0.08 : 0;
+        const ps = rotZ(sub3(p, v3(sx, 1.12, 0.04)), swing);
+        hit.add(sdRoundBox(sub3(ps, v3(0, 0.08, 0)), v3(0.022, 0.10, 0.022), 0.008), [148, 163, 184], 0.25, 20);
+        hit.add(sdRoundBox(sub3(ps, v3(0, -0.06, 0)), v3(0.088, 0.055, 0.025), 0.018), [245, 158, 11], 0.20, 20);
+      }
+    }
+  } else if (backdrop === "adoption_plaza" || backdrop === "plaza") {
+    if (p.z - (-0.65) <= hit.d) {
+      hit.add(sdRoundBox(sub3(p, v3(0, 0.38, -1.18)), v3(2.8, 1.5, 0.06), 0.01), [250, 245, 255], 0.45, 38);
+      const pa = sub3(p, v3(0, 0.28, -1.04));
+      const dArch = Math.max(
+        sdRoundedCylinder(rotX(pa, Math.PI / 2), 1.08, 0.03, 0.05),
+        -sdRoundedCylinder(rotX(pa, Math.PI / 2), 0.92, 0.02, 0.09),
+        -(pa.y + 0.85)
+      );
+      hit.add(dArch, [56, 189, 248], 0.05, 51);
+    }
+    if (backdrop === "adoption_plaza") {
+      // Pastel pedestal in center-front for egg/pet showcase
+      hit.add(sdRoundedCylinder(sub3(p, v3(0.22, -0.68, 0.28)), 0.34, 0.025, 0.16), [233, 213, 255], 0.24, 50);
+      hit.add(sdRoundedCylinder(sub3(p, v3(0.22, -0.50, 0.28)), 0.28, 0.02, 0.03), [255, 255, 255], 0.18, 50);
+    }
+  } else if (backdrop === "convenience_store") {
+    if (p.z - (-0.55) <= hit.d) {
+      hit.add(sdRoundBox(sub3(p, v3(0, 0.38, -1.08)), v3(2.8, 1.5, 0.06), 0.01), [241, 245, 249], 0.44, 44);
+      // Neon 24H header stripe (green / orange / blue)
+      hit.add(sdRoundBox(sub3(p, v3(0, 1.12, -0.98)), v3(2.4, 0.06, 0.04), 0.01), [16, 185, 129], 0.05, 44);
+      hit.add(sdRoundBox(sub3(p, v3(0, 1.00, -0.98)), v3(2.4, 0.05, 0.04), 0.01), [249, 115, 22], 0.05, 44);
+      // Stocked snack shelf on right
+      const psh = sub3(p, v3(0.82, 0.22, -0.88));
+      if (len3(psh) - 0.85 <= hit.d) {
+        hit.add(sdRoundBox(psh, v3(0.46, 0.56, 0.12), 0.015), [203, 213, 225], 0.32, 45);
+        for (const [bx, by, col] of [[-0.22, 0.28, [239, 68, 68]], [0.0, 0.28, [59, 130, 246]], [0.22, 0.28, [250, 204, 21]], [-0.18, -0.05, [16, 185, 129]], [0.14, -0.05, [244, 114, 182]]]) {
+          hit.add(sdRoundBox(sub3(psh, v3(bx, by, 0.06)), v3(0.08, 0.11, 0.06), 0.012), col, 0.24, 45);
+        }
+      }
+    }
+    // Convenience store counter
+    hit.add(sdRoundBox(sub3(p, v3(0, -0.58, 0.44)), v3(1.34, 0.26, 0.40), 0.02), [226, 232, 240], 0.32, 40);
+    hit.add(sdRoundBox(sub3(p, v3(0, -0.32, 0.44)), v3(1.38, 0.035, 0.44), 0.015), [248, 250, 252], 0.20, 40);
+  } else if (backdrop === "supermarket_aisle") {
+    // Left and right supermarket shelves stocked with colorful blocky packages
+    for (const side of [-1, 1]) {
+      const ps = sub3(p, v3(side * 1.46, 0.12, -0.35));
+      if (len3(ps) - 1.55 <= hit.d) {
+        hit.add(sdRoundBox(ps, v3(0.20, 0.96, 1.02), 0.02), [226, 232, 240], 0.34, 45);
+        for (const sy of [-0.36, 0.08, 0.52]) {
+          const col = sy > 0.3 ? [239, 68, 68] : sy > -0.1 ? [14, 165, 233] : [250, 204, 21];
+          hit.add(sdRoundBox(sub3(ps, v3(-side * 0.13, sy, 0.12)), v3(0.10, 0.12, 0.78), 0.02), col, 0.22, 45);
+        }
+      }
+    }
+  } else if (backdrop === "neon_tower") {
+    // Open-front horseshoe neon tower shaft rings (clipped at p.z <= -0.18 so rings NEVER cut across the actor's face!)
+    for (let i = -2; i <= 2; i++) {
+      const ry = i * 0.66 - ((phase * 0.66) % 0.66);
+      const pr = sub3(p, v3(0, ry, -0.42));
+      if (Math.abs(pr.y) - 0.12 <= hit.d && p.z - (-0.18) <= hit.d) {
+        const dShell = Math.max(sdRoundedCylinder(pr, 1.38, 0.02, 0.042), -sdRoundedCylinder(pr, 1.22, 0.01, 0.08));
+        const dOpenFront = Math.max(dShell, p.z - (-0.18));
+        hit.add(dOpenFront, i & 1 ? [168, 85, 247] : [56, 189, 248], 0.04, 51);
+      }
+    }
+  }
+}
+
+function addDeclarativeProp(hit, p, prop, phase = 0.5) {
+  if (prop.visible === false) return;
+  if (Array.isArray(prop.visiblePhase) && prop.visiblePhase.length >= 2) {
+    if (phase < Number(prop.visiblePhase[0]) || phase > Number(prop.visiblePhase[1])) return;
+  }
+  const s0 = prop.scale !== undefined ? Number(prop.scale) : 1.0;
+  const s1 = prop.scaleTo !== undefined ? Number(prop.scaleTo) : s0;
+  const scale = mix(s0, s1, smoothstep(0, 1, phase));
+  if (scale <= 0.02) return;
+
+  const p0 = vecFromArr(prop.pos, v3(0, -0.3, 0.4));
+  const p1 = prop.moveTo ? vecFromArr(prop.moveTo, p0) : p0;
+  const center = lerpVec(p0, p1, smoothstep(0, 1, phase));
+  const q = mul3(rotY(sub3(p, center), Number(prop.yaw) || 0), 1 / scale);
+  const sMul = scale;
+  const t = prop.type || "box";
+
+  if (t === "mystery_egg") {
+    if ((len3(q) - 0.48) * sMul > hit.d) return;
+    if (prop.state === "hatched") {
+      hit.add(sdRoundedCylinder(sub3(q, v3(-0.14, -0.06, 0)), 0.16, 0.03, 0.08) * sMul, [248, 250, 252], 0.18, 52);
+      hit.add(sdRoundedCylinder(sub3(q, v3(0.14, -0.06, 0)), 0.16, 0.03, 0.08) * sMul, [248, 250, 252], 0.18, 52);
+    } else {
+      const wobble = prop.state === "cracking" ? Math.sin(phase * Math.PI * 8) * 0.12 : 0;
+      const qe = rotZ(q, wobble);
+      const dEgg = (len3(v3(qe.x / 0.20, qe.y / 0.26, qe.z / 0.20)) - 1.0) * 0.20 * sMul;
+      const crack = Math.abs(qe.y - Math.sin(qe.x * 18) * 0.03) < 0.022;
+      hit.add(dEgg, crack ? [56, 189, 248] : [248, 250, 252], crack ? 0.03 : 0.16, 52);
+    }
+  } else if (t === "neon_dragon") {
+    const orbitX = prop.orbit ? Math.cos(phase * Math.PI * 2) * 0.34 : 0;
+    const orbitY = Math.sin(phase * Math.PI * 4) * 0.05;
+    const qd = sub3(q, v3(orbitX, orbitY, 0));
+    if ((len3(qd) - 0.52) * sMul > hit.d) return;
+    // Blocky SmoothPlastic head & body + 2D dot eyes + cyan neon horns & flapping flat geometric wing plates
+    hit.add(sdRoundBox(qd, v3(0.12, 0.10, 0.14), 0.03) * sMul, [248, 250, 252], 0.18, 53);
+    const ph = sub3(qd, v3(0, 0.12, 0.10));
+    const dHead = sdRoundBox(ph, v3(0.11, 0.095, 0.11), 0.028) * sMul;
+    if (dHead < hit.d) {
+      const isEye = ph.z > 0.08 && Math.abs(Math.abs(ph.x) - 0.045) < 0.02 && Math.abs(ph.y - 0.01) < 0.025;
+      hit.add(dHead, isEye ? [15, 23, 42] : [255, 255, 255], 0.18, 53);
+    }
+    hit.add(sdRoundBox(sub3(ph, v3(-0.06, 0.11, -0.02)), v3(0.022, 0.045, 0.022), 0.006) * sMul, [56, 189, 248], 0.03, 53);
+    hit.add(sdRoundBox(sub3(ph, v3(0.06, 0.11, -0.02)), v3(0.022, 0.045, 0.022), 0.006) * sMul, [56, 189, 248], 0.03, 53);
+    const flap = Math.sin(phase * Math.PI * 6) * 0.38;
+    const pwL = rotZ(sub3(qd, v3(-0.18, 0.06, -0.02)), -flap);
+    const pwR = rotZ(sub3(qd, v3(0.18, 0.06, -0.02)), flap);
+    hit.add(Math.min(sdRoundBox(pwL, v3(0.14, 0.018, 0.09), 0.008), sdRoundBox(pwR, v3(0.14, 0.018, 0.09), 0.008)) * sMul, [56, 189, 248], 0.04, 53);
+  } else if (t === "trade_popup") {
+    const count = clamp(Number(prop.count) || 1, 1, 4);
+    // Framed left/right margin offsets so popup cards surround the character without covering their face!
+    const offsets = [v3(-0.54, 0.32, 0.04), v3(0.54, 0.26, 0.04), v3(-0.48, -0.22, 0.06), v3(0.48, -0.26, 0.06)];
+    for (let i = 0; i < count; i++) {
+      const qp = sub3(q, count === 1 ? v3(0, 0, 0) : offsets[i]);
+      if ((len3(qp) - 0.42) * sMul <= hit.d) {
+        hit.add(sdRoundBox(qp, v3(0.25, 0.15, 0.018), 0.018) * sMul, [30, 41, 59], 0.20, 54);
+        hit.add(sdRoundBox(sub3(qp, v3(-0.095, -0.055, 0.018)), v3(0.08, 0.04, 0.012), 0.01) * sMul, [34, 197, 94], 0.04, 54);
+        hit.add(sdRoundBox(sub3(qp, v3(0.095, -0.055, 0.018)), v3(0.08, 0.04, 0.012), 0.01) * sMul, [244, 63, 94], 0.04, 54);
+      }
+    }
+  } else if (t === "shopping_cart") {
+    if ((len3(q) - 0.92) * sMul > hit.d) return;
+    // Open wire/slatted metallic basket so seated passengers and pusher hands read clearly!
+    let dCart = sdRoundBox(sub3(q, v3(0, -0.18, 0)), v3(0.36, 0.028, 0.44), 0.012); // bottom tray
+    for (const sx of [-0.34, 0.34]) {
+      for (const sz of [-0.42, 0.42]) {
+        dCart = Math.min(dCart, sdRoundBox(sub3(q, v3(sx, 0.04, sz)), v3(0.026, 0.22, 0.026), 0.008)); // 4 corner posts
+      }
+      for (const ry of [-0.04, 0.10, 0.24]) {
+        dCart = Math.min(dCart, sdRoundBox(sub3(q, v3(sx, ry, 0)), v3(0.022, 0.020, 0.42), 0.008)); // side rails
+      }
+    }
+    for (const sz of [-0.42, 0.42]) {
+      for (const ry of [0.06, 0.24]) {
+        dCart = Math.min(dCart, sdRoundBox(sub3(q, v3(0, ry, sz)), v3(0.34, 0.022, 0.022), 0.008)); // front/back rails
+      }
+    }
+    // Rear handle risers + bright red push-bar
+    for (const sx of [-0.30, 0.30]) {
+      dCart = Math.min(dCart, sdRoundBox(rotX(sub3(q, v3(sx, 0.32, -0.46)), -0.35), v3(0.022, 0.12, 0.022), 0.008));
+    }
+    hit.add(dCart * sMul, [203, 213, 225], 0.14, 85);
+    hit.add(sdRoundBox(sub3(q, v3(0, 0.40, -0.50)), v3(0.34, 0.034, 0.034), 0.014) * sMul, [239, 68, 68], 0.18, 85);
+    for (const sx of [-0.28, 0.28]) {
+      for (const sz of [-0.32, 0.32]) {
+        hit.add(sdRoundedCylinder(rotZ(sub3(q, v3(sx, -0.28, sz)), Math.PI / 2), 0.075, 0.015, 0.028) * sMul, [30, 41, 59], 0.4, 85);
+      }
+    }
+  } else if (t === "ramen_cup") {
+    if ((len3(q) - 0.45) * sMul > hit.d) return;
+    const tipped = prop.spilled ? rotZ(q, 1.15) : q;
+    const dCup = sdRoundedCylinder(tipped, 0.13, 0.02, 0.16) * sMul;
+    hit.add(dCup, Math.abs(tipped.y) < 0.055 ? [239, 68, 68] : [255, 255, 255], 0.22, 86);
+    hit.add(sdRoundedCylinder(sub3(tipped, v3(0, 0.15, 0)), 0.115, 0.008, 0.018) * sMul, [250, 204, 21], 0.3, 86);
+    if (prop.spilled) {
+      for (const nx of [-0.18, -0.06, 0.06]) {
+        hit.add(sdRoundBox(sub3(q, v3(0.24 + nx * 0.4, -0.11, nx)), v3(0.14, 0.022, 0.025), 0.01) * sMul, [253, 224, 71], 0.28, 86);
+      }
+    }
+    if (prop.tagged) {
+      hit.add(sdRoundBox(sub3(q, v3(0.08, 0.04, 0.14)), v3(0.11, 0.065, 0.015), 0.008) * sMul, [250, 204, 21], 0.16, 86);
+    }
+  } else if (t === "laser_bar") {
+    const ql = prop.spin ? rotY(q, phase * Math.PI * 2) : q;
+    hit.add(sdRoundBox(ql, v3(0.92, 0.045, 0.065), 0.015) * sMul, [255, 38, 56], 0.03, 32);
+    hit.add(sdRoundedCylinder(ql, 0.10, 0.02, 0.09) * sMul, [30, 41, 59], 0.25, 32);
+  } else if (t === "glass_pad") {
+    if (prop.broken && phase > 0.45) return;
+    const flash = prop.flicker && Math.sin(phase * Math.PI * 8) > 0;
+    const frame = Math.max(sdRoundBox(q, v3(0.54, 0.062, 0.54), 0.022), -sdRoundBox(q, v3(0.42, 0.09, 0.42), 0.01));
+    hit.add(frame * sMul, flash ? [244, 63, 94] : [56, 189, 248], 0.06, 31);
+    hit.add(sdRoundBox(q, v3(0.43, 0.032, 0.43), 0.01) * sMul, flash ? [251, 113, 133] : [186, 230, 253], 0.08, 31);
+  } else if (t === "checkout_gate") {
+    if ((len3(q) - 1.1) * sMul > hit.d) return;
+    hit.add(sdRoundBox(sub3(q, v3(-0.62, 0, 0)), v3(0.14, 0.36, 0.32), 0.02) * sMul, [51, 65, 85], 0.3, 87);
+    const swing = prop.crashed ? phase * 1.35 : 0;
+    hit.add(sdRoundBox(rotY(sub3(q, v3(0, 0.12, 0)), swing), v3(0.55, 0.04, 0.04), 0.012) * sMul, [239, 68, 68], 0.18, 87);
+  } else if (t === "alarm_clock") {
+    addTwinBellAlarmClock(hit, p, center, prop.squash || 1.0, prop.tilt || 0);
+  } else if (t === "laptop") {
+    addOpenLaptop(hit, p, center);
+  } else {
+    // Generic platform / box / cylinder fallback so declarative "platform" or "box" props always render!
+    const sz = vecFromArr(prop.size, t === "platform" ? v3(0.56, 0.07, 0.56) : v3(0.24, 0.24, 0.24));
+    if ((len3(q) - (len3(sz) + 0.15)) * sMul > hit.d) return;
+    const col = Array.isArray(prop.color) ? prop.color : t === "platform" ? [56, 189, 248] : [226, 232, 240];
+    hit.add(sdRoundBox(q, sz, 0.024) * sMul, col, prop.roughness ?? 0.22, 94);
+  }
+}
+
+function resolveActorMotion(actor = {}, phase = 0.5) {
+  const pStart = vecFromArr(actor.fromPos || actor.pos, v3(0, 0, 0));
+  const pEnd = vecFromArr(actor.toPos || actor.pos, pStart);
+  const pos = lerpVec(pStart, pEnd, smoothstep(0, 1, phase));
+  const yaw = mix(Number(actor.fromYaw ?? actor.yaw ?? 0), Number(actor.toYaw ?? actor.yaw ?? 0), phase);
+  let roll = mix(Number(actor.fromRoll ?? actor.roll ?? 0), Number(actor.toRoll ?? actor.roll ?? 0), smoothstep(0, 1, phase));
+  let waistPitch = Number(actor.waistPitch) || 0;
+  let headYaw = Number(actor.headYaw) || 0;
+  let headPitch = Number(actor.headPitch) || 0;
+  let armLPitch = -0.12;
+  let armRPitch = -0.15;
+  let legLPitch = 0;
+  let legRPitch = 0;
+
+  const pose = actor.pose || "idle";
+  const cyc = Math.sin(phase * Math.PI * 4);
+  if (pose === "walk" || pose === "run" || pose === "sprint") {
+    const amp = pose === "walk" ? 0.45 : 0.75;
+    armLPitch = cyc * amp;
+    armRPitch = -cyc * amp;
+    legLPitch = -cyc * amp;
+    legRPitch = cyc * amp;
+  } else if (pose === "jump" || pose === "hop") {
+    pos.y += Math.sin(phase * Math.PI) * 0.42;
+    armLPitch = -0.85;
+    armRPitch = 0.65;
+    legLPitch = 0.45;
+    legRPitch = -0.45;
+  } else if (pose === "cheer") {
+    armLPitch = 2.65;
+    armRPitch = 2.65;
+    pos.y += Math.abs(Math.sin(phase * Math.PI * 2)) * 0.12;
+  } else if (pose === "wave" || pose === "swat") {
+    armRPitch = 1.95 + Math.sin(phase * Math.PI * 6) * 0.38;
+  } else if (pose === "slam") {
+    const t = smoothstep(0.1, 0.7, phase);
+    armRPitch = mix(2.1, 0.85, t);
+    waistPitch = t * 0.22;
+  } else if (pose === "pour") {
+    armRPitch = 1.15 + Math.sin(phase * Math.PI) * 0.18;
+    armLPitch = 0.55;
+  } else if (pose === "recoil") {
+    const t = smoothstep(0.05, 0.6, phase);
+    waistPitch = -0.28 * t;
+    armLPitch = 1.45 * t;
+    armRPitch = 1.35 * t;
+  } else if (pose === "sit") {
+    pos.y -= 0.18;
+    legLPitch = 1.48;
+    legRPitch = 1.48;
+    armLPitch = 0.25;
+    armRPitch = 0.25;
+  } else if (pose === "ride_cart") {
+    pos.y += 0.12;
+    legLPitch = 1.45;
+    legRPitch = 1.45;
+    armLPitch = 2.35;
+    armRPitch = 1.15;
+  } else if (pose === "push_cart") {
+    armLPitch = 1.25;
+    armRPitch = 1.25;
+    legLPitch = -cyc * 0.62;
+    legRPitch = cyc * 0.62;
+  } else if (pose === "zombie_walk") {
+    armLPitch = 1.48;
+    armRPitch = 1.48;
+    legLPitch = -cyc * 0.35;
+    legRPitch = cyc * 0.35;
+  } else if (pose === "hang_strap") {
+    const sw = Math.sin(phase * Math.PI * 2) * 0.14;
+    pos.y += 0.30;
+    roll += sw;
+    armRPitch = 3.12;
+    armLPitch = -0.08;
+  } else if (pose === "fall_rigid") {
+    const t = smoothstep(0, 1, phase);
+    pos.y = mix(pos.y + 0.32, pos.y - 0.38, t);
+    waistPitch = -0.32 * t;
+    roll += 0.42 * t;
+    armLPitch = 2.15;
+    armRPitch = 2.15;
+  } else if (pose === "faceplant") {
+    const t = smoothstep(0.05, 0.65, phase);
+    return {
+      pos,
+      yaw,
+      roll,
+      bodyPitch: mix(0.28, 1.48, t),
+      waistPitch: 0,
+      headYaw,
+      headPitch,
+      armLPitch: 0.45,
+      armRPitch: 0.45,
+      legLPitch: 0,
+      legRPitch: 0
+    };
+  } else if (pose === "plank_fall") {
+    roll = smoothstep(0.05, 0.7, phase) * 1.48;
+  } else if (pose === "one_leg_freeze") {
+    pos.y += 0.12;
+    armLPitch = -0.65;
+    armRPitch = 0.65;
+    legLPitch = 0.65;
+    legRPitch = -0.35;
+  } else if (pose === "head_turn") {
+    headYaw = mix(0, Number(actor.targetHeadYaw ?? 0.68), smoothstep(0.1, 0.75, phase));
+  } else if (pose === "sword_slash") {
+    armRPitch = 1.28 + Math.sin(phase * Math.PI * 2) * 0.32;
+  }
+
+  return {
+    pos,
+    yaw,
+    roll,
+    bodyPitch: Number(actor.bodyPitch) || 0,
+    waistPitch,
+    headYaw,
+    headPitch,
+    armLPitch,
+    armRPitch,
+    legLPitch,
+    legRPitch
+  };
+}
+
+function resolveDeclarativeCamera(shot = {}, backdrop = "studio", phase = 0.5) {
+  const camSpec = shot.camera && typeof shot.camera === "object" ? shot.camera : { preset: shot.cameraPreset || "medium" };
+  const preset = camSpec.preset || "medium";
+  let ro = v3(0, 0.36, 3.18);
+  let ta = v3(0, 0.10, 0);
+  let fov = Number(camSpec.fov) || 1.9;
+
+  if (preset === "close_up") {
+    ro = v3(0, 0.46, 2.32);
+    ta = v3(0, 0.28, 0.08);
+  } else if (preset === "push_in") {
+    ro = lerpVec(v3(0, 0.42, 3.25), v3(0, 0.38, 2.52), phase);
+    ta = v3(0, 0.16, 0.05);
+  } else if (preset === "pull_out") {
+    ro = lerpVec(v3(0, 0.38, 2.55), v3(0, 0.44, 3.48), phase);
+    ta = v3(0, 0.12, 0);
+  } else if (preset === "hero_low") {
+    ro = v3(0.28, 0.08, 2.78);
+    ta = v3(0, 0.24, 0);
+  } else if (preset === "side_track") {
+    ro = lerpVec(v3(-0.55, 0.38, 3.35), v3(0.55, 0.38, 3.35), phase);
+    ta = v3(mix(-0.2, 0.2, phase), 0.10, 0);
+  } else if (preset === "high_iso") {
+    ro = v3(0.88, 1.05, 2.95);
+    ta = v3(0, 0.04, 0.12);
+  } else if (preset === "wide_two_shot" || preset === "wide_aisle") {
+    ro = v3(0, 0.42, 3.68);
+    ta = v3(0, 0.08, 0);
+  } else if (preset === "fall_follow") {
+    ro = v3(0.35, 0.65 - phase * 0.45, 3.35);
+    ta = v3(0, -0.15 * phase, 0);
+  }
+
+  if (camSpec.ro || camSpec.fromRo) {
+    const r0 = vecFromArr(camSpec.fromRo || camSpec.ro, ro);
+    const r1 = vecFromArr(camSpec.toRo || camSpec.ro, r0);
+    ro = lerpVec(r0, r1, phase);
+  }
+  if (camSpec.ta || camSpec.fromTa) {
+    const t0 = vecFromArr(camSpec.fromTa || camSpec.ta, ta);
+    const t1 = vecFromArr(camSpec.toTa || camSpec.ta, t0);
+    ta = lerpVec(t0, t1, phase);
+  }
+  if (camSpec.shake) {
+    const sh = Number(camSpec.shake) * Math.sin(phase * Math.PI * 10);
+    ro = add3(ro, v3(sh, Math.abs(sh) * 0.5, 0));
+  }
+
+  const stageTheme = {
+    subway_car: { bgTop: [71, 85, 105], bgBot: [148, 163, 184], floorY: -0.86, floorStyle: "studio_grid", floorColor1: [71, 85, 105], floorColor2: [64, 78, 98] },
+    adoption_plaza: { bgTop: [192, 132, 252], bgBot: [250, 232, 255], floorY: -0.86, floorStyle: "plaza_pavers", floorColor1: [243, 232, 255], floorColor2: [233, 213, 255] },
+    plaza: { bgTop: [147, 197, 253], bgBot: [241, 245, 249], floorY: -0.86, floorStyle: "plaza_pavers", floorColor1: [241, 245, 249], floorColor2: [226, 232, 240] },
+    convenience_store: { bgTop: [30, 41, 59], bgBot: [71, 85, 105], floorY: -0.86, floorStyle: "checker_tile", floorColor1: [241, 245, 249], floorColor2: [203, 213, 225] },
+    supermarket_aisle: { bgTop: [186, 230, 253], bgBot: [248, 250, 252], floorY: -0.86, floorStyle: "checker_tile", floorColor1: [248, 250, 252], floorColor2: [226, 232, 240] },
+    neon_tower: { bgTop: [15, 23, 42], bgBot: [49, 46, 129], floorY: camSpec.floorY === undefined ? null : camSpec.floorY, floorStyle: "studio_grid", floorColor1: [51, 65, 85], floorColor2: [30, 41, 59] },
+    bedroom: { bgTop: [147, 197, 253], bgBot: [241, 245, 249], floorY: -0.86, floorStyle: "wood_planks", floorColor1: [198, 146, 96], floorColor2: [182, 130, 82] },
+    obby_sky: { bgTop: [38, 166, 242], bgBot: [219, 240, 255], floorY: null, floorStyle: "studio_grid", floorColor1: [241, 245, 249], floorColor2: [226, 232, 240] },
+    street: { bgTop: [147, 197, 253], bgBot: [226, 232, 240], floorY: -0.86, floorStyle: "asphalt_street", floorColor1: [64, 76, 94], floorColor2: [51, 65, 85] },
+    hotel_corridor: { bgTop: [24, 24, 38], bgBot: [58, 40, 32], floorY: -0.86, floorStyle: "hotel_carpet", floorColor1: [120, 53, 15], floorColor2: [96, 42, 12] },
+    lava_bridge: { bgTop: [249, 115, 22], bgBot: [254, 215, 170], floorY: -1.04, floorStyle: "molten_lava", floorColor1: [239, 68, 68], floorColor2: [249, 115, 22] },
+    sand_court: { bgTop: [52, 211, 153], bgBot: [254, 243, 199], floorY: -0.86, floorStyle: "sand_court", floorColor1: [234, 198, 138], floorColor2: [218, 180, 118] }
+  }[backdrop] || {
+    bgTop: camSpec.bgTop || [147, 197, 253],
+    bgBot: camSpec.bgBot || [241, 245, 249],
+    floorY: camSpec.floorY === undefined ? -0.86 : camSpec.floorY,
+    floorStyle: camSpec.floorStyle || "studio_grid",
+    floorColor1: camSpec.floorColor1 || [182, 194, 210],
+    floorColor2: camSpec.floorColor2 || [168, 182, 198]
+  };
+
+  return {
+    ro,
+    ta,
+    fov,
+    phase,
+    bgTop: camSpec.bgTop || stageTheme.bgTop,
+    bgBot: camSpec.bgBot || stageTheme.bgBot,
+    floorY: camSpec.floorY !== undefined ? camSpec.floorY : stageTheme.floorY,
+    floorStyle: camSpec.floorStyle || stageTheme.floorStyle,
+    floorColor1: camSpec.floorColor1 || stageTheme.floorColor1,
+    floorColor2: camSpec.floorColor2 || stageTheme.floorColor2
+  };
+}
+
+export function computeEpisodeTimingPlan(specData = {}) {
+  const shots = Array.isArray(specData.shots) && specData.shots.length > 0 ? specData.shots : [{}];
+  const explicitClipSec = Number(specData.clipSecPerShot) || 0;
+  const sumShotSec = shots.reduce((acc, s) => acc + (Number(s.durationSec) || 0), 0);
+  const targetTotalSec =
+    explicitClipSec > 0
+      ? shots.length * explicitClipSec
+      : Number(specData.durationSeconds) || (sumShotSec > 0 ? sumShotSec : shots.length * 3.75);
+  const fallbackShotSec = targetTotalSec / shots.length;
+  const rawDurations = shots.map((s) => (explicitClipSec > 0 ? explicitClipSec : Number(s.durationSec) || fallbackShotSec));
+  const rawSum = rawDurations.reduce((a, b) => a + b, 0) || targetTotalSec;
+  const scaleSec = explicitClipSec > 0 || !specData.durationSeconds ? 1 : targetTotalSec / rawSum;
+  const shotDurations = rawDurations.map((d) => Number((d * scaleSec).toFixed(3)));
+  const totalDurationSec = shotDurations.reduce((a, b) => a + b, 0);
+
+  let shotFrameCounts;
+  if (specData.framesPerShot) {
+    const baseFrames = clamp(Number(specData.framesPerShot), 4, 24);
+    const avgSec = totalDurationSec / shots.length;
+    shotFrameCounts = shotDurations.map((d) => Math.max(4, Math.round((d / avgSec) * baseFrames)));
+  } else {
+    const sampleFps = clamp(Number(specData.sampleFps) || (totalDurationSec > 20 ? 2.4 : 3.2), 2, 12);
+    shotFrameCounts = shotDurations.map((d) => Math.max(4, Math.round(d * sampleFps)));
+  }
+  const totalFrames = shotFrameCounts.reduce((a, b) => a + b, 0);
+  const inFps = Number((totalFrames / totalDurationSec).toFixed(4));
+  return { shotDurations, totalDurationSec, shotFrameCounts, totalFrames, inFps };
+}
+
+function projectHeadToCardBubble(worldPos, cam) {
+  const headAbove = v3(worldPos.x, worldPos.y + 1.10, worldPos.z);
+  const fw = norm3(sub3(cam.ta, cam.ro));
+  const rt = norm3(cross3(fw, v3(0, 1, 0)));
+  const up = cross3(rt, fw);
+  const rel = sub3(headAbove, cam.ro);
+  const vz = Math.max(0.35, dot3(rel, fw));
+  const fov = cam.fov || 1.9;
+  const nx = (dot3(rel, rt) / vz) * fov;
+  const ny = (dot3(rel, up) / vz) * fov;
+  const aspect = 312 / 554;
+  const bx = clamp(Math.round(6 + 312 * 0.5 * (1 + nx / aspect)), 78, 246);
+  const by = clamp(Math.round(6 + 554 * 0.5 * (1 - ny) - 22), 20, 124);
+  return { bubbleX: bx, bubbleY: by };
+}
+
+export function buildDeclarativeEpisodeBuilder(specData = {}) {
+  const castList = Array.isArray(specData.cast) && specData.cast.length > 0
+    ? specData.cast
+    : [{ id: "hero", archetype: "chibi-plush", theme3d: "theo" }];
+  const castMap = new Map(
+    castList.map((c, idx) => [
+      c.id || `cast_${idx}`,
+      {
+        theme: mapArchetypeTo3DTheme(c.archetype, c.theme3d || c.theme),
+        customPalette: c.customPalette || null,
+        noAccessories: Boolean(c.noAccessories),
+        defaultFace: c.face || "smile",
+        defaultBackProp: c.noAccessories ? null : c.backProp || null
+      }
+    ])
+  );
+  const primaryCast = castMap.values().next().value;
+
+  const buildShotScene = (shotIdx, phase = 0.5) => {
+    const shot = specData.shots[clamp(shotIdx, 0, specData.shots.length - 1)] || {};
+    const backdrop = shot.backdrop || specData.backdrop || "studio";
+    const cam = resolveDeclarativeCamera(shot, backdrop, phase);
+
+    // Normalize actors[] (or shorthand pose3d from custom_story_spec.json)
+    let actors = Array.isArray(shot.actors) ? shot.actors : null;
+    if (!actors) {
+      const cArr = Array.from(castMap.entries());
+      if (cArr.length >= 2) {
+        actors = [
+          {
+            castId: cArr[0][0],
+            pos: [-0.52, 0, 0.08],
+            yaw: 0.25,
+            pose: shot.pose3d?.primary || "idle",
+            expression: shot.expressionPrimary || cArr[0][1].defaultFace
+          },
+          {
+            castId: cArr[1][0],
+            pos: [0.58, 0, -0.05],
+            yaw: -0.22,
+            pose: shot.pose3d?.secondary || "idle",
+            expression: shot.expressionSecondary || cArr[1][1].defaultFace
+          }
+        ];
+      } else {
+        actors = [
+          {
+            castId: cArr[0][0],
+            pos: [0, 0, 0.05],
+            yaw: 0.12,
+            pose: shot.pose3d?.primary || "idle",
+            expression: shot.expressionPrimary || cArr[0][1].defaultFace
+          }
+        ];
+      }
+    }
+
+    const props = Array.isArray(shot.props) ? shot.props : [];
+    const blocks = Array.isArray(shot.blocks) ? shot.blocks : [];
+    const leadMot = actors.length > 0 ? resolveActorMotion(actors[0], phase) : { pos: v3(0, 0, 0) };
+    const autoBubble = projectHeadToCardBubble(leadMot.pos, cam);
+
+    return {
+      cam,
+      autoBubble,
+      sceneFn: (p) => {
+        const hit = new SceneHit();
+        for (const ac of actors) {
+          const castDef = castMap.get(ac.castId) || primaryCast;
+          const mot = resolveActorMotion(ac, phase);
+          hit.merge(
+            evalAvatarSDF(p, {
+              ...mot,
+              theme: ac.theme ? mapArchetypeTo3DTheme(ac.theme, ac.theme) : castDef.theme,
+              customPalette: ac.customPalette || castDef.customPalette,
+              noAccessories: ac.noAccessories !== undefined ? Boolean(ac.noAccessories) : castDef.noAccessories,
+              expression: ac.expression || shot.expressionPrimary || castDef.defaultFace || "smile",
+              handPropL: ac.handPropL || null,
+              handPropR: ac.handPropR || null,
+              backProp: ac.backProp !== undefined ? ac.backProp : castDef.defaultBackProp
+            })
+          );
+        }
+        addDeclarativeBackdrop(hit, p, backdrop, phase);
+        for (const pr of props) {
+          addDeclarativeProp(hit, p, pr, phase);
+        }
+        for (const blk of blocks) {
+          const b0 = vecFromArr(blk.pos, v3(0, 0, 0));
+          const b1 = blk.moveTo ? vecFromArr(blk.moveTo, b0) : b0;
+          const bc = lerpVec(b0, b1, phase);
+          let qb = sub3(p, bc);
+          if (Array.isArray(blk.rot)) {
+            if (blk.rot[1]) qb = rotY(qb, blk.rot[1]);
+            if (blk.rot[0]) qb = rotX(qb, blk.rot[0]);
+            if (blk.rot[2]) qb = rotZ(qb, blk.rot[2]);
+          }
+          const sz = vecFromArr(blk.size, v3(0.2, 0.2, 0.2));
+          if (len3(qb) - (len3(sz) + 0.15) > hit.d) continue;
+          const col = Array.isArray(blk.color) ? blk.color : [226, 232, 240];
+          const rough = blk.roughness ?? 0.28;
+          if (blk.shape === "sphere") {
+            hit.add(sdSphere(qb, sz.x), col, rough, 95);
+          } else if (blk.shape === "cylinder") {
+            hit.add(sdRoundedCylinder(qb, sz.x, blk.bevel ?? 0.015, sz.y), col, rough, 95);
+          } else {
+            hit.add(sdRoundBox(qb, sz, blk.bevel ?? 0.02), col, rough, 95);
+          }
+        }
+        return hit;
+      }
+    };
+  };
+
+  return { primaryCast, buildShotScene };
+}
+
+export function buildEpisodeWavBuffer(shots = [], shotDurationsOrScalar = 2.0) {
+  const sampleRate = 22050;
+  const durations = Array.isArray(shotDurationsOrScalar)
+    ? shotDurationsOrScalar
+    : shots.map(() => Number(shotDurationsOrScalar) || 2.0);
+  const totalSec = Math.max(2, durations.reduce((a, b) => a + b, 0));
+  const numSamples = Math.floor(sampleRate * totalSec);
+  const pcm = new Int16Array(numSamples);
+
+  let cursorSec = 0;
+  for (let s = 0; s < shots.length; s++) {
+    const durSec = durations[s] || 2.0;
+    const cue = (shots[s].sfxCue || (s === shots.length - 1 ? "win" : s === 0 ? "chime" : "boing")).toLowerCase();
+    const startSample = Math.floor(cursorSec * sampleRate);
+    const shotSamples = Math.floor(durSec * sampleRate);
+    cursorSec += durSec;
+
+    for (let i = 0; i < shotSamples && startSample + i < numSamples; i++) {
+      const t = i / sampleRate;
+      let val = 0;
+      // Subtle upbeat background synth pulse
+      const beatT = t % 0.5;
+      val += Math.sin(2 * Math.PI * 165 * t) * Math.exp(-beatT * 9) * 0.12;
+
+      if (cue === "boing" && t < 0.45) {
+        const f = 260 + 420 * (t / 0.45);
+        val += Math.sin(2 * Math.PI * f * t) * Math.exp(-t * 6) * 0.45;
+      } else if (cue === "chime" && t < 0.5) {
+        const f = t < 0.16 ? 587.33 : 880.0;
+        val += Math.sin(2 * Math.PI * f * t) * Math.exp(-((t % 0.16) * 8)) * 0.42;
+      } else if (cue === "clack" && t < 0.18) {
+        val += (Math.sin(2 * Math.PI * 920 * t) + Math.sin(2 * Math.PI * 410 * t)) * Math.exp(-t * 24) * 0.45;
+      } else if (cue === "siren" && t < 1.4) {
+        const f = Math.floor(t * 4) % 2 === 0 ? 660 : 520;
+        val += Math.sin(2 * Math.PI * f * t) * 0.28;
+      } else if (cue === "buzz" && t < 0.55) {
+        val += (Math.sin(2 * Math.PI * 140 * t) > 0 ? 0.35 : -0.35) * Math.exp(-t * 4);
+      } else if (cue === "drop" && t < 0.75) {
+        const f = Math.max(110, 680 - 680 * (t / 0.75));
+        val += Math.sin(2 * Math.PI * f * t) * Math.exp(-t * 3) * 0.42;
+      } else if (cue === "win" && t < 0.85) {
+        const notes = [523.25, 659.25, 783.99, 1046.5];
+        const nIdx = Math.min(3, Math.floor(t / 0.16));
+        val += Math.sin(2 * Math.PI * notes[nIdx] * t) * Math.exp(-((t % 0.16) * 5)) * 0.44;
+      } else if (t < 0.35) {
+        val += Math.sin(2 * Math.PI * 640 * t) * Math.exp(-t * 10) * 0.38;
+      }
+      pcm[startSample + i] = clamp(Math.round(val * 28000), -32767, 32767);
+    }
+  }
+
+  const header = Buffer.alloc(44);
+  const byteLen = pcm.length * 2;
+  header.write("RIFF", 0);
+  header.writeUInt32LE(36 + byteLen, 4);
+  header.write("WAVE", 8);
+  header.write("fmt ", 12);
+  header.writeUInt32LE(16, 16);
+  header.writeUInt16LE(1, 20); // PCM
+  header.writeUInt16LE(1, 22); // Mono
+  header.writeUInt32LE(sampleRate, 24);
+  header.writeUInt32LE(sampleRate * 2, 28);
+  header.writeUInt16LE(2, 32);
+  header.writeUInt16LE(16, 34);
+  header.write("data", 36);
+  header.writeUInt32LE(byteLen, 40);
+  return Buffer.concat([header, Buffer.from(pcm.buffer)]);
+}
+
+function renderCustomSpecShard(specPath, rawDir, force, shardIdx, shardCount) {
+  const specData = JSON.parse(fs.readFileSync(specPath, "utf8").replace(/^\uFEFF/, ""));
+  const { primaryCast, buildShotScene } = buildDeclarativeEpisodeBuilder(specData);
+  const { shotFrameCounts } = computeEpisodeTimingPlan(specData);
+  const prefix = (specData.slug || path.basename(specPath, path.extname(specPath)) || "episode").replace(/[^a-z0-9_-]/gi, "_");
+
+  fs.mkdirSync(rawDir, { recursive: true });
+  let taskCounter = 0;
+  const writePng = (name, w, h, computeFn) => {
+    const myTask = taskCounter++;
+    if (myTask % shardCount !== shardIdx) return;
+    const outPath = path.join(rawDir, name);
+    if (!force && fs.existsSync(outPath) && fs.statSync(outPath).size > 1000) return;
+    fs.writeFileSync(outPath, encodePNG(w, h, computeFn()));
+  };
+
+  const studioCam = {
+    ro: v3(0, 0.22, 2.75),
+    ta: v3(0, 0.04, 0),
+    fov: 1.95,
+    bgTop: [219, 234, 254],
+    bgBot: [241, 245, 249],
+    floorY: -0.86,
+    floorStyle: "studio_grid",
+    floorColor1: [182, 194, 210],
+    floorColor2: [168, 182, 198]
+  };
+
+  for (const [fname, yaw] of [
+    ["turn_front.png", 0.0],
+    ["turn_3q.png", 0.68],
+    ["turn_side.png", 1.52]
+  ]) {
+    writePng(fname, 420, 520, () =>
+      render3DViewport(
+        420,
+        520,
+        (p) =>
+          evalAvatarSDF(p, {
+            yaw,
+            theme: primaryCast.theme,
+            customPalette: primaryCast.customPalette,
+            noAccessories: primaryCast.noAccessories,
+            expression: primaryCast.defaultFace || "smile",
+            backProp: primaryCast.defaultBackProp
+          }),
+        studioCam
+      )
+    );
+  }
+
+  const shotCount = specData.shots.length;
+  for (let s = 0; s < shotCount; s++) {
+    writePng(`${prefix}_shot_${s}.png`, 360, 640, () => {
+      const { cam, sceneFn } = buildShotScene(s, 0.55);
+      return render3DViewport(360, 640, sceneFn, cam);
+    });
+  }
+
+  let frameIdx = 0;
+  for (let s = 0; s < shotCount; s++) {
+    const countForShot = shotFrameCounts[s];
+    for (let f = 0; f < countForShot; f++) {
+      const phase = (f + 0.5) / countForShot;
+      const idx = frameIdx++;
+      writePng(`${prefix}_anim_${String(idx).padStart(4, "0")}.png`, 270, 480, () => {
+        const { cam, sceneFn } = buildShotScene(s, phase);
+        return render3DViewport(270, 480, sceneFn, { ...cam, maxSteps: 26 });
+      });
+    }
+  }
+}
+
+const isMain = process.argv[1] && path.resolve(process.argv[1]).endsWith("render_preview.mjs");
 if (isMain) {
   if (process.argv.includes("--help") || process.argv.includes("-h")) {
-    console.log(`Usage: node scripts/render_preview.mjs [--raw-dir <dir>] [--force] [--only <prefixes>]`);
+    console.log(`Usage:
+  node scripts/render_preview.mjs --spec <episode.json> --out-dir <dir> [--workers <n>] [--force]
+  node scripts/render_preview.mjs [--raw-dir <dir>] [--force] [--only <prefixes>] [--shots-only]
+
+Render self-contained 3D Roblox-style turnaround sheets, 9:16 storyboard sheets, GIFs, and H.264 MP4 videos with audio.`);
     process.exit(0);
   }
-  const rawIdx = process.argv.indexOf("--raw-dir");
-  const rawDir =
-    rawIdx !== -1 && process.argv[rawIdx + 1]
-      ? path.resolve(process.argv[rawIdx + 1])
-      : path.join(ROOT, "tmp", "raw_3d");
-  const force = process.argv.includes("--force");
 
-  const onlyIdx = process.argv.indexOf("--only");
-  const onlyPrefixes = onlyIdx !== -1 && process.argv[onlyIdx + 1] ? process.argv[onlyIdx + 1].split(",") : null;
+  const getArg = (flag) => {
+    const idx = process.argv.indexOf(flag);
+    return idx !== -1 && process.argv[idx + 1] ? process.argv[idx + 1] : null;
+  };
+
+  const specArg = getArg("--spec");
+  const outDirArg = getArg("--out-dir");
+  const force = process.argv.includes("--force");
+  const shardArg = getArg("--shard");
+
+  // Mode 1: Direct Custom Episode 3D Video Render (--spec <episode.json> --out-dir <dir>)
+  if (specArg) {
+    const absSpec = path.resolve(specArg);
+    if (!fs.existsSync(absSpec)) {
+      console.error(`ERROR: Spec file not found: ${absSpec}`);
+      process.exit(1);
+    }
+    const specData = JSON.parse(fs.readFileSync(absSpec, "utf8").replace(/^\uFEFF/, ""));
+    if (!Array.isArray(specData.shots) || specData.shots.length === 0) {
+      console.error(`ERROR: Spec file must contain a non-empty shots[] array`);
+      process.exit(1);
+    }
+
+    const outDir = outDirArg ? path.resolve(outDirArg) : path.join(path.dirname(absSpec), "assets");
+    const tmpRoot = getArg("--raw-dir") ? path.resolve(getArg("--raw-dir")) : path.join(outDir, ".render_tmp");
+
+    if (shardArg) {
+      const [sIdx, sTotal] = shardArg.split("/").map(Number);
+      renderCustomSpecShard(absSpec, tmpRoot, force, sIdx, sTotal);
+      process.exit(0);
+    }
+
+    fs.mkdirSync(outDir, { recursive: true });
+    fs.mkdirSync(tmpRoot, { recursive: true });
+    // Default to 2 workers per custom episode so multiple concurrent sessions never hit Windows heap limits
+    const workers = clamp(Number(getArg("--workers")) || 2, 1, 6);
+    await Promise.all(
+      Array.from({ length: workers }, (_, i) => {
+        return new Promise((resolve, reject) => {
+          const args = [process.argv[1], "--spec", absSpec, "--out-dir", outDir, "--raw-dir", tmpRoot, "--shard", `${i}/${workers}`];
+          if (force) args.push("--force");
+          const child = spawn(process.execPath, args, { stdio: "inherit" });
+          child.on("exit", (code) => (code === 0 ? resolve() : reject(new Error(`Custom shard ${i} exited ${code}`))));
+        });
+      })
+    );
+
+    const slug = (specData.slug || path.basename(absSpec, path.extname(absSpec))).replace(/[^a-z0-9_-]/gi, "_");
+    const { shotDurations, shotFrameCounts, totalFrames, inFps } = computeEpisodeTimingPlan(specData);
+    const { buildShotScene } = buildDeclarativeEpisodeBuilder(specData);
+    const wavPath = path.join(tmpRoot, `${slug}_audio.wav`);
+    fs.writeFileSync(wavPath, buildEpisodeWavBuffer(specData.shots, shotDurations));
+
+    const customManifest = {
+      rootDir: outDir,
+      rawDir: tmpRoot,
+      turnaround: {
+        outZh: path.join(outDir, "turnaround_sheet.zh.png"),
+        outEn: path.join(outDir, "turnaround_sheet.en.png"),
+        outDefault: [path.join(outDir, "turnaround_sheet.png")],
+        views: [
+          { file: "turn_front.png", labelZh: "正面 0°", labelEn: "Front 0°" },
+          { file: "turn_3q.png", labelZh: "斜侧 45°", labelEn: "3/4 View 45°" },
+          { file: "turn_side.png", labelZh: "侧面 90°", labelEn: "Profile 90°" }
+        ]
+      },
+      drift: { panels: [{ file: "__skip__" }] },
+      cases: [
+        {
+          prefix: slug,
+          framePadWidth: 4,
+          totalFrames,
+          inFps,
+          wavPath,
+          sheetZh: path.join(outDir, "storyboard_sheet.zh.png"),
+          sheetEn: path.join(outDir, "storyboard_sheet.en.png"),
+          sheetDefault: path.join(outDir, "storyboard_sheet.png"),
+          gifPath: path.join(outDir, `${slug}.gif`),
+          mp4Path: path.join(outDir, `${slug}.mp4`),
+          shots: specData.shots.map((sh, idx) => {
+            const num = String(idx + 1).padStart(2, "0");
+            const { autoBubble } = buildShotScene(idx, 0.55);
+            return {
+              frameCount: shotFrameCounts[idx],
+              labelZh: sh.labelZh || `${num} · ${sh.role || `镜头 ${num}`}`,
+              labelEn: sh.labelEn || `${num} · ${(sh.role || `Shot ${num}`).split("/")[0].trim()}`,
+              chatZh: sh.chatEn || "",
+              chatEn: sh.chatEn || "",
+              bubbleX: sh.bubbleX ?? autoBubble.bubbleX,
+              bubbleY: sh.bubbleY ?? autoBubble.bubbleY,
+              savePath: path.join(outDir, `shot_${num}.png`)
+            };
+          })
+        }
+      ]
+    };
+
+    const manifestPath = path.join(tmpRoot, "boards_manifest.json");
+    fs.writeFileSync(manifestPath, JSON.stringify(customManifest, null, 2), "utf8");
+    const ps1Path = path.join(ROOT, "scripts", "compose_boards.ps1");
+    if (process.platform === "win32" && fs.existsSync(ps1Path)) {
+      execFileSync("powershell", ["-ExecutionPolicy", "Bypass", "-File", ps1Path, "-ManifestPath", manifestPath], {
+        stdio: "inherit"
+      });
+    }
+    if (!process.argv.includes("--keep-tmp")) {
+      fs.rmSync(tmpRoot, { recursive: true, force: true });
+    }
+    console.log(`Rendered custom episode video: ${path.join(outDir, `${slug}.mp4`)}`);
+    process.exit(0);
+  }
+
+  // Mode 2: Built-in Repository Showcase & Examples Render
+  const rawDir = getArg("--raw-dir") ? path.resolve(getArg("--raw-dir")) : path.join(ROOT, "tmp", "raw_3d");
+  const onlyPrefixes = getArg("--only") ? getArg("--only").split(",") : null;
   const shotsOnly = process.argv.includes("--shots-only");
 
-  const shardArgIdx = process.argv.indexOf("--shard");
-  if (shardArgIdx !== -1 && process.argv[shardArgIdx + 1]) {
-    const [sIdx, sTotal] = process.argv[shardArgIdx + 1].split("/").map(Number);
+  if (shardArg) {
+    const [sIdx, sTotal] = shardArg.split("/").map(Number);
     renderRawPanelSet(rawDir, force, sIdx, sTotal, onlyPrefixes, shotsOnly);
     process.exit(0);
   }
 
   fs.mkdirSync(rawDir, { recursive: true });
-  const workers = 6;
+  const workers = clamp(Number(getArg("--workers")) || 6, 1, 6);
   await Promise.all(
     Array.from({ length: workers }, (_, i) => {
       return new Promise((resolve, reject) => {

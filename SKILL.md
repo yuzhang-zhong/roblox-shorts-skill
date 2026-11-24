@@ -5,14 +5,14 @@ description: |
   Use when the user wants to generate Roblox-style avatar videos, blocky 3D character shorts, Douyin/Xiaohongshu/TikTok Roblox skits, R6/R15/chibi-plush character turnaround sheets, or prompts for Kling (可灵), Seedance/Jimeng (即梦), Hailuo MiniMax (海螺), Wan (通义万相), Sora, or Runway, or when fixing AI video defects such as human fingers, Lego C-claws/studs, Minecraft voxels, realistic faces, or rubbery limbs.
 license: MIT
 metadata:
-  version: "1.5.0"
+  version: "1.6.0"
 ---
 
 # Roblox Style Video Skill
 
 ## Core Objective / 核心目标
 
-An Agent Skill (`SKILL.md` + references + zero-dependency CLI scripts) that helps creators and coding agents turn a short-video idea into a geometry-consistent Roblox-style blocky avatar video package: a locked Character DNA card, a 3-view reference sheet prompt, a 9:16 beat-timed storyboard, model-specific Image-to-Video (I2V) or Text-to-Video (T2V) prompts, prompt patches when a clip drifts, and local 3D preview animatics.
+An Agent Skill (`SKILL.md` + references + zero-dependency Node.js 3D video engine & CLI scripts) that **directly generates complete 9:16 Roblox-style blocky avatar short videos (`.mp4` + `.gif` + 3-view turnaround `.png` + multi-shot storyboard `.png`) offline on the local machine**—with zero external platforms, no Kling/Seedance/Sora accounts, and no API keys required—while also compiling optional I2V/T2V prompt packs when requested.
 
 Respond in the user's language (`en`, `zh`, `zh-tw`, `ja`, `ko`, `es`, `fr`, `de`, `pt`, `ru`). When the user requests bilingual output or uses domestic Chinese video engines (Kling 可灵, Seedance/Jimeng 即梦, Hailuo 海螺, Wan 通义万相), provide localized explanations alongside English generation prompts and Chinese prompt equivalents.
 
@@ -66,79 +66,62 @@ Key inputs:
 
 Default assumptions when unspecified:
 
-- Style: `chibi-plush` (`chibi-blocky` rig with `glossy-vinyl` shader), since this matches the high-appeal blind-box Roblox aesthetic on short-video platforms.
-- Workflow: `I2V` (generate image keyframes first, then animate).
-- Aspect ratio: `9:16` vertical, `15s` total duration (4 shots of 3.5 to 4.0 seconds each).
-- Engine output: bilingual prompts suitable for Kling / Seedance / Wan and English prompts for Sora / Runway / Hailuo.
+- **Primary execution path (`local3d` — Direct Video Generation)**: Whenever the user asks to create, test, or generate a Roblox-style short video, **always render the actual `.mp4` + `.gif` + storyboard `.png` + turnaround `.png` video package directly** using `node scripts/render_preview.mjs --spec <episode.json> --out-dir <dir>`! Do **not** stop at text-only prompts or claim an external platform (Kling/快手, Seedance/即梦, Hailuo, Wan, Sora, Runway) is required. Include external engine prompts via `shot_compiler.mjs --spec <episode.json>` only as a companion file or when explicitly requested.
+- **UTF-8 file safety**: Always pass `--out <file>` to `avatar_spec.mjs`, `shot_compiler.mjs`, and `drift_check.mjs` instead of shell `>` redirection (which writes UTF-16 LE BOM in Windows PowerShell).
+- **Aspect ratio & pacing**: `9:16` vertical (`540x960` local H.264 `24fps` MP4 + synthesized multi-shot WAV audio), `4` shots (`15s` story) or `8` unique shots (`30s` story, zero repeated beats).
 
-## End-to-End Workflow / 标准工作流
+## End-to-End Direct Video Workflow / 本地直出成片标准工作流
 
-### Step 1: Lock Character DNA and Turnaround Sheet
+### Step 1: Lock Cast & Companion DNA (`avatar_spec.mjs`)
 
-Read `references/avatar-geometry-and-materials.md` and run `scripts/avatar_spec.mjs` to lock the avatar's silhouette, hand shape, face decal, and material shader before drafting any scene prompts:
+Read `references/avatar-geometry-and-materials.md` and run `scripts/avatar_spec.mjs` with `--out` (supports single avatars, `--cast` multi-character ensembles, `--face` overrides, `--no-accessories` / `--replace-accessory`, and `--companion` non-human blocky pets):
 
 ```bash
-node scripts/avatar_spec.mjs --archetype chibi-plush --rig chibi-blocky --material glossy-vinyl --name "Momo" --lang en
+node scripts/avatar_spec.mjs --cast "chibi-plush:Mo:chibi-blocky:sleepy,classic-noob:Noob:r6:deadpan" --lang zh-en --out ./my-episode/character_card.md
 ```
 
-Give the user:
-- The Character DNA table (rig, head, face decal, hand lock, material, accessories, color palette).
-- A copy-pasteable 3-View Turnaround Image Prompt (`front view, 45-degree three-quarter view, side profile view on a clean neutral studio backdrop`).
-- The anti-drift negative prompt block.
+### Step 2: Author a Custom Episode Spec JSON (`episode.json`)
 
-### Step 2: Plan the 9:16 Short-Video Beat Sheet
+Copy or adapt `templates/custom_story_spec.json` to define any custom story, multi-character cast, props, custom 3D blocks, camera moves, English `BillboardGui` chat bubbles, and retro SFX cues:
 
-Read `references/short-video-beats-and-audio.md` and `references/viral-archetypes-catalog.md`. Structure the short into three retention zones:
+- **`slug`**: output filename prefix (renders `<slug>.mp4` and `<slug>.gif`).
+- **`backdrop`** (per episode or per shot): `subway_car` | `adoption_plaza` | `convenience_store` | `supermarket_aisle` | `neon_tower` | `bedroom` | `obby_sky` | `plaza` | `cafe` | `runway` | `kitchen` | `watchtower` | `street` | `hotel_corridor` | `lava_bridge` | `classroom` | `sand_court` | `studio`.
+- **`cast[]`**: `{ "id": "mo", "name": "Mo", "archetype": "chibi-plush", "theme3d": "commuter", "face": "deadpan", "backProp": "backpack_cyan", "customPalette": { "top": [244,142,178], "pants": [241,245,249] } }`.
+  - Built-in `theme3d` values: `theo` | `commuter` | `noob` | `guest` | `bacon` | `builderman` | `obby` | `y2k` | `chef` | `police` | `clerk` | `zombie` | `base-gray`.
+- **`shots[]`** (`4` shots for 15s, `8` unique shots for 30s — 1 primary action per shot):
+  - **`camera`**: `{ "preset": "push_in" | "pull_out" | "close_up" | "hero_low" | "side_track" | "high_iso" | "wide_two_shot" | "wide_aisle" | "fall_follow", "shake": 0.04 }` (or explicit `"fromRo": [x,y,z], "toRo": [x,y,z], "ta": [x,y,z]`).
+  - **`actors[]`**: `{ "castId": "mo", "fromPos": [-0.6, 0, 0.1], "toPos": [0.2, 0, 0.1], "yaw": 0.4, "pose": "run", "expression": "shocked", "handPropR": "kettle" }`.
+    - Supported `pose`: `idle` | `walk` | `run` | `sprint` | `jump` | `hop` | `cheer` | `wave` | `swat` | `slam` | `pour` | `recoil` | `sit` | `ride_cart` | `push_cart` | `zombie_walk` | `hang_strap` | `fall_rigid` | `faceplant` | `plank_fall` | `one_leg_freeze` | `head_turn` | `sword_slash`.
+    - Supported `expression`: `smile` | `deadpan` | `smirk` | `grin` | `shocked` | `tears` | `angry` | `dizzy` | `slam`.
+    - Supported `handPropL` / `handPropR`: `mug` | `cola` | `boba` | `flashlight` | `sword` | `pencil` | `kettle` | `ramen_cup` | `mystery_egg` | `soda_pack` | `price_tag`.
+    - Supported `backProp`: `backpack_purple` | `backpack_cyan` | `jetpack`.
+  - **`props[]`**: `{ "type": "mystery_egg" | "neon_dragon" | "trade_popup" | "shopping_cart" | "ramen_cup" | "laser_bar" | "glass_pad" | "checkout_gate" | "alarm_clock" | "laptop", "pos": [x,y,z], "moveTo": [x2,y2,z2] }`.
+  - **`blocks[]`**: custom 3D rounded primitives `{ "shape": "box" | "cylinder" | "sphere", "pos": [x,y,z], "moveTo": [x2,y2,z2], "size": [hx,hy,hz], "color": [r,g,b], "roughness": 0.25 }`.
+  - **`chatEn`**: crisp English `BillboardGui` overhead speech bubble (`1–3` words, e.g. `"MYTHIC PET!!"`), plus `"sfxCue"`: `chime` | `boing` | `clack` | `siren` | `buzz` | `drop` | `win`.
 
-- **Shot 1 (0.0s to 3.5s) · Hook / 黄金前3秒**: immediate visual contrast, exaggerated 2D decal expression change, rapid push-in, or rigid blocky slapstick impact. Never open with a slow empty establishing shot.
-- **Shots 2 to N-1 · Escalation / 推进镜头**: 3.5s to 4.0s per shot. Each shot gets **one clear physical verb** (e.g., "slams the blocky alarm clock with a solid rectangular block hand" or "rigidly hops across neon pastel platforms").
-- **Final Shot · Payoff or Loop / 反转或无缝循环**: deadpan freeze-frame, sudden lighting shift, ragdoll flop, or a pose that matches Frame 1 for infinite replay on TikTok/Douyin.
+### Step 3: Compile Storyboard & Lint with 8-Gate Anti-Drift Checker
 
-### Step 3: Compile Model-Tuned Prompts
-
-Read `references/model-prompt-playbook.md` and run `scripts/shot_compiler.mjs` to generate shot-by-shot prompts tailored to the user's video engine:
+Compile the structured storyboard and verify all 8 gates (`Hand Lock`, `2D Face`, `Studless/Non-Voxel`, `Single-Action Budget`, `Rigid Physics`, `Trademark Cleanliness`, `Pet/Prop Topology`, `UI/Engine Guard`) pass with zero duplicate shots:
 
 ```bash
-node scripts/shot_compiler.mjs --template daily-meltdown --duration 15 --engine kling --rig chibi-blocky --lang en
+node scripts/shot_compiler.mjs --spec ./my-episode/episode.json --engine local3d --lang zh-en --out ./my-episode/storyboard.md
+node scripts/shot_compiler.mjs --spec ./my-episode/episode.json --engine local3d --json --out ./my-episode/prompts.json
+node scripts/drift_check.mjs --pack ./my-episode/prompts.json --engine local3d --out ./my-episode/drift_report.md
 ```
 
-Every compiled shot must include:
-1. **First-Frame Image Prompt (首帧画面提示词)**: geometry-locked static composition for Midjourney, Flux, Jimeng Image, or GPT-4o Image.
-2. **I2V / T2V Motion Prompt (视频动态提示词)**: subject anchor + single action + physical secondary motion (hair/accessory bounce, rigid limb swing) + engine-specific camera command.
-3. **Negative Prompt (负向防串味词)**: explicit exclusions for human anatomy, Lego studs, and voxel blocks.
-4. **Audio and Caption Cue (音效与花字卡点)**: classic plastic click, cartoon spring, bass drop, or dialogue subtitle timing.
+### Step 4: Render the Complete 9:16 Video Package Locally (`render_preview.mjs --spec`)
 
-### Step 4: Lint for Style Drift and Rescue Failures
-
-Before handing off custom prompts, or whenever the user reports a broken generation, run `scripts/drift_check.mjs`:
+Render the 3-view turnaround sheet, shot keyframes, bilingual storyboard contact sheets, animated `.gif`, and `540x960` H.264 `.mp4` video with synthesized multi-shot audio directly into `--out-dir`:
 
 ```bash
-node scripts/drift_check.mjs --prompt "A cute Roblox character walking in a room and drinking coffee then waving" --engine kling --mode t2v --lang en
-```
-
-Read `references/rescue-and-anti-drift.md` when troubleshooting specific defects:
-- `human-fingers`: inject `fingerless and clawless solid 1x2x1 beveled rectangular block hands, no human fingers, no five fingers`.
-- `lego-studs`: inject `solid 1x2x1 rectangular block hands (no Lego C-shaped hook claws), smooth studless barrel-beveled Roblox head, flat SmoothPlastic / WoodPlanks floor (zero raised circular Lego floor or head studs)`.
-- `minecraft-voxels`: inject `classic Roblox 1:1 barrel-cylinder head with deep curved top and bottom bevels, SmoothPlastic shader, non-voxel, no pixelated cube textures`.
-- `limb-gap`: inject `canonical Roblox 2x2x1 rectangular torso with two 1x2x1 rectangular leg blocks sitting flush side-by-side matching exact torso width`.
-- `face-morph`: inject `flat 2D screen-printed Roblox decal face on smooth cylindrical surface, no 3D nose, no realistic mouth cavity`.
-- `noodle-limbs`: inject `rigid Motor6D mechanical hinge joints, stiff 1x2x1 rectangular arms and legs, pivot rotation only, no rubbery limb bending`.
-- `outfit-drift`: switch from T2V to First-Frame I2V anchored by the 3-view character turnaround sheet.
-- `overload`: split any clip containing more than two sequential verbs into separate shots.
-
-### Step 5: Render 3D Turnaround Sheets, Contact Sheets, and Animated Previews
-
-Run `scripts/render_preview.mjs` to render authentic 3D Roblox R6/Chibi turnaround sheets, 4-way anti-drift comparison boards, 9:16 storyboard contact sheets, and animated `.gif` / `.mp4` short video previews:
-
-```bash
-node scripts/render_preview.mjs
+node scripts/render_preview.mjs --spec ./my-episode/episode.json --out-dir ./my-episode/assets --force
 ```
 
 ## Quality and Honesty Boundaries / 质量与边界说明
 
-- **Prompts, storyboards, and local 3D preview renderer.** This skill and its four CLI scripts (`avatar_spec.mjs`, `shot_compiler.mjs`, `drift_check.mjs`, `render_preview.mjs`) generate structured character cards, storyboards, anti-drift diagnostics, and local 3D Roblox studio preview renders. Generating diffusion videos requires an external model (Kling, Seedance/Jimeng, Hailuo, Wan, Sora, Runway).
-- **Zero external runtime dependencies.** All scripts in `scripts/` use the Node.js standard library only and run offline without API keys.
-- **Trademark clarity & zero brand logos.** "Roblox-style" describes a blocky 3D character aesthetic (`R6`/`R15`/chibi blocky rigs) for creative prompt engineering. Never place official Roblox Corporation trademarks, wordmarks, `[R]` badges, or Roblox Tilt tilted-square logos onto generated outfits, caps, icons, UI, or thumbnails; use a clean geometric triangle emblem instead and keep official brand logos in the negative prompt. This project is an independent open-source Agent Skill and is not affiliated with or endorsed by Roblox Corporation.
+- **Self-contained local 3D video generation first.** `scripts/render_preview.mjs --spec <episode.json> --out-dir <dir>` directly renders real playable `.mp4` (H.264 + AAC audio) and `.gif` blocky 3D animations offline with zero external accounts or APIs. Optional prompt compilation (`shot_compiler.mjs`) is also included for users who wish to feed first-frame keyframes into external I2V models.
+- **Zero external npm dependencies.** All Node.js scripts use standard library modules only (`fs`, `path`, `zlib`, `child_process`), paired with Windows PowerShell `System.Drawing` and `ffmpeg` for board composition and H.264 MP4 encoding.
+- **Trademark clarity & zero brand logos.** "Roblox-style" describes a blocky 3D character aesthetic (`R6`/`R15`/chibi blocky rigs). Never place official Roblox Corporation trademarks, wordmarks, `[R]` badges, or Roblox Tilt tilted-square logos onto generated outfits, caps, icons, UI, or thumbnails; use a clean geometric triangle emblem instead and keep official brand logos in the negative prompt. This project is an independent open-source Agent Skill and is not affiliated with or endorsed by Roblox Corporation.
 
 ## Reference Navigation / 参考文档索引
 

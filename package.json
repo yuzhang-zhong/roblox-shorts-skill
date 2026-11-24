@@ -1,6 +1,6 @@
 {
   "name": "roblox-style-video",
-  "version": "1.5.0",
+  "version": "1.6.0",
   "private": false,
   "type": "module",
   "description": "Agent Skill to generate Roblox-style R6 and blocky avatar 9:16 short videos with locked proportions, storyboards, and model-specific prompts.",

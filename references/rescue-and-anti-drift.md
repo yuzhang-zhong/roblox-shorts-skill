@@ -38,5 +38,7 @@ When an AI video clip ruins the Roblox aesthetic, the cause is almost always one
 
 - **Broken Prompt (翻车原词)**:
   `A blocky plastic toy character jumping across floating blocks in the sky.`
-- **Rescued Prompt (救场修复词)**:
-  `A Roblox R6 blocky avatar with a smooth studless 1:1 barrel-beveled head, chamfered 2x2x1 blue torso, and fingerless and clawless solid 1x2x1 rectangular block hands hops cleanly onto a smooth pastel-pink SmoothPlastic floating platform with crisp white trim. Smooth flat architectural surfaces, zero raised Lego floor or head studs, non-voxel geometry, bright sky dome lighting.`
+### Case D: Non-Human Blocky Companions & Rigid Prop Docking (`Pet & Prop Topology Lock`)
+
+- **Blocky Pet / Creature Rule**: When adding pets, dragons, dogs, or monsters, lock `chamfered Roblox SmoothPlastic + Neon geometric primitives, flat 2D dot eyes, stubby clawless rectangular block paws, rigid hinged wing/tail plates (zero reptile scales, zero sharp claws/talons, zero realistic fur or leathery bat wings)`. Use `node scripts/avatar_spec.mjs --companion neon-dragon` to generate a ready-to-use Pet DNA block.
+- **Handheld Prop Docking Rule**: Blocky `1x2x1` arms have no fingers or claws, so never write `pinches`, `wraps fingers`, or `holds between thumb and index`. Always state that the prop (`kettle`, `ramen cup`, `Bloxy Cola`, `Linked Sword`, `flashlight`, `overhead subway strap`) is **docked / welded / parented flush against the flat bottom or front face of the solid `1x2x1` rectangular block hand**.
