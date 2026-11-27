@@ -15,7 +15,7 @@ An installable Agent Skill for **Roblox video generation** in Claude Code, Curso
 
 </div>
 
-> **Quick answer:** `roblox-style-video` is a coding-agent Skill for generating Roblox-style 9:16 short videos, not only video prompts. It can directly produce local MP4/GIF animatics, character turnaround sheets, storyboard images, model-specific prompts, and anti-drift reports without a video-model account or API key.
+> **Quick answer:** `roblox-style-video` is a coding-agent Skill for generating Roblox-style 9:16 short videos **without Roblox Studio**, manual keyframing, or paid API keys. It directly renders local MP4/GIF animatics, 2D pupil-tracked Cast Acting Sheets, character turnaround sheets, 4-shot storyboards, model-specific Kling/Seedance/Hailuo/Wan/Sora/Runway prompts, and 10-gate anti-drift checks (stopping five fingers on blocky hands, Lego claws/studs, and deadpan eyes).
 
 <a name="examples-and-local-3d-previews"></a>
 
@@ -148,7 +148,7 @@ See [the discovery evaluation protocol](docs/discovery-evaluation.md) and [fixed
 
 ## 中文简介
 
-`roblox-style-video`（v1.7.0）是面向 GitHub Copilot、Claude Code、Codex 与 Cursor 的**罗布乐思（Roblox）R6/R15 方块小人 9:16 竖屏短视频生成 Agent Skill 与零依赖 Node.js 本地 3D 动画引擎**（无需安装 Roblox Studio 或手动 K 帧，无需任何视频模型账号或 API Key，轻松制作 Roblox R6/R15 抽象小剧场与 TikTok/抖音爆款短片）。内置 12 套爆款竖屏模板（Obby 跑酷、Bacon Hair / 萌新与大佬反差小剧场、Brookhaven 警察追逐、DOORS 恐怖酒店走廊、双人剑斗、灾难塔龙卷风等）、2D 贴花瞳孔视线追踪（`gazeTarget`）与群像表演卡（Cast Acting Sheet），通过 **10 门几何与表演可读性检查（`drift_check.mjs`）**拦截 AI 视频常见的「方块手长出五根人类手指、乐高积木圆凸点与 C 型爪、MC 体素方块头串味、眼神呆滞木讷」等翻车问题，并支持导出本地 MP4/GIF 动态分镜或编译可灵（Kling）、即梦（Seedance）、海螺（Hailuo）、通义万相（Wan）、Sora、Runway 图生视频/文生视频提示词。详见[简体中文完整说明](README.zh-CN.md)与 [`llms.txt`](llms.txt)。
+`roblox-style-video`（v1.7.0）是面向 GitHub Copilot、Claude Code、Codex 与 Cursor 的**罗布乐思（Roblox）R6/R15 方块人（方块小人）9:16 竖屏短视频生成与 AI 视频防串味 Agent Skill 及零依赖 Node.js 本地 3D 动画引擎**（无需安装 Roblox Studio 或手动 K 帧，无需任何视频模型账号或 API Key，轻松制作 Roblox R6/R15 抽象小剧场与 TikTok/抖音爆款短片）。内置 12 套爆款竖屏模板（Obby 跑酷、Bacon Hair / 萌新与大佬反差小剧场、Brookhaven 警察追逐、DOORS 恐怖酒店走廊、双人剑斗、灾难塔龙卷风等）、2D 贴花瞳孔视线追踪（`gazeTarget`）与群像表演卡（Cast Acting Sheet），通过 **10 门几何防串味与表演可读性检查（`drift_check.mjs`）**拦截 AI 视频常见的「方块手长出五根人类手指、乐高积木圆凸点与 C 型爪、MC 体素方块头串味、眼神呆滞木讷」等翻车问题，并支持导出本地 MP4/GIF 动态分镜或编译可灵（Kling）、即梦（Seedance）、海螺（Hailuo）、通义万相（Wan）、Sora、Runway 图生视频/文生视频提示词。详见[简体中文完整说明](README.zh-CN.md)与 [`llms.txt`](llms.txt)。
 
 ## Languages
 
