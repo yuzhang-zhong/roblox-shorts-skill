@@ -5,6 +5,7 @@
 An installable Agent Skill for **Roblox video generation** in Claude Code, Cursor, GitHub Copilot, and Codex. It turns a story into consistent R6/R15 blocky-avatar characters, 9:16 storyboards, offline MP4/GIF animatics, and optional Kling, Seedance, Hailuo, Wan, Sora, or Runway I2V/T2V prompt packs.
 
 [![Agent Skill](https://img.shields.io/badge/Agent_Skill-SKILL.md-0f172a?style=flat-square)](skills/roblox-style-video/SKILL.md)
+[![Skill validation](https://github.com/yuzhang-zhong/roblox-style-video/actions/workflows/skill-validation.yml/badge.svg)](https://github.com/yuzhang-zhong/roblox-style-video/actions/workflows/skill-validation.yml)
 [![Node.js 18+ for the CLI](https://img.shields.io/badge/Node.js-18%2B-268354?style=flat-square)](#skill-workflow-and-quick-start)
 [![MIT license](https://img.shields.io/badge/License-MIT-2563eb?style=flat-square)](LICENSE)
 
@@ -120,6 +121,30 @@ Generic video prompts often produce human fingers, circular Lego floor/head stud
 - **Which Roblox video use cases does it match?** Roblox AI video generation, R6/R15 or blocky-avatar animation, machinima, Obby stories, Roblox-style comedy, horror, action, and TikTok/YouTube/Douyin short-video storyboards.
 - **Does the local workflow require API keys?** No video-model account or API key is required. Node.js 18+ runs the CLI; MP4/GIF packaging additionally requires `ffmpeg`.
 - **Which agents and video models are supported?** The Skill format works with GitHub Copilot, Codex, Claude Code, Cursor, Gemini CLI, and other Agent Skills hosts. Prompt compilation covers Kling, Seedance/Jimeng, Hailuo MiniMax, Wan, Sora, and Runway.
+
+## Verification and reproducibility
+
+| Check | Current evidence | Last verified |
+| --- | --- | --- |
+| Package validation and tests | `npm run validate` and 8/8 Node tests pass, including a real PNG render smoke test | 2026-11-27 |
+| Standard GitHub Skill package | `gh skill publish --dry-run`, remote preview, and pinned `@v1.6.1` installation passed | 2026-11-27 |
+| Linux and Windows compatibility | CI matrix covers Node 18 and 22 after this release | Each push and pull request |
+| Agent UI recommendation | Manual query protocol is provided; no automated pass is claimed until results are recorded | Per release |
+| Web-model discovery | Monthly measurement is defined; search placement is not yet inferred from local metadata tests | Monthly / after placement changes |
+
+Run the deterministic discovery preflight with:
+
+```bash
+npm run test:discovery
+```
+
+After a release has propagated, run the live GitHub registry audit:
+
+```bash
+npm run test:discovery:remote -- --out discovery-report.json
+```
+
+See [the discovery evaluation protocol](docs/discovery-evaluation.md) and [fixed test queries](tests/discovery_queries.json). The live audit intentionally fails on missing results or rate limits so an unverified search is never recorded as a pass.
 
 ## Languages
 

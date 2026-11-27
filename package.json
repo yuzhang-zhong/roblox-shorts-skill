@@ -1,6 +1,6 @@
 {
   "name": "roblox-style-video",
-  "version": "1.6.1",
+  "version": "1.6.2",
   "private": false,
   "type": "module",
   "description": "Roblox video generation for R6/R15 blocky avatars: generate 9:16 shorts, storyboards, offline MP4/GIF animatics, I2V/T2V prompts, and anti-drift checks.",
@@ -36,6 +36,8 @@
     "check": "node scripts/drift_check.mjs",
     "render": "node scripts/render_preview.mjs",
     "sync:skill": "node scripts/sync_skill_bundle.mjs",
+    "test:discovery": "node scripts/discovery_audit.mjs",
+    "test:discovery:remote": "node scripts/discovery_audit.mjs --remote",
     "validate": "node scripts/validate_skill.mjs",
     "test": "node --test tests/run_tests.mjs"
   },

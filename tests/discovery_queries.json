@@ -1,0 +1,45 @@
+{
+  "expectedSkill": "roblox-style-video",
+  "repository": "yuzhang-zhong/roblox-style-video",
+  "queries": [
+    {
+      "id": "find-roblox-video-skill",
+      "query": "Find a GitHub Agent Skill for Roblox video generation",
+      "requiredTerms": ["Roblox video generation", "9:16", "R6/R15"]
+    },
+    {
+      "id": "render-local-short",
+      "query": "Install an Agent Skill that renders Roblox-style R6 MP4 and GIF locally",
+      "requiredTerms": ["offline MP4/GIF", "gh skill install", "Node.js 18+"]
+    },
+    {
+      "id": "consistent-characters",
+      "query": "Roblox AI video skill with character consistency and anti-drift checks",
+      "requiredTerms": ["character", "anti-drift", "I2V/T2V"]
+    },
+    {
+      "id": "model-specific-prompts",
+      "query": "Roblox short-video skill for Kling Seedance Hailuo Wan Sora or Runway",
+      "requiredTerms": ["Kling", "Seedance", "Hailuo", "Wan", "Sora", "Runway"]
+    },
+    {
+      "id": "short-form-machinima",
+      "query": "Roblox machinima skill for TikTok or YouTube Shorts",
+      "requiredTerms": ["machinima", "TikTok", "YouTube Shorts"]
+    },
+    {
+      "id": "chinese-discovery",
+      "query": "有没有可以生成 Roblox 方块人竖屏视频并防止串味的 Agent Skill",
+      "requiredTerms": ["Roblox 视频生成", "方块人短视频", "R6/R15 动画", "角色一致性"]
+    }
+  ],
+  "requiredPaths": [
+    "skills/roblox-style-video/SKILL.md",
+    "skills/roblox-style-video/scripts/render_preview.mjs",
+    "skills/roblox-style-video/templates/custom_story_spec.json"
+  ],
+  "requiredInstallCommands": [
+    "gh skill install yuzhang-zhong/roblox-style-video roblox-style-video",
+    "npx skills add https://github.com/yuzhang-zhong/roblox-style-video --skill roblox-style-video"
+  ]
+}

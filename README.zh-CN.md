@@ -5,6 +5,7 @@
 一套面向 Claude Code、Cursor、GitHub Copilot 与 Codex 的可安装 **Agent Skill**：围绕 **Roblox 视频生成**，锁住 R6/R15 方块角色一致性，制作 9:16 竖屏分镜，在本地直接输出 MP4/GIF 动态成片，并可按需编译可灵、即梦、海螺、万相、Sora 或 Runway 的图生/文生视频提示词。
 
 [![Agent Skill](https://img.shields.io/badge/Agent_Skill-SKILL.md-0f172a?style=flat-square)](skills/roblox-style-video/SKILL.md)
+[![Skill validation](https://github.com/yuzhang-zhong/roblox-style-video/actions/workflows/skill-validation.yml/badge.svg)](https://github.com/yuzhang-zhong/roblox-style-video/actions/workflows/skill-validation.yml)
 [![命令行需要 Node.js 18+](https://img.shields.io/badge/Node.js-18%2B-268354?style=flat-square)](#skill-工作流与安装使用)
 [![MIT 许可证](https://img.shields.io/badge/License-MIT-2563eb?style=flat-square)](LICENSE)
 
@@ -120,6 +121,30 @@ node scripts/drift_check.mjs --pack templates/custom_story_spec.json --engine lo
 - **它匹配哪些需求？** Roblox 视频生成、R6/R15 或方块角色动画、机摄短片（machinima）、跑酷剧情、搞笑/恐怖/动作短片、抖音/小红书/TikTok/YouTube Shorts 分镜与角色一致性修复。
 - **本地生成需要 API Key 吗？** 不需要视频模型账号或 API Key。命令行需要 Node.js 18+，MP4/GIF 打包还需要 `ffmpeg`。
 - **支持哪些 Agent 和模型？** 支持 GitHub Copilot、Codex、Claude Code、Cursor、Gemini CLI 等 Agent Skills 宿主；提示词覆盖可灵、即梦/Seedance、海螺、万相、Sora 与 Runway。
+
+## 验证与可复现性
+
+| 检查项 | 当前证据 | 最近验证 |
+| --- | --- | --- |
+| 包结构与测试 | `npm run validate` 与 8/8 项 Node 测试通过，包含一次真实 PNG 渲染冒烟测试 | 2026-11-27 |
+| GitHub 标准 Skill 安装 | `gh skill publish --dry-run`、远端预览及固定 `@v1.6.1` 安装通过 | 2026-11-27 |
+| Linux / Windows 兼容 | CI 将在 Node 18 与 Node 22 上分别验证 | 每次 push / pull request |
+| Agent UI 推荐结果 | 已提供固定查询手工协议；没有记录结果前不宣称通过 | 每次发布 |
+| 网页模型可发现性 | 月度测量流程已定义；不会用本地元数据测试推断真实搜索排名 | 每月 / 外部收录变化后 |
+
+运行本地确定性发现预检：
+
+```bash
+npm run test:discovery
+```
+
+Release 索引刷新后运行 GitHub 实时审计：
+
+```bash
+npm run test:discovery:remote -- --out discovery-report.json
+```
+
+详细步骤见 [发现效果评估协议](docs/discovery-evaluation.md) 与 [固定测试查询](tests/discovery_queries.json)。远端审计会在结果缺失、限流或爬虫尚未刷新时明确失败，不会把“未验证”写成通过。
 
 ## 语言
 

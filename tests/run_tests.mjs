@@ -1,6 +1,8 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 import { execFileSync } from "node:child_process";
+import fs from "node:fs";
+import os from "node:os";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 
@@ -8,6 +10,7 @@ import { buildAvatarSpec, buildCastSpec, formatAvatarSpecMarkdown, normalizeLang
 import { compileStoryboard, formatStoryboardMarkdown } from "../scripts/shot_compiler.mjs";
 import { inspectPrompt, inspectPackageFile, formatDriftCheckMarkdown } from "../scripts/drift_check.mjs";
 import { computeEpisodeTimingPlan, buildEpisodeWavBuffer } from "../scripts/render_preview.mjs";
+import { auditLocalDiscovery } from "../scripts/discovery_audit.mjs";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(__dirname, "..");
@@ -179,10 +182,43 @@ test("CLI formatters support 10 languages plus zh-en backward compatibility", ()
   }
 });
 
+test("discovery audit covers fixed multilingual query intents and install surfaces", () => {
+  const report = auditLocalDiscovery(ROOT);
+  assert.equal(report.expectedSkill, "roblox-style-video");
+  assert.ok(report.checks.length >= 10);
+  assert.equal(report.passed, true, JSON.stringify(report.checks.filter((check) => !check.passed)));
+});
+
+test("render_preview produces a valid PNG from the documented custom episode spec without ffmpeg", { timeout: 60_000 }, () => {
+  const rawDir = fs.mkdtempSync(path.join(os.tmpdir(), "roblox-style-video-render-"));
+  try {
+    execFileSync(
+      process.execPath,
+      [
+        path.join(ROOT, "scripts", "render_preview.mjs"),
+        "--spec",
+        path.join(ROOT, "templates", "custom_story_spec.json"),
+        "--raw-dir",
+        rawDir,
+        "--shard",
+        "0/1000",
+        "--force"
+      ],
+      { cwd: ROOT, encoding: "utf8", timeout: 55_000 }
+    );
+
+    const png = fs.readFileSync(path.join(rawDir, "turn_front.png"));
+    assert.deepEqual([...png.subarray(0, 8)], [137, 80, 78, 71, 13, 10, 26, 10]);
+    assert.ok(png.length > 1_000);
+  } finally {
+    fs.rmSync(rawDir, { recursive: true, force: true });
+  }
+});
+
 test("validate_skill CLI verifies repository files, versions, and manifests", () => {
   const out = execFileSync(process.execPath, [path.join(ROOT, "scripts", "validate_skill.mjs")], {
     cwd: ROOT,
     encoding: "utf8"
   });
-  assert.match(out, /roblox-style-video v1\.6\.1 package is valid/);
+  assert.match(out, /roblox-style-video v1\.6\.2 package is valid/);
 });

@@ -1,7 +1,7 @@
 {
   "name": "roblox-style-video",
   "description": "Roblox video generation for R6/R15 blocky avatars: generate 9:16 shorts, storyboards, offline MP4/GIF animatics, I2V/T2V prompts, and anti-drift checks.",
-  "version": "1.6.1",
+  "version": "1.6.2",
   "author": {
     "name": "yuzhang-zhong",
     "url": "https://github.com/yuzhang-zhong"

@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.6.2
+
+- Added a fixed multilingual discovery query set and `scripts/discovery_audit.mjs` for deterministic local preflight plus optional live `gh skill search` verification.
+- Added a documented manual AI-tool evaluation protocol, honest compatibility evidence, and a Linux/Windows plus Node 18/22 validation workflow.
+- Added README verification guidance so future GEO/discovery changes can be tested and compared across releases instead of relying on keyword changes alone.
+
 ## 1.6.1
 
 - Added a synchronized, self-contained `skills/roblox-style-video/` distribution package so GitHub Skill search, preview, install, and publish can discover the project without changing the existing root workflow.
