@@ -3,7 +3,7 @@ name: roblox-style-video
 description: |
   Roblox video generation for R6/R15 blocky avatars: generate 9:16 shorts, storyboards, offline MP4/GIF animatics, I2V/T2V prompts, and anti-drift checks.
   Use when the user wants Roblox AI videos, Roblox-style avatar animation, blocky 3D character shorts, machinima, Obby skits, Douyin/Xiaohongshu/TikTok or YouTube Shorts, character turnaround sheets, or prompts for Kling (可灵), Seedance/Jimeng (即梦), Hailuo MiniMax (海螺), Wan (通义万相), Sora, or Runway. Also use for fixing inconsistent Roblox characters, human fingers, Lego C-claws/studs, Minecraft voxels, realistic faces, or rubbery limbs.
-  中文触发词包括 Roblox 视频生成、方块人短视频、R6/R15 动画、竖屏剧情、角色一致性与 AI 视频防串味。
+  中文触发词包括 Roblox 视频生成、罗布乐思方块人短视频、R6/R15 动画、Obby 跑酷与 Bacon Hair 小剧场、竖屏剧情分镜、角色一致性、眼神表演控制、防长五根人类手指/乐高积木凸点C型爪与 AI 视频防串味。
 license: MIT
 metadata:
   version: "1.7.0"

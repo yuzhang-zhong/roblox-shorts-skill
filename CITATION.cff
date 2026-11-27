@@ -1,0 +1,25 @@
+cff-version: 1.2.0
+message: "If you use or reference this project, please cite it using the metadata below."
+type: software
+title: "Roblox Style Video Skill: R6/R15 Blocky Avatar 9:16 Offline 3D Animatics, Instant-Acting Grammar, and 10-Gate Anti-Drift Prompts"
+version: "1.7.0"
+authors:
+  - family-names: "Zhong"
+    given-names: "Yuzhang"
+repository-code: "https://github.com/yuzhang-zhong/roblox-style-video"
+url: "https://github.com/yuzhang-zhong/roblox-style-video"
+license: "MIT"
+abstract: "Installable Agent Skill and zero-dependency Node.js 18+ 3D engine & CLI for generating 9:16 Roblox-style R6/R15 blocky-avatar short videos with locked proportions, 2D pupil-tracked Cast Acting Sheets, local MP4/GIF animatics, 10-gate anti-drift and readability checks, and Kling/Seedance/Hailuo/Wan/Sora/Runway prompts."
+keywords:
+  - "agent-skill"
+  - "roblox"
+  - "roblox-video"
+  - "r6"
+  - "r15"
+  - "machinima"
+  - "ai-video"
+  - "storyboard"
+  - "short-video"
+  - "kling"
+  - "seedance"
+  - "sora"
