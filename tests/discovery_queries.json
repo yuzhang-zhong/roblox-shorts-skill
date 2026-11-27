@@ -3,34 +3,340 @@
   "repository": "yuzhang-zhong/roblox-style-video",
   "queries": [
     {
-      "id": "find-roblox-video-skill",
-      "query": "Find a GitHub Agent Skill for Roblox video generation",
-      "requiredTerms": ["Roblox video generation", "9:16", "R6/R15"]
+      "id": "q01-m1_exact",
+      "method": "M1_exact",
+      "query": "roblox-style-video Agent Skill",
+      "requiredTerms": [
+        "roblox-style-video",
+        "Agent Skill"
+      ]
     },
     {
-      "id": "render-local-short",
-      "query": "Install an Agent Skill that renders Roblox-style R6 MP4 and GIF locally",
-      "requiredTerms": ["offline MP4/GIF", "gh skill install", "Node.js 18+"]
+      "id": "q02-m1_exact",
+      "method": "M1_exact",
+      "query": "yuzhang-zhong/roblox-style-video",
+      "requiredTerms": [
+        "yuzhang-zhong/roblox-style-video"
+      ]
     },
     {
-      "id": "consistent-characters",
-      "query": "Roblox AI video skill with character consistency and anti-drift checks",
-      "requiredTerms": ["character", "anti-drift", "I2V/T2V"]
+      "id": "q03-m1_exact",
+      "method": "M1_exact",
+      "query": "avatar_spec.mjs shot_compiler.mjs drift_check.mjs render_preview.mjs",
+      "requiredTerms": [
+        "avatar_spec.mjs",
+        "shot_compiler.mjs",
+        "drift_check.mjs",
+        "render_preview.mjs"
+      ]
     },
     {
-      "id": "model-specific-prompts",
-      "query": "Roblox short-video skill for Kling Seedance Hailuo Wan Sora or Runway",
-      "requiredTerms": ["Kling", "Seedance", "Hailuo", "Wan", "Sora", "Runway"]
+      "id": "q04-m1_exact",
+      "method": "M1_exact",
+      "query": "subway-acting-versus-baseline Cast Acting Sheet",
+      "requiredTerms": [
+        "subway-acting-versus-baseline",
+        "Cast Acting Sheet"
+      ]
     },
     {
-      "id": "short-form-machinima",
-      "query": "Roblox machinima skill for TikTok or YouTube Shorts",
-      "requiredTerms": ["machinima", "TikTok", "YouTube Shorts"]
+      "id": "q05-m2_en_symptom",
+      "method": "M2_en_symptom",
+      "query": "Sora or Kling gave my Roblox R6 avatar five human fingers",
+      "requiredTerms": [
+        "five human fingers",
+        "R6",
+        "Kling",
+        "Sora"
+      ]
     },
     {
-      "id": "chinese-discovery",
-      "query": "有没有可以生成 Roblox 方块人竖屏视频并防止串味的 Agent Skill",
-      "requiredTerms": ["Roblox 视频生成", "方块人短视频", "R6/R15 动画", "角色一致性"]
+      "id": "q06-m2_en_symptom",
+      "method": "M2_en_symptom",
+      "query": "stop AI video turning Roblox character into Lego minifigure C-claws and floor studs",
+      "requiredTerms": [
+        "Lego",
+        "C-claws",
+        "studs",
+        "SmoothPlastic"
+      ]
+    },
+    {
+      "id": "q07-m2_en_symptom",
+      "method": "M2_en_symptom",
+      "query": "prevent Roblox avatar drifting into Minecraft voxel cubes or realistic face",
+      "requiredTerms": [
+        "Minecraft",
+        "voxel",
+        "2D face decal"
+      ]
+    },
+    {
+      "id": "q08-m2_en_symptom",
+      "method": "M2_en_symptom",
+      "query": "fix deadpan lifeless stare on blocky avatar short videos with gaze tracking",
+      "requiredTerms": [
+        "deadpan",
+        "gazeTarget",
+        "pupil"
+      ]
+    },
+    {
+      "id": "q09-m3_zh_colloquial",
+      "method": "M3_zh_colloquial",
+      "query": "AI生成罗布乐思Roblox小人长出五根手指变成乐高或MC方块串味怎么解决",
+      "requiredTerms": [
+        "罗布乐思",
+        "五根人类手指",
+        "乐高",
+        "串味"
+      ]
+    },
+    {
+      "id": "q10-m3_zh_colloquial",
+      "method": "M3_zh_colloquial",
+      "query": "不用装Roblox Studio做9:16竖屏方块人跑酷搞笑短剧",
+      "requiredTerms": [
+        "Roblox Studio",
+        "9:16",
+        "跑酷"
+      ]
+    },
+    {
+      "id": "q11-m3_zh_colloquial",
+      "method": "M3_zh_colloquial",
+      "query": "可灵即梦海螺通义万相生成Roblox培根头Noob短视频提示词",
+      "requiredTerms": [
+        "可灵",
+        "即梦",
+        "海螺",
+        "通义万相",
+        "Noob"
+      ]
+    },
+    {
+      "id": "q12-m3_zh_colloquial",
+      "method": "M3_zh_colloquial",
+      "query": "方块小人眼神呆滞怎么加视线追踪和不对称眉毛表演控制",
+      "requiredTerms": [
+        "眼神呆滞",
+        "视线",
+        "眉毛"
+      ]
+    },
+    {
+      "id": "q13-m4_alternative",
+      "method": "M4_alternative",
+      "query": "generate Roblox machinima TikTok and YouTube Shorts without installing Roblox Studio",
+      "requiredTerms": [
+        "machinima",
+        "TikTok",
+        "YouTube Shorts",
+        "Roblox Studio"
+      ]
+    },
+    {
+      "id": "q14-m4_alternative",
+      "method": "M4_alternative",
+      "query": "offline zero-API-key 3D blocky avatar MP4 and GIF animatic previewer",
+      "requiredTerms": [
+        "zero API keys",
+        "MP4",
+        "GIF",
+        "Node.js 18+"
+      ]
+    },
+    {
+      "id": "q15-m4_alternative",
+      "method": "M4_alternative",
+      "query": "deterministic prompt compiler alternative to raw ChatGPT Roblox video prompts",
+      "requiredTerms": [
+        "10-gate",
+        "anti-drift",
+        "I2V/T2V"
+      ]
+    },
+    {
+      "id": "q16-m4_alternative",
+      "method": "M4_alternative",
+      "query": "Moon Animator or Blender Roblox animation storyboard previsualization alternative",
+      "requiredTerms": [
+        "Moon Animator",
+        "Blender",
+        "storyboard"
+      ]
+    },
+    {
+      "id": "q17-m5_tech_stack",
+      "method": "M5_tech_stack",
+      "query": "lock 2x2x1 torso 1x2x1 limbs 1.2x1.2x1.2 studless barrel head geometry",
+      "requiredTerms": [
+        "2x2x1",
+        "1x2x1",
+        "1.2x1.2x1.2"
+      ]
+    },
+    {
+      "id": "q18-m5_tech_stack",
+      "method": "M5_tech_stack",
+      "query": "BillboardGui overhead chat bubble SmoothPlastic WoodPlanks Neon materials",
+      "requiredTerms": [
+        "BillboardGui",
+        "SmoothPlastic",
+        "WoodPlanks",
+        "Neon"
+      ]
+    },
+    {
+      "id": "q19-m5_tech_stack",
+      "method": "M5_tech_stack",
+      "query": "64x64 thumbnail contrast readability gate and 9:16 safe-zone audit",
+      "requiredTerms": [
+        "64x64",
+        "safe-zone",
+        "Gates 9–10"
+      ]
+    },
+    {
+      "id": "q20-m5_tech_stack",
+      "method": "M5_tech_stack",
+      "query": "zero npm dependencies Node.js 18+ 3D renderer and 3-view turnaround sheet",
+      "requiredTerms": [
+        "Zero npm dependencies",
+        "Node.js 18+",
+        "turnaround"
+      ]
+    },
+    {
+      "id": "q21-m6_agent_workflow",
+      "method": "M6_agent_workflow",
+      "query": "gh skill install roblox-style-video Claude Code Copilot Codex Cursor",
+      "requiredTerms": [
+        "gh skill install yuzhang-zhong/roblox-style-video",
+        "Claude Code",
+        "GitHub Copilot",
+        "Codex",
+        "Cursor"
+      ]
+    },
+    {
+      "id": "q22-m6_agent_workflow",
+      "method": "M6_agent_workflow",
+      "query": "npx skills add roblox-style-video Gemini CLI Pi",
+      "requiredTerms": [
+        "npx skills add https://github.com/yuzhang-zhong/roblox-style-video",
+        "Gemini CLI",
+        "Pi"
+      ]
+    },
+    {
+      "id": "q23-m6_agent_workflow",
+      "method": "M6_agent_workflow",
+      "query": "Kling Seedance Jimeng Hailuo Wan Sora Runway Roblox prompt pack",
+      "requiredTerms": [
+        "Kling",
+        "Seedance",
+        "Jimeng",
+        "Hailuo",
+        "Wan",
+        "Sora",
+        "Runway"
+      ]
+    },
+    {
+      "id": "q24-m6_agent_workflow",
+      "method": "M6_agent_workflow",
+      "query": "Agent Plugins v1.0.0 plugin.json for Roblox short-video automation",
+      "requiredTerms": [
+        "plugin.json",
+        "short-video"
+      ]
+    },
+    {
+      "id": "q25-m7_llm_chat",
+      "method": "M7_llm_chat",
+      "query": "What GitHub Agent Skill creates 9:16 Roblox R6 and R15 shorts with character consistency?",
+      "requiredTerms": [
+        "R6/R15",
+        "9:16",
+        "character",
+        "Agent Skill"
+      ]
+    },
+    {
+      "id": "q26-m7_llm_chat",
+      "method": "M7_llm_chat",
+      "query": "How can I preview a 4-shot Roblox Obby or Brookhaven skit locally as MP4 before paying for video credits?",
+      "requiredTerms": [
+        "Obby",
+        "Brookhaven",
+        "MP4",
+        "4-shot"
+      ]
+    },
+    {
+      "id": "q27-m7_llm_chat",
+      "method": "M7_llm_chat",
+      "query": "有没有支持Claude Code和Codex的Roblox方块人短视频分镜与防崩坏Skill",
+      "requiredTerms": [
+        "方块人短视频",
+        "Claude Code",
+        "Codex"
+      ]
+    },
+    {
+      "id": "q28-m7_llm_chat",
+      "method": "M7_llm_chat",
+      "query": "小红书抖音爆款Roblox跑酷故事会视频怎么用AI批量写分镜",
+      "requiredTerms": [
+        "小红书",
+        "抖音",
+        "分镜"
+      ]
+    },
+    {
+      "id": "q29-m8_persona_longtail",
+      "method": "M8_persona_longtail",
+      "query": "Brookhaven police chase DOORS hotel hallway Crossroads sword duel templates",
+      "requiredTerms": [
+        "Brookhaven",
+        "DOORS",
+        "Crossroads"
+      ]
+    },
+    {
+      "id": "q30-m8_persona_longtail",
+      "method": "M8_persona_longtail",
+      "query": "Bacon Hair Noob vs Pro comedy tornado disaster tower classroom exam skits",
+      "requiredTerms": [
+        "Bacon Hair",
+        "Noob",
+        "tornado",
+        "classroom"
+      ]
+    },
+    {
+      "id": "q31-m8_persona_longtail",
+      "method": "M8_persona_longtail",
+      "query": "cozy cafe tycoon burnt pizza slapstick runway outfit drop red-light freeze",
+      "requiredTerms": [
+        "cafe tycoon",
+        "burnt pizza",
+        "runway",
+        "red-light"
+      ]
+    },
+    {
+      "id": "q32-m8_persona_longtail",
+      "method": "M8_persona_longtail",
+      "query": "10-language Roblox video skill supporting Japanese Korean Spanish Portuguese Russian",
+      "requiredTerms": [
+        "README.ja.md",
+        "README.ko.md",
+        "README.es.md",
+        "README.pt-BR.md",
+        "README.ru.md"
+      ]
     }
   ],
   "requiredPaths": [

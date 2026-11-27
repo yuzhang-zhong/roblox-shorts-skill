@@ -9,6 +9,29 @@
   "homepage": "https://github.com/yuzhang-zhong/roblox-style-video",
   "repository": "https://github.com/yuzhang-zhong/roblox-style-video",
   "license": "MIT",
-  "keywords": ["roblox", "roblox-video", "ai-video", "video-generation", "r6", "r15", "short-video", "storyboard", "machinima", "kling", "seedance", "wan"],
-  "skills": ["./skills/roblox-style-video"]
+  "keywords": [
+    "agent-skills",
+    "agent-skill",
+    "claude-skill",
+    "copilot-skill",
+    "codex-skill",
+    "cursor-skill",
+    "roblox",
+    "roblox-video",
+    "r6",
+    "r15",
+    "machinima",
+    "ai-video",
+    "video-generation",
+    "short-video",
+    "storyboard",
+    "kling",
+    "seedance",
+    "hailuo",
+    "wan",
+    "sora"
+  ],
+  "skills": [
+    "./skills/roblox-style-video"
+  ]
 }

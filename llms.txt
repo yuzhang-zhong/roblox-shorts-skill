@@ -27,3 +27,8 @@ npm run validate && npm run test:discovery && npm test
 - [Agent Skill Entry](skills/roblox-style-video/SKILL.md)
 - [README (English)](README.md) · [README (简体中文)](README.zh-CN.md)
 - [Discovery Evaluation Protocol](docs/discovery-evaluation.md) · [Controlled A/B Acting Study](examples/subway-acting-versus-baseline/README.md)
+
+## Multi-Angle Search & Slang Mapping
+- **Exact & Manifests**: `roblox-style-video`, `plugin.json` (Agent Plugins v1.0.0), `.claude-plugin/plugin.json`, `.cursor-plugin/plugin.json`, `avatar_spec.mjs`, `shot_compiler.mjs`, `drift_check.mjs`, `render_preview.mjs`.
+- **Alternative-To**: Agent-native zero-install storyboard & 3D animatic previsualization alternative to **Roblox Studio**, **Moon Animator**, or **Blender** R6/R15 rig setups when ideating 9:16 TikTok, YouTube Shorts, Douyin (抖音), or Xiaohongshu (小红书) skits.
+- **Multilingual READMEs**: Includes 10 full-length guides (`README.md`, `README.zh-CN.md`, `docs/i18n/README.zh-TW.md`, `README.ja.md`, `README.ko.md`, `README.es.md`, `README.fr.md`, `README.de.md`, `README.pt-BR.md`, `README.ru.md`).
