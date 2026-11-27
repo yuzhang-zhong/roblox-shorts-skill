@@ -129,8 +129,8 @@ class SceneHit {
   }
 }
 
-// ---------- 2D Face Decal Evaluator ----------
-function evalFaceDecal(u, v, expression = "smile") {
+// ---------- 2D Face Decal Evaluator (with 1st-Class Pupil Gaze & Asymmetrical Brows) ----------
+function evalFaceDecal(u, v, expression = "smile", faceMod = {}) {
   if (Math.abs(u) > 0.44 || Math.abs(v) > 0.44) return null;
 
   const ink = [16, 20, 28];
@@ -139,10 +139,37 @@ function evalFaceDecal(u, v, expression = "smile") {
   const tongue = [244, 102, 112];
   const tear = [96, 195, 255];
 
+  const gx = clamp(Number(faceMod.gazeX) || 0, -1, 1);
+  const gy = clamp(Number(faceMod.gazeY) || 0, -1, 1);
+  const browMode = String(faceMod.brows || "").toLowerCase();
+
+  const eyeSign = u >= 0 ? 1 : -1;
+  const eyeCx = eyeSign * 0.125;
+  const lx = u - eyeCx; // signed offset inside each eye (+lx = screen right for BOTH eyes)
   const ex = Math.abs(u) - 0.125;
   const ey = v - 0.085;
 
-  if (expression === "slam" || expression === "angry") {
+  // 1. Expressive & Asymmetrical Eyebrows
+  if (browMode && browMode !== "none") {
+    if (browMode === "left-up-right-down" || browMode === "asymmetrical") {
+      const targetEy = u < 0 ? 0.118 - lx * 0.18 : 0.088 + lx * 0.24;
+      if (Math.abs(lx) < 0.074 && Math.abs(ey - targetEy) < 0.017) return ink;
+    } else if (browMode === "right-up-left-down") {
+      const targetEy = u < 0 ? 0.088 - lx * 0.24 : 0.118 + lx * 0.18;
+      if (Math.abs(lx) < 0.074 && Math.abs(ey - targetEy) < 0.017) return ink;
+    } else if (browMode === "furrowed") {
+      const by = ey - (0.095 - (0.14 - Math.abs(u)) * 0.35);
+      if (Math.abs(ex) < 0.075 && Math.abs(by) < 0.018) return ink;
+    } else if (browMode === "worried") {
+      const by = ey - (0.105 + (0.14 - Math.abs(u)) * 0.25);
+      if (Math.abs(ex) < 0.075 && Math.abs(by) < 0.017) return ink;
+    } else if (browMode === "raised") {
+      const arch = 0.116 - lx * lx * 1.4;
+      if (Math.abs(lx) < 0.072 && Math.abs(ey - arch) < 0.016) return ink;
+    } else if (browMode === "flat") {
+      if (Math.abs(lx) < 0.072 && Math.abs(ey - 0.098) < 0.016) return ink;
+    }
+  } else if (expression === "slam" || expression === "angry") {
     const by = ey - (0.095 - (0.14 - Math.abs(u)) * 0.35);
     if (Math.abs(ex) < 0.075 && Math.abs(by) < 0.018) return ink;
   } else if (expression === "shocked" || expression === "tears") {
@@ -160,28 +187,42 @@ function evalFaceDecal(u, v, expression = "smile") {
     }
   }
 
+  // 2. Eyes with 1st-Class Directional Pupil Tracking
   if (expression === "deadpan") {
-    if (Math.abs(ex) < 0.068 && Math.abs(ey) < 0.018) return ink;
+    const slx = lx - gx * 0.022;
+    const sey = ey - gy * 0.012;
+    if (Math.abs(slx) < 0.068 && Math.abs(sey) < 0.018) return ink;
+    // Subtle directional iris drop under the flat line when actively side-eyeing a target
+    if (Math.hypot(gx, gy) > 0.18) {
+      const px = lx - gx * 0.034;
+      const py = ey - gy * 0.014 + 0.022;
+      if (ey < sey && Math.hypot(px / 0.024, py / 0.024) < 1.0) return ink;
+    }
   } else if (expression === "sleepy") {
-    if (Math.abs(ex) < 0.070 && Math.abs(ey + 0.008) < 0.016) return ink;
-    const lidR = Math.hypot(ex / 0.062, (ey + 0.008) / 0.038);
+    const slx = lx - gx * 0.020;
+    if (Math.abs(slx) < 0.070 && Math.abs(ey + 0.008) < 0.016) return ink;
+    const lidR = Math.hypot(slx / 0.062, (ey + 0.008) / 0.038);
     if (ey < -0.008 && lidR < 1.0 && lidR > 0.70) return ink;
   } else if (expression === "dizzy") {
     const d1 = Math.abs(ex - ey);
     const d2 = Math.abs(ex + ey);
     if (Math.abs(ex) < 0.062 && Math.abs(ey) < 0.062 && (d1 < 0.02 || d2 < 0.02)) return ink;
   } else if (expression === "shocked") {
-    const rOut = Math.hypot(ex / 0.072, ey / 0.082);
+    const rOut = Math.hypot((lx - gx * 0.006) / 0.074, (ey - gy * 0.005) / 0.084);
     if (rOut < 1.0) {
       if (rOut > 0.82) return ink;
-      const rPupil = Math.hypot(ex / 0.028, ey / 0.032);
+      const px = lx - gx * 0.028;
+      const py = ey - gy * 0.028;
+      const rPupil = Math.hypot(px / 0.029, py / 0.033);
       if (rPupil < 1.0) return ink;
       return white;
     }
   } else {
-    const rEye = Math.hypot(ex / 0.044, ey / 0.078);
+    const elx = lx - gx * 0.026;
+    const eey = ey - gy * 0.018;
+    const rEye = Math.hypot(elx / 0.044, eey / 0.078);
     if (rEye < 1.0) {
-      const hl = Math.hypot((ex + 0.012) / 0.015, (ey - 0.028) / 0.021);
+      const hl = Math.hypot((elx - gx * 0.008 + 0.012) / 0.015, (eey - gy * 0.006 - 0.028) / 0.021);
       if (hl < 1.0) return white;
       return ink;
     }
@@ -546,6 +587,9 @@ export function evalAvatarSDF(pWorld, cfg = {}) {
     legLPitch = 0,
     legRPitch = 0,
     expression = "smile",
+    gazeX = 0,
+    gazeY = 0,
+    brows = "",
     theme = "theo",
     customPalette = null,
     noAccessories = false,
@@ -673,7 +717,7 @@ export function evalAvatarSDF(pWorld, cfg = {}) {
     if (pHeadLocal.z > 0.08) {
       const u = pHeadLocal.x / 0.44;
       const v = pHeadLocal.y / 0.42;
-      const decal = evalFaceDecal(u, v, expression);
+      const decal = evalFaceDecal(u, v, expression, { gazeX, gazeY, brows });
       if (decal) hCol = decal;
     }
     hit.add(dHead, hCol, 0.28, 4);
@@ -3011,23 +3055,211 @@ function projectHeadToCardBubble(worldPos, cam) {
   return { bubbleX: bx, bubbleY: by };
 }
 
+const BACKDROP_LANDMARKS = {
+  subway_car: {
+    empty_seat: [0.62, -0.32, -0.78],
+    left_seat: [-0.92, -0.32, -0.78],
+    center_strap: [0.0, 1.06, 0.04],
+    left_strap: [-0.72, 1.06, 0.04],
+    right_strap: [0.72, 1.06, 0.04]
+  },
+  adoption_plaza: {
+    pedestal: [0.22, -0.45, 0.28],
+    archway: [0.0, 0.35, -1.04]
+  },
+  convenience_store: {
+    counter_top: [0.0, -0.28, 0.44],
+    snack_shelf: [0.82, 0.22, -0.88]
+  },
+  supermarket_aisle: {
+    left_shelf: [-1.35, 0.12, -0.35],
+    right_shelf: [1.35, 0.12, -0.35]
+  }
+};
+
+function parseBodyAttitudeRad(att = "") {
+  const s = String(att || "").toLowerCase();
+  if (!s) return 0;
+  const degMatch = s.match(/([0-9]+(?:\.[0-9]+)?)\s*(?:deg|degrees?)/);
+  const deg = degMatch ? Number(degMatch[1]) : 8;
+  const rad = (deg * Math.PI) / 180;
+  if (s.includes("lean-forward") || s.includes("forward-lean")) return rad;
+  if (s.includes("recoil") || s.includes("lean-back")) return -rad;
+  return 0;
+}
+
+function resolveStageTargetMap(shot = {}, specData = {}, actorMotById = new Map(), backdrop = "studio", cam = {}, phase = 0.5) {
+  const map = new Map();
+  map.set("camera", cam.ro || v3(0, 0.36, 3.18));
+  map.set("viewer", cam.ro || v3(0, 0.36, 3.18));
+
+  const bMarks = BACKDROP_LANDMARKS[backdrop] || {};
+  for (const [k, arr] of Object.entries(bMarks)) {
+    map.set(k, vecFromArr(arr));
+  }
+  if (Array.isArray(specData.stageTargets)) {
+    for (const st of specData.stageTargets) {
+      if (st && st.id && Array.isArray(st.pos)) {
+        map.set(st.id, vecFromArr(st.pos));
+      }
+    }
+  }
+  if (Array.isArray(shot.props)) {
+    for (const pr of shot.props) {
+      if (!pr) continue;
+      const p0 = vecFromArr(pr.pos, v3(0, -0.3, 0.4));
+      const p1 = pr.moveTo ? vecFromArr(pr.moveTo, p0) : p0;
+      const center = lerpVec(p0, p1, smoothstep(0, 1, phase));
+      if (pr.id) map.set(pr.id, center);
+      if (pr.type && !map.has(pr.type)) map.set(pr.type, center);
+    }
+  }
+  for (const [aid, mot] of actorMotById.entries()) {
+    map.set(aid, v3(mot.pos.x, mot.pos.y + 0.65, mot.pos.z));
+  }
+  return map;
+}
+
+function applyActingAndInteractionToMotion(ac = {}, isLeadActor = false, baseMot = {}, shot = {}, targetMap = new Map(), phase = 0.5) {
+  const mot = { ...baseMot, gazeX: 0, gazeY: 0, brows: ac.brows || "" };
+  const perf = isLeadActor && shot.performance && typeof shot.performance === "object" ? shot.performance : null;
+
+  if (!mot.brows && perf?.eyebrows) {
+    mot.brows = perf.eyebrows;
+  }
+  if (perf?.bodyAttitude && ac.pose !== "faceplant" && ac.pose !== "hang_strap") {
+    mot.waistPitch += parseBodyAttitudeRad(perf.bodyAttitude);
+  }
+
+  // 1. Pupil Gaze + Subtle Head Micro-Turn (cheated to camera so 2D face stays readable!)
+  const gazeObj = ac.gaze && typeof ac.gaze === "object" ? ac.gaze : null;
+  const targetId = gazeObj?.targetId || (typeof ac.gaze === "string" ? ac.gaze : "") || (perf?.gazeTarget || "");
+  if (gazeObj && (gazeObj.horizontal !== undefined || gazeObj.vertical !== undefined)) {
+    mot.gazeX = clamp(Number(gazeObj.horizontal) || 0, -1, 1);
+    mot.gazeY = clamp(Number(gazeObj.vertical) || 0, -1, 1);
+  } else if (targetId && targetId !== ac.castId && targetMap.has(targetId)) {
+    const tgt = targetMap.get(targetId);
+    const headWorld = v3(mot.pos.x, mot.pos.y + 0.75, mot.pos.z);
+    const relLocal = rotY(sub3(tgt, headWorld), -mot.yaw);
+    const forwardRef = Math.max(0.65, Math.abs(relLocal.z));
+    mot.gazeX = clamp(relLocal.x / Math.hypot(relLocal.x, forwardRef), -0.95, 0.95);
+    mot.gazeY = clamp(relLocal.y / 1.15, -0.85, 0.85);
+    if (ac.pose !== "head_turn" && ac.headYaw === undefined) {
+      mot.headYaw += clamp(mot.gazeX * 0.24, -0.28, 0.28);
+    }
+    if (ac.headPitch === undefined && ac.pose !== "faceplant") {
+      mot.headPitch += clamp(-mot.gazeY * 0.14, -0.18, 0.18);
+    }
+  }
+
+  // 2. Executable Hand-Prop Interaction Semantics (hold | present | tap | slam | point | drop | receive)
+  const inter = ac.interaction || (shot.interaction && (!shot.interaction.actorId || shot.interaction.actorId === ac.castId) ? shot.interaction : null);
+  if (inter && ac.pose !== "hang_strap" && ac.pose !== "faceplant") {
+    const hand = String(inter.hand || "right").toLowerCase();
+    const intent = String(inter.intent || "hold").toLowerCase();
+    let targetPitch = null;
+    if (intent === "point") targetPitch = 1.42;
+    else if (intent === "present") targetPitch = 1.18;
+    else if (intent === "hold" || intent === "receive") targetPitch = 1.06;
+    else if (intent === "tap") targetPitch = mix(1.34, 0.96, smoothstep(0.15, 0.75, phase));
+    else if (intent === "slam") targetPitch = mix(2.05, 0.82, smoothstep(0.10, 0.70, phase));
+    else if (intent === "drop") targetPitch = mix(1.18, 0.62, smoothstep(0.20, 0.80, phase));
+
+    if (targetPitch !== null) {
+      if (hand === "left" || hand === "both") mot.armLPitch = targetPitch;
+      if (hand === "right" || hand === "both") mot.armRPitch = targetPitch;
+    }
+  }
+
+  return mot;
+}
+
+function resolveSignatureActingPose(castEntry = {}, idx = 0) {
+  const perf = castEntry.performanceDNA || {};
+  const sigGaze = String(perf.signatureGaze || "").toLowerCase();
+  const sigGest = String(perf.signatureGesture || "").toLowerCase();
+  const temp = String(perf.defaultTemperament || "").toLowerCase();
+
+  const gazeDir = idx % 2 === 0 ? 0.78 : -0.65;
+  const gazeX = sigGaze.includes("blank") || sigGaze.includes("calm") ? gazeDir * 0.35 : gazeDir;
+  const brows =
+    temp.includes("unbothered") || temp.includes("deadpan")
+      ? "flat"
+      : idx % 2 === 0
+      ? "left-up-right-down"
+      : "right-up-left-down";
+  const expression =
+    castEntry.defaultFace === "deadpan" || temp.includes("deadpan")
+      ? "deadpan"
+      : temp.includes("eager") || temp.includes("anxious") || temp.includes("panic")
+      ? "shocked"
+      : temp.includes("overconfident")
+      ? "smirk"
+      : castEntry.defaultFace || "grin";
+
+  let armLPitch = -0.15;
+  let armRPitch = 1.15;
+  let waistPitch = 0.10;
+  let legLPitch = 0;
+  let legRPitch = 0;
+  let posY = 0;
+
+  if (sigGest.includes("sit")) {
+    posY = -0.16;
+    legLPitch = 1.48;
+    legRPitch = 1.48;
+    armLPitch = 0.22;
+    armRPitch = 0.22;
+    waistPitch = 0;
+  } else if (sigGest.includes("both")) {
+    armLPitch = 1.18;
+    armRPitch = 1.18;
+  } else if (sigGest.includes("lean-forward")) {
+    waistPitch = 0.15;
+    armRPitch = 1.32;
+    legLPitch = 0.25;
+    legRPitch = -0.25;
+  }
+
+  return {
+    pos: v3(0, posY, 0),
+    yaw: idx % 2 === 0 ? 0.24 : -0.22,
+    headYaw: clamp(gazeX * 0.22, -0.24, 0.24),
+    waistPitch,
+    armLPitch,
+    armRPitch,
+    legLPitch,
+    legRPitch,
+    expression,
+    gazeX,
+    gazeY: -0.12,
+    brows
+  };
+}
+
 export function buildDeclarativeEpisodeBuilder(specData = {}) {
   const castList = Array.isArray(specData.cast) && specData.cast.length > 0
     ? specData.cast
-    : [{ id: "hero", archetype: "chibi-plush", theme3d: "theo" }];
-  const castMap = new Map(
-    castList.map((c, idx) => [
-      c.id || `cast_${idx}`,
-      {
-        theme: mapArchetypeTo3DTheme(c.archetype, c.theme3d || c.theme),
-        customPalette: c.customPalette || null,
-        noAccessories: Boolean(c.noAccessories),
-        defaultFace: c.face || "smile",
-        defaultBackProp: c.noAccessories ? null : c.backProp || null
-      }
-    ])
-  );
-  const primaryCast = castMap.values().next().value;
+    : [{ id: "hero", name: "Hero", archetype: "chibi-plush", theme3d: "theo" }];
+  const castEntries = castList.map((c, idx) => {
+    const id = c.id || `cast_${idx}`;
+    const vis = c.visualDNA && typeof c.visualDNA === "object" ? c.visualDNA : {};
+    const perf = c.performanceDNA && typeof c.performanceDNA === "object" ? c.performanceDNA : {};
+    const noAcc = Boolean(vis.noAccessories ?? c.noAccessories);
+    return {
+      id,
+      name: c.name || id,
+      rig: vis.rig || c.rig || specData.rig || "r6",
+      theme: mapArchetypeTo3DTheme(vis.archetype || c.archetype, vis.theme3d || c.theme3d || c.theme),
+      customPalette: vis.customPalette || c.customPalette || null,
+      noAccessories: noAcc,
+      defaultFace: vis.face || c.face || "smile",
+      defaultBackProp: noAcc ? null : vis.backProp || c.backProp || null,
+      performanceDNA: perf
+    };
+  });
+  const castMap = new Map(castEntries.map((e) => [e.id, e]));
+  const primaryCast = castEntries[0];
 
   const buildShotScene = (shotIdx, phase = 0.5) => {
     const shot = specData.shots[clamp(shotIdx, 0, specData.shots.length - 1)] || {};
@@ -3070,7 +3302,20 @@ export function buildDeclarativeEpisodeBuilder(specData = {}) {
 
     const props = Array.isArray(shot.props) ? shot.props : [];
     const blocks = Array.isArray(shot.blocks) ? shot.blocks : [];
-    const leadMot = actors.length > 0 ? resolveActorMotion(actors[0], phase) : { pos: v3(0, 0, 0) };
+
+    // Precompute actor base motions & 3D stage targets so every actor's pupil gaze & interaction resolve deterministically
+    const baseMotList = actors.map((ac) => resolveActorMotion(ac, phase));
+    const actorMotById = new Map();
+    actors.forEach((ac, idx) => {
+      if (ac.castId) actorMotById.set(ac.castId, baseMotList[idx]);
+    });
+    const targetMap = resolveStageTargetMap(shot, specData, actorMotById, backdrop, cam, phase);
+    const resolvedActors = actors.map((ac, idx) => ({
+      ac,
+      mot: applyActingAndInteractionToMotion(ac, idx === 0, baseMotList[idx], shot, targetMap, phase)
+    }));
+
+    const leadMot = resolvedActors.length > 0 ? resolvedActors[0].mot : { pos: v3(0, 0, 0) };
     const autoBubble = projectHeadToCardBubble(leadMot.pos, cam);
 
     return {
@@ -3078,9 +3323,8 @@ export function buildDeclarativeEpisodeBuilder(specData = {}) {
       autoBubble,
       sceneFn: (p) => {
         const hit = new SceneHit();
-        for (const ac of actors) {
+        for (const { ac, mot } of resolvedActors) {
           const castDef = castMap.get(ac.castId) || primaryCast;
-          const mot = resolveActorMotion(ac, phase);
           hit.merge(
             evalAvatarSDF(p, {
               ...mot,
@@ -3125,7 +3369,7 @@ export function buildDeclarativeEpisodeBuilder(specData = {}) {
     };
   };
 
-  return { primaryCast, buildShotScene };
+  return { primaryCast, castEntries, buildShotScene };
 }
 
 export function buildEpisodeWavBuffer(shots = [], shotDurationsOrScalar = 2.0) {
@@ -3197,21 +3441,25 @@ export function buildEpisodeWavBuffer(shots = [], shotDurationsOrScalar = 2.0) {
   return Buffer.concat([header, Buffer.from(pcm.buffer)]);
 }
 
-function renderCustomSpecShard(specPath, rawDir, force, shardIdx, shardCount) {
+function renderCustomSpecShard(specPath, rawDir, force, shardIdx, shardCount, outDir = "") {
   const specData = JSON.parse(fs.readFileSync(specPath, "utf8").replace(/^\uFEFF/, ""));
-  const { primaryCast, buildShotScene } = buildDeclarativeEpisodeBuilder(specData);
+  const { primaryCast, castEntries, buildShotScene } = buildDeclarativeEpisodeBuilder(specData);
   const { shotFrameCounts } = computeEpisodeTimingPlan(specData);
   const prefix = (specData.slug || path.basename(specPath, path.extname(specPath)) || "episode").replace(/[^a-z0-9_-]/gi, "_");
 
   fs.mkdirSync(rawDir, { recursive: true });
+  const avatarsDir = outDir ? path.join(outDir, "avatars") : path.join(rawDir, "avatars");
+  fs.mkdirSync(avatarsDir, { recursive: true });
+
   let taskCounter = 0;
-  const writePng = (name, w, h, computeFn) => {
+  const writePngTo = (targetDir, name, w, h, computeFn) => {
     const myTask = taskCounter++;
     if (myTask % shardCount !== shardIdx) return;
-    const outPath = path.join(rawDir, name);
+    const outPath = path.join(targetDir, name);
     if (!force && fs.existsSync(outPath) && fs.statSync(outPath).size > 1000) return;
     fs.writeFileSync(outPath, encodePNG(w, h, computeFn()));
   };
+  const writePng = (name, w, h, computeFn) => writePngTo(rawDir, name, w, h, computeFn);
 
   const studioCam = {
     ro: v3(0, 0.22, 2.75),
@@ -3225,6 +3473,16 @@ function renderCustomSpecShard(specPath, rawDir, force, shardIdx, shardCount) {
     floorColor2: [168, 182, 198]
   };
 
+  const portraitCam = {
+    ro: v3(0.08, 0.72, 1.48),
+    ta: v3(0, 0.66, 0),
+    fov: 2.08,
+    bgTop: [224, 242, 254],
+    bgBot: [248, 250, 252],
+    floorY: null
+  };
+
+  // 1. Geometry Sheet views (Front 0°, 3/4 45°, Profile 90°)
   for (const [fname, yaw] of [
     ["turn_front.png", 0.0],
     ["turn_3q.png", 0.68],
@@ -3247,6 +3505,44 @@ function renderCustomSpecShard(specPath, rawDir, force, shardIdx, shardCount) {
       )
     );
   }
+
+  // 2. Cast Acting Sheet cells + 256x256 Avatar Crops (Identity + Signature Acting Moment)
+  castEntries.forEach((ce, idx) => {
+    const actPose = resolveSignatureActingPose(ce, idx);
+    writePng(`cast_acting_${idx}.png`, 380, 460, () =>
+      render3DViewport(
+        380,
+        460,
+        (p) =>
+          evalAvatarSDF(p, {
+            ...actPose,
+            theme: ce.theme,
+            customPalette: ce.customPalette,
+            noAccessories: ce.noAccessories,
+            backProp: ce.defaultBackProp
+          }),
+        studioCam
+      )
+    );
+    const safeId = String(ce.id || `cast_${idx}`).replace(/[^a-z0-9_-]/gi, "_");
+    writePngTo(avatarsDir, `${safeId}_avatar.png`, 256, 256, () =>
+      render3DViewport(
+        256,
+        256,
+        (p) =>
+          evalAvatarSDF(p, {
+            ...actPose,
+            pos: v3(0, 0, 0),
+            waistPitch: 0.05,
+            theme: ce.theme,
+            customPalette: ce.customPalette,
+            noAccessories: ce.noAccessories,
+            backProp: ce.defaultBackProp
+          }),
+        portraitCam
+      )
+    );
+  });
 
   const shotCount = specData.shots.length;
   for (let s = 0; s < shotCount; s++) {
@@ -3309,7 +3605,7 @@ Render self-contained 3D Roblox-style turnaround sheets, 9:16 storyboard sheets,
 
     if (shardArg) {
       const [sIdx, sTotal] = shardArg.split("/").map(Number);
-      renderCustomSpecShard(absSpec, tmpRoot, force, sIdx, sTotal);
+      renderCustomSpecShard(absSpec, tmpRoot, force, sIdx, sTotal, outDir);
       process.exit(0);
     }
 
@@ -3330,7 +3626,7 @@ Render self-contained 3D Roblox-style turnaround sheets, 9:16 storyboard sheets,
 
     const slug = (specData.slug || path.basename(absSpec, path.extname(absSpec))).replace(/[^a-z0-9_-]/gi, "_");
     const { shotDurations, shotFrameCounts, totalFrames, inFps } = computeEpisodeTimingPlan(specData);
-    const { buildShotScene } = buildDeclarativeEpisodeBuilder(specData);
+    const { castEntries, buildShotScene } = buildDeclarativeEpisodeBuilder(specData);
     const wavPath = path.join(tmpRoot, `${slug}_audio.wav`);
     fs.writeFileSync(wavPath, buildEpisodeWavBuffer(specData.shots, shotDurations));
 
@@ -3346,6 +3642,23 @@ Render self-contained 3D Roblox-style turnaround sheets, 9:16 storyboard sheets,
           { file: "turn_3q.png", labelZh: "斜侧 45°", labelEn: "3/4 View 45°" },
           { file: "turn_side.png", labelZh: "侧面 90°", labelEn: "Profile 90°" }
         ]
+      },
+      castActingSheet: {
+        outZh: path.join(outDir, "cast_acting_sheet.zh.png"),
+        outEn: path.join(outDir, "cast_acting_sheet.en.png"),
+        outDefault: path.join(outDir, "cast_acting_sheet.png"),
+        panels: castEntries.map((ce, idx) => {
+          const momEn = ce.performanceDNA?.actingMomentEn || ce.performanceDNA?.defaultTemperament || "Signature acting moment";
+          const momZh = ce.performanceDNA?.actingMomentZh || ce.performanceDNA?.defaultTemperament || "标志性瞬间表演";
+          const trunc = (t, n) => (String(t).length > n ? `${String(t).slice(0, n - 1)}…` : String(t));
+          return {
+            file: `cast_acting_${idx}.png`,
+            titleEn: `${ce.name} (${ce.rig})`,
+            titleZh: `${ce.name} (${ce.rig})`,
+            momentEn: trunc(momEn, 78),
+            momentZh: trunc(momZh, 38)
+          };
+        })
       },
       drift: { panels: [{ file: "__skip__" }] },
       cases: [

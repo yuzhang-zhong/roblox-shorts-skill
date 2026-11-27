@@ -42,3 +42,15 @@ Pair each visual beat with tactile toy and retro game audio cues in post-product
 - **Cartoon Boing (`弹簧Q弹声`)**: when oversized UGC cat ears, backpack, or springy hats bounce after a jump.
 - **Vinyl Squeak (`轻微橡胶摩擦声`)**: when the cylindrical head rotates 45 degrees in deadpan silence.
 - **Record Scratch + Bass Drop (`黑胶急停+重低音`)**: at the `11.5s` payoff twist or outfit swap cut.
+
+## 5. Instant-Acting Grammar (`v1.7.0`) / 瞬间表演语法（眼神、眉型与道具关系）
+
+Locking Roblox proportions solves *"does it look like Roblox?"*; viral retention also requires *"what is the character thinking in 0.5 seconds without reading captions?"*. Upgrade every beat from static role labels to **purposeful instant acting**:
+
+1. **One Story Instant (`beatIntent` + `audienceRead`)**:
+   Combine motion and decal into one causal reaction—e.g. *"spots the last empty seat while realizing the rival commuter noticed it too (`audienceRead`: both are about to sprint)"*.
+2. **1st-Class Gaze & Asymmetrical Brows (`performance.gazeTarget` + `eyebrows`)**:
+   Bind `gazeTarget` to a concrete `prop.id` or `castId` (`pupils tracking "empty_seat"`). Pair with `left-up-right-down` / `right-up-left-down` / `furrowed` / `worried` eyebrows and decoupled head/body orientation (e.g., torso leaning forward ready to run while pupils dart sideways at the rival).
+3. **Camera-Facing Hand-Prop Interaction (`interaction`)**:
+   Restrict prop actions to `hold | present | tap | slam | point | drop | receive`, always specifying `hand` (`right` | `left` | `both`), `contact` (`flush-flat`), and `visibility: "camera-facing"` so neither torso nor secondary actors occlude the key prop at mobile thumbnail scale.
+

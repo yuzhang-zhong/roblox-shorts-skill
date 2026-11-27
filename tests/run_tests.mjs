@@ -217,10 +217,79 @@ test("render_preview produces a valid PNG from the documented custom episode spe
   }
 });
 
+test("v1.7.0 two-layer Character DNA, acting-priority compiler, and Gates 9-10 separate Geometry from Acting", () => {
+  const moSpec = buildAvatarSpec({
+    archetype: "chibi-plush",
+    name: "Mo",
+    temperament: "guilty-comic",
+    signatureGaze: "side-eye-before-acting"
+  });
+  assert.equal(moSpec.visualDNA.archetype, "chibi-plush");
+  assert.equal(moSpec.performanceDNA.defaultTemperament, "guilty-comic");
+  assert.equal(moSpec.performanceDNA.signatureGaze, "side-eye-before-acting");
+
+  const castSheet = buildCastSpec("chibi-plush:Mo:chibi-blocky:sleepy,classic-noob:Noob:r6:deadpan");
+  assert.match(castSheet.actingSheetPromptEn, /Cast Acting Reference Sheet/);
+  assert.match(castSheet.actingSheetPromptEn, /Instant acting beat:/);
+
+  const actingPlan = compileStoryboard({
+    spec: path.join(ROOT, "templates", "custom_story_spec.json"),
+    engine: "kling"
+  });
+  const shot1Prompt = actingPlan.shots[0].i2vPromptEn;
+  const idxIntent = shot1Prompt.indexOf("Beat intent:");
+  const idxGaze = shot1Prompt.indexOf('pupils tracking "empty_seat"');
+  const idxInter = shot1Prompt.indexOf("Hand-prop interaction:");
+  const idxAction = shot1Prompt.indexOf("Single action:");
+  const idxGeoTail = shot1Prompt.indexOf("Canonical Roblox 2x2x1");
+  assert.ok(idxIntent >= 0 && idxGaze > idxIntent && idxInter > idxGaze && idxAction > idxInter && idxGeoTail > idxAction);
+
+  const staticRole = inspectPrompt({
+    prompt:
+      "An authentic Roblox R6 SmoothPlastic figure with a smooth studless 1:1 cylindrical head, flat 2D screen-printed face decal, rigid Motor6D hinges, and fingerless clawless solid 1x2x1 rectangular block hands standing still with two potion bottles.",
+    engine: "local3d",
+    mode: "local3d"
+  });
+  assert.equal(staticRole.geometryStatus, "PASS");
+  assert.equal(staticRole.actingStatus, "WARN");
+
+  const baselineAudit = inspectPackageFile(path.join(ROOT, "examples", "subway-acting-versus-baseline", "baseline_spec.json"), {
+    engine: "local3d"
+  });
+  assert.equal(baselineAudit.geometryStatus, "PASS");
+  assert.equal(baselineAudit.actingStatus, "WARN");
+
+  const actingRichAssets = path.join(ROOT, "examples", "subway-acting-versus-baseline", "assets", "acting_rich");
+  const actingAudit = inspectPackageFile(path.join(ROOT, "examples", "subway-acting-versus-baseline", "acting_rich_spec.json"), {
+    engine: "local3d",
+    assetsDir: actingRichAssets
+  });
+  assert.equal(actingAudit.geometryStatus, "PASS");
+  assert.equal(actingAudit.actingStatus, "PASS");
+  assert.equal(actingAudit.overallStatus, "PASS");
+  assert.ok(actingAudit.avatarCropStats.length >= 2);
+  assert.ok(actingAudit.avatarCropStats[0].stdDev > 14);
+
+  const badInter = inspectPrompt({
+    prompt: "Roblox R6 SmoothPlastic 1:1 barrel head flat 2D face decal fingerless clawless 1x2x1 block hands rigid Motor6D waves.",
+    engine: "local3d",
+    mode: "local3d",
+    shotSpec: {
+      beatIntent: "Wave",
+      audienceRead: "Greeting",
+      performance: { gazeTarget: "nonexistent_prop", reactionCause: "friend arrived" },
+      interaction: { hand: "right", propId: "nonexistent_prop", intent: "juggle", visibility: "camera-facing" }
+    },
+    knownTargetMap: new Map([["camera", [0, 0, 3]]])
+  });
+  assert.equal(badInter.geometryStatus, "PASS");
+  assert.equal(badInter.actingStatus, "FAIL");
+});
+
 test("validate_skill CLI verifies repository files, versions, and manifests", () => {
   const out = execFileSync(process.execPath, [path.join(ROOT, "scripts", "validate_skill.mjs")], {
     cwd: ROOT,
     encoding: "utf8"
   });
-  assert.match(out, /roblox-style-video v1\.6\.3 package is valid/);
+  assert.match(out, /roblox-style-video v1\.7\.0 package is valid/);
 });

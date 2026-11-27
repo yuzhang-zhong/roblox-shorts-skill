@@ -9,6 +9,89 @@
 import fs from "node:fs";
 import path from "node:path";
 
+export const DEFAULT_PERFORMANCE_DNA = {
+  "chibi-plush": {
+    defaultTemperament: "eager-expressive-blindbox",
+    signatureGaze: "pupils-dart-to-trigger-before-head-turns",
+    signatureGesture: "present-prop-forward-with-both-solid-block-hands",
+    conflictReaction: "freeze-wide-eyed-then-lean-back",
+    actingMomentEn: "hesitates between two choices with asymmetrical brows and pupils locked on the trigger prop",
+    actingMomentZh: "高低眉犹豫不决、瞳孔死死盯住触发剧情的关键道具"
+  },
+  "classic-noob": {
+    defaultTemperament: "unbothered-deadpan-opportunist",
+    signatureGaze: "calm-peripheral-stare-amid-chaos",
+    signatureGesture: "zero-telegraph-rigid-90-degree-action",
+    conflictReaction: "complete-deadpan-emotional-immunity",
+    actingMomentEn: "holds an unchanging Default Smile or Chill (-_-) face while calmly claiming the prize",
+    actingMomentZh: "在混乱现场保持毫无波澜的默认微笑或死鱼眼淡定截胡"
+  },
+  "bacon-hair": {
+    defaultTemperament: "earnest-panicked-rookie",
+    signatureGaze: "double-take-at-unexpected-hazard",
+    signatureGesture: "both-block-hands-raised-beside-head",
+    conflictReaction: "stiff-step-back-then-frantic-scramble",
+    actingMomentEn: "freezes mid-step with worried brows and pupils tracking the sudden hazard",
+    actingMomentZh: "半步急停、八字眉惊恐紧盯突发危机"
+  },
+  "classic-guest": {
+    defaultTemperament: "silent-observant-wildcard",
+    signatureGaze: "direct-fourth-wall-camera-glance",
+    signatureGesture: "single-crisp-right-arm-point",
+    conflictReaction: "instant-180-pivot-exit",
+    actingMomentEn: "points one solid block arm at incoming danger while glancing back at the camera",
+    actingMomentZh: "单侧实心方臂直指远处危机并回头看镜头"
+  },
+  "builderman": {
+    defaultTemperament: "overconfident-problem-solver",
+    signatureGaze: "squinted-measure-of-target-distance",
+    signatureGesture: "confident-forward-push-or-tool-raise",
+    conflictReaction: "brief-smirk-before-physics-backfires",
+    actingMomentEn: "leans forward with a confident asymmetrical smirk while bracing a camera-facing prop",
+    actingMomentZh: "挑眉坏笑身体前倾、双侧方手朝镜头清晰抵住关键道具"
+  },
+  "ugc-streetwear": {
+    defaultTemperament: "dramatic-main-character",
+    signatureGaze: "confident-side-eye-over-shoulder",
+    signatureGesture: "pose-strike-with-hip-tilt",
+    conflictReaction: "dramatic-gasp-protecting-fit",
+    actingMomentEn: "strikes an angled runway pose while side-eyeing a rival's outfit",
+    actingMomentZh: "侧身定格时尚造型、挑眉斜睨身旁反差搭档"
+  },
+  "corporate-worker": {
+    defaultTemperament: "caffeine-depleted-realist",
+    signatureGaze: "slow-eyeball-shift-before-neck-pivot",
+    signatureGesture: "protective-two-hand-mug-dock",
+    conflictReaction: "90-degree-waist-hinge-desk-slump",
+    actingMomentEn: "stares at an alarming screen notification with tired asymmetrical brows and coffee mug held camera-facing",
+    actingMomentZh: "疲惫高低眉紧盯屏幕弹窗、胸前朝镜头稳稳端住咖啡杯"
+  },
+  "cozy-chef": {
+    defaultTemperament: "proud-perfectionist-in-denial",
+    signatureGaze: "proudly-tracks-dish-ignoring-smoke",
+    signatureGesture: "two-hand-platter-presentation",
+    conflictReaction: "holds-cheerful-smile-until-rigid-tip-over",
+    actingMomentEn: "presents a smoking dish toward the lens with cheerful eyes locked on the viewer",
+    actingMomentZh: "双手平托冒烟料理朝向镜头、眼神骄傲发亮制造反差喜感"
+  },
+  "obby-runner": {
+    defaultTemperament: "hyper-focused-speedrunner",
+    signatureGaze: "laser-locked-on-landing-edge",
+    signatureGesture: "forward-lean-sprint-ready",
+    conflictReaction: "silent-chill-stare-after-ragdoll-wipeout",
+    actingMomentEn: "leans 10 degrees forward on platform edge with pupils locked on a tiny landing pad",
+    actingMomentZh: "站在平台边缘前倾10度、瞳孔死锁前方极限落点"
+  },
+  "zombie-r6": {
+    defaultTemperament: "single-minded-blocky-pursuer",
+    signatureGaze: "unblinking-lock-on-nearest-snack-or-player",
+    signatureGesture: "both-arms-locked-90-degrees-forward",
+    conflictReaction: "tips-outward-as-one-rigid-statue",
+    actingMomentEn: "reaches both stiff moss-green block arms forward with asymmetrical dazed eyes tracking the cart",
+    actingMomentZh: "双侧绿方臂平举90度、大小眼呆滞锁定前方目标"
+  }
+};
+
 export const ARCHETYPES = {
   "chibi-plush": {
     labelZh: "小红书爆款Plushie盲盒风小人",
@@ -330,6 +413,11 @@ Options:
   --accessory-zh <str>     Extra Chinese UGC accessory to append (falls back to --accessory)
   --replace-accessory <s > Replace preset's default accessories completely (removes jetpacks/mugs)
   --no-accessories         Strip all default accessories/held gear for a bare base rig
+  --temperament <str>      Performance DNA default temperament (e.g., "guilty-comic")
+  --signature-gaze <str>   Performance DNA gaze habit (e.g., "side-eye-before-acting")
+  --signature-gesture <s>  Performance DNA hand/body habit (e.g., "present-prop-camera-facing")
+  --conflict-reaction <s>  Performance DNA reaction under pressure (e.g., "freeze-then-overcompensate")
+  --acting-moment <str>    Signature one-beat acting moment for Cast Acting Sheets
   --companion <id>         Attach a Blocky Pet DNA card: ${Object.keys(COMPANIONS).join(" | ")}
   --cast <list>            Multi-character cast lock, e.g. "classic-noob:Noob:r6,builderman:Builder:r6,zombie-r6:Zombies:r6"
   --lang <code>            Output language: en | zh | zh-tw | ja | ko | es | fr | de | pt | ru | zh-en (default: en)
@@ -373,6 +461,11 @@ export function parseArgs(argv) {
     replaceAccessory: "",
     replaceAccessoryZh: "",
     noAccessories: false,
+    temperament: "",
+    signatureGaze: "",
+    signatureGesture: "",
+    conflictReaction: "",
+    actingMoment: "",
     companion: "",
     cast: "",
     out: "",
@@ -397,6 +490,11 @@ export function parseArgs(argv) {
     else if (arg === "--accessory-zh" && argv[i + 1]) opts.accessoryZh = argv[++i];
     else if (arg === "--replace-accessory" && argv[i + 1]) opts.replaceAccessory = argv[++i];
     else if (arg === "--replace-accessory-zh" && argv[i + 1]) opts.replaceAccessoryZh = argv[++i];
+    else if (arg === "--temperament" && argv[i + 1]) opts.temperament = argv[++i];
+    else if (arg === "--signature-gaze" && argv[i + 1]) opts.signatureGaze = argv[++i];
+    else if (arg === "--signature-gesture" && argv[i + 1]) opts.signatureGesture = argv[++i];
+    else if (arg === "--conflict-reaction" && argv[i + 1]) opts.conflictReaction = argv[++i];
+    else if (arg === "--acting-moment" && argv[i + 1]) opts.actingMoment = argv[++i];
     else if (arg === "--companion" && argv[i + 1]) opts.companion = argv[++i].toLowerCase();
     else if (arg === "--cast" && argv[i + 1]) opts.cast = argv[++i];
     else if (arg === "--out" && argv[i + 1]) opts.out = argv[++i];
@@ -406,39 +504,47 @@ export function parseArgs(argv) {
 }
 
 export function buildAvatarSpec(rawOpts = {}) {
+  const visIn = rawOpts.visualDNA && typeof rawOpts.visualDNA === "object" ? rawOpts.visualDNA : {};
+  const perfIn = rawOpts.performanceDNA && typeof rawOpts.performanceDNA === "object" ? rawOpts.performanceDNA : {};
+  const mergedArchetype = visIn.archetype || rawOpts.archetype;
+  const mergedRig = visIn.rig || rawOpts.rig;
+  const mergedMaterial = visIn.material || rawOpts.material;
+  const mergedFace = visIn.face || rawOpts.face;
+
   if (rawOpts.strict) {
-    if (rawOpts.archetype && !ARCHETYPES[rawOpts.archetype]) {
-      throw new Error(`Unknown --archetype "${rawOpts.archetype}". Valid presets: ${Object.keys(ARCHETYPES).join(", ")}`);
+    if (mergedArchetype && !ARCHETYPES[mergedArchetype]) {
+      throw new Error(`Unknown --archetype "${mergedArchetype}". Valid presets: ${Object.keys(ARCHETYPES).join(", ")}`);
     }
-    if (rawOpts.rig && !RIGS[rawOpts.rig]) {
-      throw new Error(`Unknown --rig "${rawOpts.rig}". Valid rigs: ${Object.keys(RIGS).join(", ")}`);
+    if (mergedRig && !RIGS[mergedRig]) {
+      throw new Error(`Unknown --rig "${mergedRig}". Valid rigs: ${Object.keys(RIGS).join(", ")}`);
     }
-    if (rawOpts.material && !MATERIALS[rawOpts.material]) {
-      throw new Error(`Unknown --material "${rawOpts.material}". Valid materials: ${Object.keys(MATERIALS).join(", ")}`);
+    if (mergedMaterial && !MATERIALS[mergedMaterial]) {
+      throw new Error(`Unknown --material "${mergedMaterial}". Valid materials: ${Object.keys(MATERIALS).join(", ")}`);
     }
-    if (rawOpts.face && !FACE_OVERRIDES[rawOpts.face]) {
-      throw new Error(`Unknown --face "${rawOpts.face}". Valid faces: ${Object.keys(FACE_OVERRIDES).join(", ")}`);
+    if (mergedFace && !FACE_OVERRIDES[mergedFace]) {
+      throw new Error(`Unknown --face "${mergedFace}". Valid faces: ${Object.keys(FACE_OVERRIDES).join(", ")}`);
     }
     if (rawOpts.companion && !COMPANIONS[rawOpts.companion]) {
       throw new Error(`Unknown --companion "${rawOpts.companion}". Valid companions: ${Object.keys(COMPANIONS).join(", ")}`);
     }
   }
 
-  const archetypeKey = ARCHETYPES[rawOpts.archetype] ? rawOpts.archetype : "chibi-plush";
+  const archetypeKey = ARCHETYPES[mergedArchetype] ? mergedArchetype : "chibi-plush";
   const preset = ARCHETYPES[archetypeKey];
-  const rigKey = RIGS[rawOpts.rig] ? rawOpts.rig : preset.defaultRig;
-  const materialKey = MATERIALS[rawOpts.material] ? rawOpts.material : preset.defaultMaterial;
+  const rigKey = RIGS[mergedRig] ? mergedRig : preset.defaultRig;
+  const materialKey = MATERIALS[mergedMaterial] ? mergedMaterial : preset.defaultMaterial;
   const rig = RIGS[rigKey];
   const material = MATERIALS[materialKey];
   const name = rawOpts.name || "Bloxy";
 
-  const faceOverride = rawOpts.face && FACE_OVERRIDES[rawOpts.face] ? FACE_OVERRIDES[rawOpts.face] : null;
+  const faceOverride = mergedFace && FACE_OVERRIDES[mergedFace] ? FACE_OVERRIDES[mergedFace] : null;
   const faceEn = faceOverride ? faceOverride.en : preset.faceEn;
   const faceZh = faceOverride ? faceOverride.zh : preset.faceZh;
 
+  const noAcc = Boolean(visIn.noAccessories ?? rawOpts.noAccessories);
   let accessoriesEn;
   let accessoriesZh;
-  if (rawOpts.noAccessories) {
+  if (noAcc) {
     accessoriesEn = "none (clean bare silhouette, zero held props or back gear)";
     accessoriesZh = "无额外配饰与手持物（干净基础轮廓）";
   } else if (rawOpts.replaceAccessory) {
@@ -450,6 +556,16 @@ export function buildAvatarSpec(rawOpts = {}) {
     accessoriesEn = `${preset.accessoriesEn}${extraEn}`;
     accessoriesZh = `${preset.accessoriesZh}${extraZh}`;
   }
+
+  const defaultPerf = DEFAULT_PERFORMANCE_DNA[archetypeKey] || DEFAULT_PERFORMANCE_DNA["chibi-plush"];
+  const performanceDNA = {
+    defaultTemperament: perfIn.defaultTemperament || rawOpts.temperament || defaultPerf.defaultTemperament,
+    signatureGaze: perfIn.signatureGaze || rawOpts.signatureGaze || defaultPerf.signatureGaze,
+    signatureGesture: perfIn.signatureGesture || rawOpts.signatureGesture || defaultPerf.signatureGesture,
+    conflictReaction: perfIn.conflictReaction || rawOpts.conflictReaction || defaultPerf.conflictReaction,
+    actingMomentEn: perfIn.actingMomentEn || rawOpts.actingMoment || defaultPerf.actingMomentEn,
+    actingMomentZh: perfIn.actingMomentZh || rawOpts.actingMoment || defaultPerf.actingMomentZh
+  };
 
   const companionObj = rawOpts.companion && COMPANIONS[rawOpts.companion] ? COMPANIONS[rawOpts.companion] : null;
   const companionPromptEn = companionObj ? ` Companion pet lock: ${companionObj.specEn}.` : "";
@@ -474,6 +590,23 @@ export function buildAvatarSpec(rawOpts = {}) {
   const petNegEn = companionObj ? ", organic animal fur, reptile scales, sharp claws, talons, leathery bat wings, wet snout" : "";
   const petNegZh = companionObj ? "，真实动物毛发，爬行鳞片，锋利尖爪，蝙蝠皮膜翼，湿鼻头" : "";
 
+  const palette = {
+    head: preset.headColor,
+    primary: preset.primaryColor,
+    secondary: preset.secondaryColor,
+    accent: preset.accentColor
+  };
+  const locks = {
+    headAndFaceEn: faceEn,
+    headAndFaceZh: faceZh,
+    handsEn: "Fingerless and clawless solid 1x2x1 beveled rectangular block hands (zero human fingers, zero Lego C-shaped hooks)",
+    handsZh: "平头倒角1x2x1实心方块手（严禁人类五指、严禁乐高C型钩子手）",
+    outfitEn: preset.outfitEn,
+    outfitZh: preset.outfitZh,
+    accessoriesEn,
+    accessoriesZh
+  };
+
   return {
     name,
     archetype: archetypeKey,
@@ -482,7 +615,16 @@ export function buildAvatarSpec(rawOpts = {}) {
     rigLabel: rig.label,
     material: materialKey,
     materialLabel: material.label,
-    face: rawOpts.face || "preset-default",
+    face: mergedFace || "preset-default",
+    visualDNA: {
+      archetype: archetypeKey,
+      rig: rigKey,
+      material: materialKey,
+      face: mergedFace || "preset-default",
+      palette,
+      locks
+    },
+    performanceDNA,
     companion: companionObj
       ? {
           id: rawOpts.companion,
@@ -492,24 +634,10 @@ export function buildAvatarSpec(rawOpts = {}) {
           specZh: companionObj.specZh
         }
       : null,
-    palette: {
-      head: preset.headColor,
-      primary: preset.primaryColor,
-      secondary: preset.secondaryColor,
-      accent: preset.accentColor
-    },
-    locks: {
-      headAndFaceEn: faceEn,
-      headAndFaceZh: faceZh,
-      handsEn: "Fingerless and clawless solid 1x2x1 beveled rectangular block hands (zero human fingers, zero Lego C-shaped hooks)",
-      handsZh: "平头倒角1x2x1实心方块手（严禁人类五指、严禁乐高C型钩子手）",
-      outfitEn: preset.outfitEn,
-      outfitZh: preset.outfitZh,
-      accessoriesEn,
-      accessoriesZh
-    },
-    shotAnchorEn: `${name} (${rigKey} blocky figure: ${preset.outfitEn}; ${faceEn}; accessories: ${accessoriesEn})`,
-    shotAnchorZh: `${name}（${rigKey}方块小人：${preset.outfitZh}；${faceZh}；配饰：${accessoriesZh}）`,
+    palette,
+    locks,
+    shotAnchorEn: `${name} (${rigKey} blocky figure: ${preset.outfitEn}; ${faceEn}; accessories: ${accessoriesEn}; acting temperament: ${performanceDNA.defaultTemperament})`,
+    shotAnchorZh: `${name}（${rigKey}方块小人：${preset.outfitZh}；${faceZh}；配饰：${accessoriesZh}；表演性格：${performanceDNA.defaultTemperament}）`,
     turnaroundPromptEn,
     turnaroundPromptZh,
     negativePromptEn: `${NEGATIVE_PROMPT_EN}${petNegEn}`,
@@ -518,35 +646,72 @@ export function buildAvatarSpec(rawOpts = {}) {
 }
 
 export function buildCastSpec(castDescriptor = "", sharedOpts = {}) {
-  const entries = String(castDescriptor)
-    .split(",")
-    .map((s) => s.trim())
-    .filter(Boolean);
-  if (entries.length === 0) {
-    throw new Error(`--cast requires at least one entry in "archetype:Name[:rig]" format`);
+  let members;
+  if (Array.isArray(castDescriptor)) {
+    if (castDescriptor.length === 0) {
+      throw new Error(`Cast list must contain at least one character`);
+    }
+    members = castDescriptor.map((item, idx) => {
+      const id = item.id || `cast_${idx + 1}`;
+      const spec = buildAvatarSpec({
+        ...sharedOpts,
+        ...item,
+        name: item.name || id
+      });
+      return { id, ...spec };
+    });
+  } else {
+    const entries = String(castDescriptor)
+      .split(",")
+      .map((s) => s.trim())
+      .filter(Boolean);
+    if (entries.length === 0) {
+      throw new Error(`--cast requires at least one entry in "archetype:Name[:rig[:face[:actingMoment]]]" format`);
+    }
+    members = entries.map((item, idx) => {
+      const [archRaw, nameRaw, rigRaw, faceRaw, momentRaw] = item.split(":").map((x) => x.trim());
+      const id = `cast_${idx + 1}_${(nameRaw || archRaw || `actor${idx + 1}`).toLowerCase().replace(/[^a-z0-9]+/g, "_")}`;
+      const spec = buildAvatarSpec({
+        archetype: archRaw || "classic-noob",
+        name: nameRaw || `Actor${idx + 1}`,
+        rig: rigRaw || sharedOpts.rig || "",
+        material: sharedOpts.material || "",
+        face: faceRaw || "",
+        actingMoment: momentRaw || "",
+        strict: sharedOpts.strict
+      });
+      return { id, ...spec };
+    });
   }
 
-  const members = entries.map((item, idx) => {
-    const [archRaw, nameRaw, rigRaw, faceRaw] = item.split(":").map((x) => x.trim());
-    const id = `cast_${idx + 1}_${(nameRaw || archRaw || `actor${idx + 1}`).toLowerCase().replace(/[^a-z0-9]+/g, "_")}`;
-    const spec = buildAvatarSpec({
-      archetype: archRaw || "classic-noob",
-      name: nameRaw || `Actor${idx + 1}`,
-      rig: rigRaw || sharedOpts.rig || "",
-      material: sharedOpts.material || "",
-      face: faceRaw || "",
-      strict: sharedOpts.strict
-    });
-    return { id, ...spec };
-  });
+  const cols = Math.min(4, Math.max(2, Math.ceil(Math.sqrt(members.length))));
+  const rows = Math.ceil(members.length / cols);
+  const panelListEn = members
+    .map(
+      (m, idx) =>
+        `Panel ${idx + 1} (${m.name} · ${m.rig}): ${m.locks.outfitEn}, ${m.locks.accessoriesEn} — Instant acting beat: ${m.performanceDNA.actingMomentEn} (${m.performanceDNA.signatureGaze}, camera-facing solid 1x2x1 block hands)`
+    )
+    .join("; ");
+  const panelListZh = members
+    .map(
+      (m, idx) =>
+        `第${idx + 1}格（${m.name} · ${m.rig}）：${m.locks.outfitZh}，${m.locks.accessoriesZh} —— 标志性瞬间表演：${m.performanceDNA.actingMomentZh}（${m.performanceDNA.signatureGaze}，平头方手朝向镜头无遮挡）`
+    )
+    .join("；");
+
+  const actingSheetPromptEn = `Unified ${cols}x${rows} Cast Acting Reference Sheet on one shared neutral warm-gray studio board showing ${members.length} distinct Roblox-style blocky characters under identical SmoothPlastic lighting and scale. Punchy toy-comedy reaction stills, one immediately readable story beat per cell, pupils tracking the trigger object, expressive asymmetrical eyebrows, canonical 2x2x1 torsos with flush 1x2x1 solid rectangular limbs, fingerless and clawless block hands, 1:1 studless barrel heads, readable without dialogue: ${panelListEn}. Zero official brand logos, zero Lego studs or C-claws, non-voxel.`;
+  const actingSheetPromptZh = `同图统一角色瞬间表演设定板（${cols}x${rows}宫格，浅暖灰摄影棚底板，同一套SmoothPlastic布光与比例）：喜剧玩具插画式反应定格，每格不是静态站桩标签，而是“身份+瞬间表演”，瞳孔明确追踪触发反应的物件，眉毛允许高低不对称，遮住对白也能半秒读懂剧情：${panelListZh}。保持标准2x2x1躯干配并拢1x2x1实心平头方肢、1:1无颗粒桶状头、无官方商标Logo、无人类五指或乐高C型爪。`;
 
   return {
     castCount: members.length,
+    gridLayout: `${cols}x${rows}`,
     members,
     combinedShotLockEn: members.map((m) => `[${m.id}] ${m.shotAnchorEn}`).join(" | "),
     combinedShotLockZh: members.map((m) => `[${m.id}] ${m.shotAnchorZh}`).join("；"),
-    negativePromptEn: NEGATIVE_PROMPT_EN + ", character outfit swap, palette swap between characters, identity drift",
-    negativePromptZh: NEGATIVE_PROMPT_ZH + "，角色衣服互换，双人串色，跨镜头换脸"
+    actingSheetPromptEn,
+    actingSheetPromptZh,
+    negativePromptEn: NEGATIVE_PROMPT_EN + ", character outfit swap, palette swap between characters, identity drift, static T-pose mannequin",
+    negativePromptZh: NEGATIVE_PROMPT_ZH + "，角色衣服互换，双人串色，跨镜头换脸，呆板无眼神站桩"
   };
 }
 
@@ -572,6 +737,19 @@ export function formatAvatarSpecMarkdown(spec, rawLang = "en") {
     );
   }
   lines.push(`| Color Palette | Head \`${spec.palette.head}\` · Primary \`${spec.palette.primary}\` · Secondary \`${spec.palette.secondary}\` · Accent \`${spec.palette.accent}\` |`);
+  lines.push("");
+
+  lines.push(useZhText ? "## Performance DNA / 表演习惯与情绪语言锁" : "## Performance DNA (Acting & Attention Lock)");
+  lines.push("");
+  lines.push(`| ${h.field} | ${h.spec} |`);
+  lines.push("| --- | --- |");
+  lines.push(`| Default Temperament | \`${spec.performanceDNA.defaultTemperament}\` |`);
+  lines.push(`| Signature Gaze | \`${spec.performanceDNA.signatureGaze}\` |`);
+  lines.push(`| Signature Gesture | \`${spec.performanceDNA.signatureGesture}\` |`);
+  lines.push(`| Conflict Reaction | \`${spec.performanceDNA.conflictReaction}\` |`);
+  lines.push(
+    `| Signature Acting Beat | ${useZhText ? spec.performanceDNA.actingMomentZh : spec.performanceDNA.actingMomentEn} |`
+  );
   lines.push("");
 
   if (lang !== "zh") {
@@ -607,15 +785,24 @@ export function formatCastSpecMarkdown(castPack, rawLang = "en") {
   const lines = [];
   lines.push(`# Multi-Character Cast Lock Sheet (\`lang: ${lang}\`, \`${castPack.castCount}\` roles)`);
   lines.push("");
-  lines.push("| Cast ID | Name | Archetype & Rig | Shot Identity Lock |");
+  lines.push("| Cast ID | Name | Archetype & Rig | Visual & Performance DNA Lock |");
   lines.push("| --- | --- | --- | --- |");
   for (const m of castPack.members) {
+    const moment = useZhText ? m.performanceDNA.actingMomentZh : m.performanceDNA.actingMomentEn;
     lines.push(
-      `| \`${m.id}\` | **${m.name}** | \`${m.archetype}\` · \`${m.rig}\` | ${useZhText ? m.shotAnchorZh : m.shotAnchorEn} |`
+      `| \`${m.id}\` | **${m.name}** | \`${m.archetype}\` · \`${m.rig}\` | ${useZhText ? m.shotAnchorZh : m.shotAnchorEn} · *Acting*: ${moment} |`
     );
   }
   lines.push("");
-  lines.push("## Individual Turnaround Sheets (Generate Separately Before Multi-Character Keyframes)");
+  lines.push("## 1. Cast Acting Sheet Prompt (Optional Shared-Canvas Exploration Board)");
+  lines.push("");
+  lines.push("> Director reference board (`" + castPack.gridLayout + "`): generates the whole cast's signature acting moments in one unified style pass. Inspect & crop individual avatars afterward rather than treating full-grid pixels as ground-truth hand topology.");
+  lines.push("");
+  lines.push("```text");
+  lines.push(useZhText && lang === "zh" ? castPack.actingSheetPromptZh : castPack.actingSheetPromptEn);
+  lines.push("```");
+  lines.push("");
+  lines.push("## 2. Individual Geometry Turnaround Sheets (3-View Proportion Locks)");
   lines.push("");
   for (const m of castPack.members) {
     lines.push(`### \`${m.id}\` · ${m.name}`);

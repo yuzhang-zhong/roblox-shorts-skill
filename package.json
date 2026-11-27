@@ -1,6 +1,6 @@
 {
   "name": "roblox-style-video",
-  "version": "1.6.3",
+  "version": "1.7.0",
   "private": false,
   "type": "module",
   "description": "Roblox video generation for R6/R15 blocky avatars: generate 9:16 shorts, storyboards, offline MP4/GIF animatics, I2V/T2V prompts, and anti-drift checks.",

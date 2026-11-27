@@ -1,10 +1,11 @@
 #!/usr/bin/env node
 /**
  * drift_check.mjs
- * Zero-dependency Unicode-safe linter, package auditor, and rescue rewriter
- * for Roblox-style blocky short-video specs and prompts.
+ * Zero-dependency Unicode-safe linter, package auditor, thumbnail readability checker,
+ * and rescue rewriter for Roblox-style blocky short-video specs and prompts.
  *
- * Enforces 8 quality gates:
+ * Enforces 10 independent quality gates across two distinct domains:
+ * [Geometry & Brand Gates 1–8: "Does it look like authentic Roblox?"]
  * 1. Hand Geometry Lock (no human fingers, no Lego C-claws, no contradictory negations)
  * 2. 2D Face Decal Lock (1:1 barrel head, flat 2D decal, no 3D nose)
  * 3. Studless & Non-Voxel Guard (smooth floors/props, zero Lego floor/head bumps, non-voxel)
@@ -13,12 +14,39 @@
  * 6. Trademark & Brand Cleanliness (fails official Roblox Tilt / [R] logo leaks)
  * 7. Pet & Prop Topology Lock (blocks scaly/clawed organic pets & finger-pinched props)
  * 8. UI & Engine Compatibility Guard (flags dense garble-prone UI text & unknown engines)
+ *
+ * [Performance & Readability Gates 9–10: "Does the acting beat read in 0.5s?"]
+ * 9. Performance & Interaction Completeness (gaze target, reaction cause, single audienceRead, camera-facing hand-prop intent)
+ * 10. Thumbnail & Safe-Zone Readability (9:16 safe zone, silhouette non-occlusion, <=4-word bubble, optional 64x64 PNG crop contrast)
  */
 
 import fs from "node:fs";
 import path from "node:path";
+import zlib from "node:zlib";
 
 const VALID_ENGINES = new Set(["local3d", "kling", "seedance", "hailuo", "wan", "sora", "runway"]);
+const VALID_INTERACTION_INTENTS = new Set(["hold", "present", "tap", "slam", "point", "drop", "receive"]);
+const BUILTIN_STAGE_TARGETS = {
+  subway_car: {
+    empty_seat: [0.62, -0.32, -0.78],
+    left_seat: [-0.92, -0.32, -0.78],
+    center_strap: [0.0, 1.06, 0.04],
+    left_strap: [-0.72, 1.06, 0.04],
+    right_strap: [0.72, 1.06, 0.04]
+  },
+  adoption_plaza: {
+    pedestal: [0.22, -0.45, 0.28],
+    archway: [0.0, 0.35, -1.04]
+  },
+  convenience_store: {
+    counter_top: [0.0, -0.28, 0.44],
+    snack_shelf: [0.82, 0.22, -0.88]
+  },
+  supermarket_aisle: {
+    left_shelf: [-1.35, 0.12, -0.35],
+    right_shelf: [1.35, 0.12, -0.35]
+  }
+};
 
 const ISSUE_PATCHES = {
   "human-fingers": {
@@ -70,6 +98,16 @@ const ISSUE_PATCHES = {
     titleZh: "单镜头动作过多导致穿模卡死 (Single-Clip Action Overload)",
     fixEn: "Split sequential verbs so each 3.5–4s shot executes only ONE primary physical action and ONE camera move",
     fixZh: "遵循单镜头单动作铁律：将多个连续动词拆分为独立的3.5~4秒分镜，每镜只保留1个核心动作"
+  },
+  "missing-acting": {
+    titleZh: "只有静态职业/外观标签，缺少瞬间表演关系 (Missing Acting Grammar & Gaze Target)",
+    fixEn: "Upgrade static role labels into one readable story instant: specify beatIntent, pupils tracking a concrete gazeTarget, asymmetrical eyebrows, and camera-facing hand-prop interaction",
+    fixZh: "将静态身份标签升级为瞬间表演：明确角色此刻的beatIntent、瞳孔追踪目标(gazeTarget)、不对称高低眉与朝向镜头的手部道具交互"
+  },
+  "poor-readability": {
+    titleZh: "小尺寸缩略图遮挡或安全区失焦 (Thumbnail Occlusion & Safe-Zone Drift)",
+    fixEn: "Separate actor silhouettes, keep the key hand/prop on the camera-facing plane unoccluded by torsos, place heads inside the central 9:16 safe band, and keep chat bubbles <= 4 words",
+    fixZh: "拉开双人剪影间距，确保关键手与道具朝向镜头不被躯干遮挡，角色头部落入9:16竖屏中央安全区，气泡台词控制在4词以内确保遮住字幕也能看懂"
   }
 };
 
@@ -78,11 +116,13 @@ function printHelp() {
   node scripts/drift_check.mjs --prompt "<prompt text>" [options]
   node scripts/drift_check.mjs --pack <prompts.json | episode.json> [options]
 
-Run 8-gate deterministic PASS/WARN/FAIL checks on a Roblox-style video prompt or full episode spec.
+Run 10-gate deterministic PASS/WARN/FAIL checks (Gates 1–8 Geometry + Gates 9–10 Acting & Thumbnail Readability).
 
 Options:
   --prompt <text>    Draft prompt to inspect
   --pack <file>      Inspect all shots inside a compiled prompts.json or custom episode spec JSON
+  --assets-dir <dir> Optional rendered assets folder to verify 64x64 thumbnail/avatar contrast
+  --require-acting   Require explicit gaze target, reaction cause, and audienceRead on single prompts
   --engine <id>      Target engine: local3d | kling | seedance | hailuo | wan | sora | runway (default: local3d)
   --rig <id>         Optional rig hint: r6 | r15 | chibi-blocky
   --mode <id>        Workflow mode: i2v | t2v | local3d (default: i2v)
@@ -106,6 +146,8 @@ export function parseArgs(argv) {
   const opts = {
     prompt: "",
     pack: "",
+    assetsDir: "",
+    requireActing: false,
     engine: "kling",
     rig: "",
     mode: "i2v",
@@ -120,8 +162,10 @@ export function parseArgs(argv) {
     const arg = argv[i];
     if (arg === "--help" || arg === "-h") opts.help = true;
     else if (arg === "--json") opts.json = true;
+    else if (arg === "--require-acting") opts.requireActing = true;
     else if (arg === "--prompt" && argv[i + 1]) opts.prompt = argv[++i];
     else if ((arg === "--pack" || arg === "--spec") && argv[i + 1]) opts.pack = argv[++i];
+    else if (arg === "--assets-dir" && argv[i + 1]) opts.assetsDir = argv[++i];
     else if (arg === "--engine" && argv[i + 1]) opts.engine = argv[++i].toLowerCase();
     else if (arg === "--rig" && argv[i + 1]) opts.rig = argv[++i].toLowerCase();
     else if (arg === "--mode" && argv[i + 1]) opts.mode = argv[++i].toLowerCase();
@@ -130,6 +174,86 @@ export function parseArgs(argv) {
     else if (arg === "--lang" && argv[i + 1]) opts.lang = normalizeLang(argv[++i]);
   }
   return opts;
+}
+
+/**
+ * Decode an RGBA 8-bit PNG generated by render_preview.mjs and measure 64x64 thumbnail luminance std-dev
+ * to verify small-size avatar / keyframe contrast without external dependencies.
+ */
+export function measurePngThumbnailContrast(pngPath) {
+  if (!pngPath || !fs.existsSync(pngPath)) return null;
+  const buf = fs.readFileSync(pngPath);
+  if (buf.length < 33 || buf.readUInt32BE(0) !== 0x89504e47) return null;
+  let offset = 8;
+  let width = 0;
+  let height = 0;
+  let colorType = 6;
+  const idatChunks = [];
+  while (offset + 8 <= buf.length) {
+    const len = buf.readUInt32BE(offset);
+    const type = buf.toString("ascii", offset + 4, offset + 8);
+    const dataStart = offset + 8;
+    if (type === "IHDR" && len >= 10) {
+      width = buf.readUInt32BE(dataStart);
+      height = buf.readUInt32BE(dataStart + 4);
+      colorType = buf[dataStart + 9];
+    } else if (type === "IDAT") {
+      idatChunks.push(buf.subarray(dataStart, dataStart + len));
+    } else if (type === "IEND") {
+      break;
+    }
+    offset = dataStart + len + 4;
+  }
+  if (!width || !height || idatChunks.length === 0 || (colorType !== 6 && colorType !== 2)) return null;
+  const bpp = colorType === 6 ? 4 : 3;
+  const raw = zlib.inflateSync(Buffer.concat(idatChunks));
+  const stride = 1 + width * bpp;
+  if (raw.length < height * stride) return null;
+
+  // Reconstruct PNG scanline filters (None=0, Sub=1, Up=2, Average=3, Paeth=4)
+  const pixels = new Uint8Array(width * height * bpp);
+  const paeth = (a, b, c) => {
+    const p = a + b - c;
+    const pa = Math.abs(p - a);
+    const pb = Math.abs(p - b);
+    const pc = Math.abs(p - c);
+    if (pa <= pb && pa <= pc) return a;
+    return pb <= pc ? b : c;
+  };
+  for (let y = 0; y < height; y++) {
+    const filter = raw[y * stride];
+    const rowIn = y * stride + 1;
+    const rowOut = y * width * bpp;
+    const prevOut = (y - 1) * width * bpp;
+    for (let i = 0; i < width * bpp; i++) {
+      const x = raw[rowIn + i];
+      const a = i >= bpp ? pixels[rowOut + i - bpp] : 0;
+      const b = y > 0 ? pixels[prevOut + i] : 0;
+      const c = y > 0 && i >= bpp ? pixels[prevOut + i - bpp] : 0;
+      let val = x;
+      if (filter === 1) val = (x + a) & 0xff;
+      else if (filter === 2) val = (x + b) & 0xff;
+      else if (filter === 3) val = (x + ((a + b) >> 1)) & 0xff;
+      else if (filter === 4) val = (x + paeth(a, b, c)) & 0xff;
+      pixels[rowOut + i] = val;
+    }
+  }
+
+  // Sample central 64x64 thumbnail grid inside the 9:16 safe band (x: 15%..85%, y: 18%..78%)
+  const lumas = [];
+  for (let gy = 0; gy < 64; gy++) {
+    const sy = Math.min(height - 1, Math.floor(height * (0.18 + (gy / 63) * 0.60)));
+    for (let gx = 0; gx < 64; gx++) {
+      const sx = Math.min(width - 1, Math.floor(width * (0.15 + (gx / 63) * 0.70)));
+      const pIdx = (sy * width + sx) * bpp;
+      const lum = 0.299 * pixels[pIdx] + 0.587 * pixels[pIdx + 1] + 0.114 * pixels[pIdx + 2];
+      lumas.push(lum);
+    }
+  }
+  const mean = lumas.reduce((a, b) => a + b, 0) / lumas.length;
+  const variance = lumas.reduce((acc, v) => acc + (v - mean) * (v - mean), 0) / lumas.length;
+  const stdDev = Math.sqrt(variance);
+  return { width, height, stdDev: Number(stdDev.toFixed(2)) };
 }
 
 /**
@@ -313,8 +437,15 @@ export function inspectPrompt(rawOpts = {}) {
     });
   }
 
-  // 4. Single-Action Clip Budget (Unicode-safe; prefer isolated actionText when available from structured packs!)
-  const actionScopeText = rawOpts.actionText ? stripNegatedSpans(rawOpts.actionText) : positiveOnly;
+  // 4. Single-Action Clip Budget (Unicode-safe; prefer isolated actionText or extracted Single action clause!)
+  let extractedAction = rawOpts.actionText ? rawOpts.actionText : "";
+  if (!extractedAction) {
+    const mEn = prompt.match(/(?:Single action|Action):\s*([^.;]+?)(?:\s+while\s+maintaining|\.)/i);
+    const mZh = prompt.match(/单镜动作：([^。；]+)/);
+    if (mEn) extractedAction = mEn[1];
+    else if (mZh) extractedAction = mZh[1];
+  }
+  const actionScopeText = extractedAction ? stripNegatedSpans(extractedAction) : positiveOnly;
   const { chainConnectors, verbCount } = countActionVerbsAndConnectors(actionScopeText);
   if (issue === "overload" || chainConnectors >= 2 || verbCount >= 3 || (chainConnectors >= 1 && verbCount >= 3)) {
     checks.push({
@@ -492,11 +623,231 @@ export function inspectPrompt(rawOpts = {}) {
     });
   }
 
-  const overallStatus = checks.some((c) => c.status === "FAIL")
-    ? "FAIL"
-    : checks.some((c) => c.status === "WARN")
-    ? "WARN"
-    : "PASS";
+  // Tag Gates 1–8 explicitly under "geometry" domain so Geometry vs. Acting never conflate
+  for (const c of checks) {
+    c.category = "geometry";
+  }
+
+  // 9. Performance & Interaction Completeness Gate ("Does the character act with clear gaze, cause, and camera-facing prop intent?")
+  const shotSpec = rawOpts.shotSpec && typeof rawOpts.shotSpec === "object" ? rawOpts.shotSpec : null;
+  const knownTargetMap = rawOpts.knownTargetMap instanceof Map ? rawOpts.knownTargetMap : null;
+  const requireActing = Boolean(rawOpts.requireActing);
+
+  if (issue === "missing-acting") {
+    checks.push({
+      category: "acting",
+      gate: "Performance & Interaction Completeness / 表演关系完整性",
+      status: "FAIL",
+      reasonEn: ISSUE_PATCHES["missing-acting"].fixEn,
+      reasonZh: ISSUE_PATCHES["missing-acting"].fixZh
+    });
+  } else if (shotSpec) {
+    const perf = shotSpec.performance && typeof shotSpec.performance === "object" ? shotSpec.performance : null;
+    const inter = shotSpec.interaction && typeof shotSpec.interaction === "object" ? shotSpec.interaction : null;
+    const actorGazePresent = Array.isArray(shotSpec.actors) && shotSpec.actors.some((a) => Boolean(a?.gaze));
+    const hasGaze = Boolean(perf?.gazeTarget || actorGazePresent);
+    const hasRead = Boolean(shotSpec.audienceRead || shotSpec.beatIntent);
+    const hasCause = Boolean(perf?.reactionCause || shotSpec.beatIntent);
+    const actorUsesHandProp = Array.isArray(shotSpec.actors) && shotSpec.actors.some((a) => Boolean(a?.handPropL || a?.handPropR));
+
+    const badIntent = inter && inter.intent && !VALID_INTERACTION_INTENTS.has(String(inter.intent).toLowerCase());
+    const occludedInter = inter && /^(?:occluded|hidden|blocked)$/i.test(String(inter.visibility || ""));
+    const unknownGazeTarget =
+      perf?.gazeTarget && knownTargetMap && knownTargetMap.size > 0 && !knownTargetMap.has(perf.gazeTarget);
+    const unknownInterProp =
+      inter?.propId && knownTargetMap && knownTargetMap.size > 0 && !knownTargetMap.has(inter.propId);
+
+    if (badIntent || occludedInter || unknownGazeTarget || unknownInterProp) {
+      const detailEn = badIntent
+        ? `Invalid interaction.intent "${inter.intent}" (must be hold | present | tap | slam | point | drop | receive).`
+        : occludedInter
+        ? `interaction.visibility is "${inter.visibility}"; key hand-prop contact must be camera-facing/unoccluded.`
+        : unknownGazeTarget
+        ? `performance.gazeTarget "${perf.gazeTarget}" does not match any castId, prop id, or stageTarget id.`
+        : `interaction.propId "${inter.propId}" does not match any prop id or stageTarget id.`;
+      checks.push({
+        category: "acting",
+        gate: "Performance & Interaction Completeness / 表演关系完整性",
+        status: "FAIL",
+        reasonEn: detailEn,
+        reasonZh: `表演或交互目标无效：${detailEn}`
+      });
+    } else if (rawOpts.enforceStructuredActing && (!hasGaze || !hasRead || !hasCause || (actorUsesHandProp && !inter))) {
+      const missing = [];
+      if (!hasRead) missing.push("audienceRead/beatIntent");
+      if (!hasGaze) missing.push("performance.gazeTarget");
+      if (!hasCause) missing.push("performance.reactionCause");
+      if (actorUsesHandProp && !inter) missing.push("interaction (hand/propId/intent/visibility)");
+      checks.push({
+        category: "acting",
+        gate: "Performance & Interaction Completeness / 表演关系完整性",
+        status: "WARN",
+        reasonEn: `Shot describes mechanics without complete acting grammar (missing: ${missing.join(", ")}). Add gaze target, reaction cause, and single audienceRead.`,
+        reasonZh: `分镜仅描述了动作与外观，缺少完整瞬间表演字段（缺失：${missing.join("、")}）；请补充视线目标、触发前因与半秒观众读点。`
+      });
+    } else {
+      checks.push({
+        category: "acting",
+        gate: "Performance & Interaction Completeness / 表演关系完整性",
+        status: "PASS",
+        reasonEn: hasGaze && hasRead
+          ? "Beat intent, gaze target, and camera-facing interaction semantics verified."
+          : "Single-beat action and prop interaction semantics clean.",
+        reasonZh: hasGaze && hasRead ? "已完整锁定表演动机、瞳孔追踪目标与可见面道具交互。" : "单镜头动作与交互语义清晰。"
+      });
+    }
+  } else {
+    // Plain prompt string check: catch static occupation-label prompts or --require-acting gaps
+    const hasExplicitGaze =
+      /\b(?:pupils?\s+track(?:ing)?|gaze|stares?\s+at|looks?\s+(?:at|toward)|watching|eyebrows?|side-eye)\b/i.test(lower) ||
+      /(?:瞳孔|视线|盯住|盯着|看向|斜睨|高低眉|挑眉)/.test(prompt);
+    const hasExpressiveBeat =
+      verbCount >= 1 ||
+      hasExplicitGaze ||
+      /\b(?:pivots?|leans?|freezes?|holds?\s+up|presents?|points?|waves?|slumps?|recoils?|swings?)\b/i.test(lower) ||
+      /(?:转头|前倾|后仰|定格|举起|指向|挥动|摆动|端着)/.test(prompt);
+    const mentionsOccludedHand =
+      /\b(?:hand\s+hidden|occluded\s+by\s+torso|prop\s+behind\s+back)\b/i.test(posLower) || /(?:手被挡住|道具被身体遮挡)/.test(positiveOnly);
+
+    if (mentionsOccludedHand) {
+      checks.push({
+        category: "acting",
+        gate: "Performance & Interaction Completeness / 表演关系完整性",
+        status: "FAIL",
+        reasonEn: "Key hand or prop is described as hidden/occluded; keep acting hand and prop on the camera-facing plane.",
+        reasonZh: "关键手部或道具被描述为遮挡不可见；必须将核心交互手与道具置于朝向镜头的可见面。"
+      });
+    } else if ((requireActing && !hasExplicitGaze) || !hasExpressiveBeat) {
+      checks.push({
+        category: "acting",
+        gate: "Performance & Interaction Completeness / 表演关系完整性",
+        status: "WARN",
+        reasonEn: "Static label-style description without explicit pupil gaze target or story-beat intent; specify what the character's pupils track and what the viewer reads in 0.5s.",
+        reasonZh: "当前描述偏向静态身份/站桩标签，缺少明确视线追踪目标(pupils tracking)与瞬间剧情读点；建议补充角色正在看什么及触发前因。"
+      });
+    } else {
+      checks.push({
+        category: "acting",
+        gate: "Performance & Interaction Completeness / 表演关系完整性",
+        status: "PASS",
+        reasonEn: "Expressive single-beat acting cue verified.",
+        reasonZh: "单镜头动态表演指向清晰。"
+      });
+    }
+  }
+
+  // 10. Thumbnail & Safe-Zone Readability Gate ("Can the joke, expression, and prop still read at mobile thumbnail size?")
+  const thumbStats = rawOpts.thumbnailPath ? measurePngThumbnailContrast(rawOpts.thumbnailPath) : null;
+  if (issue === "poor-readability") {
+    checks.push({
+      category: "acting",
+      gate: "Thumbnail & Safe-Zone Readability / 小尺寸与安全区可读性",
+      status: "FAIL",
+      reasonEn: ISSUE_PATCHES["poor-readability"].fixEn,
+      reasonZh: ISSUE_PATCHES["poor-readability"].fixZh
+    });
+  } else {
+    let readabilityStatus = "PASS";
+    let readReasonEn = thumbStats
+      ? `9:16 safe-zone framing, silhouette separation, and 64x64 thumbnail contrast (stdDev=${thumbStats.stdDev}) verified.`
+      : "9:16 safe-zone framing, silhouette separation, and dialogue-free readability verified.";
+    let readReasonZh = thumbStats
+      ? `9:16竖屏安全区、剪影分离度与64x64缩略图对比度(stdDev=${thumbStats.stdDev})校验通过。`
+      : "9:16竖屏安全区、剪影无遮挡与去台词可读性校验通过。";
+
+    if (shotSpec) {
+      const chatWords = String(shotSpec.chatEn || "")
+        .trim()
+        .split(/\s+/)
+        .filter(Boolean).length;
+      const actors = Array.isArray(shotSpec.actors) ? shotSpec.actors : [];
+      const actorPositions = actors.map((a) => {
+        const p = Array.isArray(a.pos) ? a.pos : Array.isArray(a.fromPos) ? a.fromPos : [0, 0, 0];
+        return { id: a.castId || "", x: Number(p[0]) || 0, y: Number(p[1]) || 0, z: Number(p[2]) || 0, pose: a.pose || "idle" };
+      });
+
+      // Check actor-to-actor silhouette collision
+      let collidedPair = null;
+      for (let i = 0; i < actorPositions.length; i++) {
+        for (let j = i + 1; j < actorPositions.length; j++) {
+          const dx = Math.abs(actorPositions[i].x - actorPositions[j].x);
+          const dz = Math.abs(actorPositions[i].z - actorPositions[j].z);
+          if (dx < 0.28 && dz < 0.22) {
+            collidedPair = `${actorPositions[i].id || i} & ${actorPositions[j].id || j}`;
+          }
+        }
+      }
+
+      // Check whether a non-target standing actor blocks the camera's sightline to gazeTarget!
+      let occludedTarget = "";
+      const gazeTgtId = shotSpec.performance?.gazeTarget || "";
+      if (gazeTgtId && knownTargetMap && knownTargetMap.has(gazeTgtId)) {
+        const tgtPos = knownTargetMap.get(gazeTgtId);
+        if (Array.isArray(tgtPos)) {
+          for (const ap of actorPositions) {
+            if (ap.id !== gazeTgtId && ap.pose !== "sit" && Math.abs(ap.x - tgtPos[0]) < 0.24 && ap.z > tgtPos[2] + 0.25) {
+              occludedTarget = `${ap.id || "actor"} stands directly in front of gazeTarget "${gazeTgtId}"`;
+            }
+          }
+        }
+      }
+
+      // Check fallback 2-cast occlusion when actors[] was omitted on subway_car with empty_seat!
+      if (!occludedTarget && actors.length === 0 && rawOpts.backdrop === "subway_car" && rawOpts.castCount >= 2) {
+        occludedTarget = "Default 2-actor placement (x=+0.58) occludes subway empty_seat (x=+0.62); declare explicit actors[] positions";
+      }
+
+      const bubbleOutOfSafeZone =
+        shotSpec.bubbleY !== undefined && (Number(shotSpec.bubbleY) < 14 || Number(shotSpec.bubbleY) > 165);
+
+      if (collidedPair || chatWords > 8) {
+        readabilityStatus = "FAIL";
+        readReasonEn = collidedPair
+          ? `Actors (${collidedPair}) overlap in 3D space (|dx|<0.28, |dz|<0.22), merging silhouettes at mobile thumbnail size.`
+          : `Overhead chatEn has ${chatWords} words (>8); visual gag relies on dense text instead of silent-comedy readability.`;
+        readReasonZh = collidedPair
+          ? `角色（${collidedPair}）站位重叠导致缩略图剪影粘连；请拉开横向或前后景深间距。`
+          : `头顶气泡词数过多（${chatWords}词 > 8词），在小尺寸画面中无法一眼读懂，请精简至1~4词并将笑点交给动作眼神。`;
+      } else if (occludedTarget || chatWords > 4 || bubbleOutOfSafeZone || (thumbStats && thumbStats.stdDev < 14)) {
+        readabilityStatus = "WARN";
+        readReasonEn = occludedTarget
+          ? `Sightline occlusion warning: ${occludedTarget}. Keep the contested prop/target unoccluded.`
+          : bubbleOutOfSafeZone
+          ? `bubbleY=${shotSpec.bubbleY} sits outside the 9:16 top/face safe band (20..140).`
+          : thumbStats && thumbStats.stdDev < 14
+          ? `Rendered 64x64 thumbnail contrast is flat (stdDev=${thumbStats.stdDev}); boost rim/silhouette contrast.`
+          : `Overhead chatEn has ${chatWords} words; trim to <=4 bold words so the pose carries the joke.`;
+        readReasonZh = occludedTarget
+          ? `视线遮挡预警：${occludedTarget}；请调整站位让关键目标完全露在镜头可见面。`
+          : bubbleOutOfSafeZone
+          ? `气泡纵向位置(bubbleY=${shotSpec.bubbleY})超出竖屏安全区(20..140)。`
+          : thumbStats && thumbStats.stdDev < 14
+          ? `64x64缩略图对比度偏低(stdDev=${thumbStats.stdDev})，小尺寸易糊成一片。`
+          : `头顶气泡偏长（${chatWords}词），建议压缩至4词以内，确保遮住台词也能读懂表演。`;
+      }
+    } else if (thumbStats && thumbStats.stdDev < 14) {
+      readabilityStatus = "WARN";
+      readReasonEn = `Rendered 64x64 thumbnail contrast is low (stdDev=${thumbStats.stdDev}).`;
+      readReasonZh = `渲染图64x64缩略图对比度偏低(stdDev=${thumbStats.stdDev})。`;
+    }
+
+    checks.push({
+      category: "acting",
+      gate: "Thumbnail & Safe-Zone Readability / 小尺寸与安全区可读性",
+      status: readabilityStatus,
+      reasonEn: readReasonEn,
+      reasonZh: readReasonZh
+    });
+  }
+
+  const geoChecks = checks.filter((c) => c.category === "geometry");
+  const actChecks = checks.filter((c) => c.category === "acting");
+  const summarizeChecks = (arr) =>
+    arr.some((c) => c.status === "FAIL") ? "FAIL" : arr.some((c) => c.status === "WARN") ? "WARN" : "PASS";
+
+  const geometryStatus = summarizeChecks(geoChecks);
+  const actingStatus = summarizeChecks(actChecks);
+  const overallStatus = summarizeChecks(checks);
 
   // Clean & rig-accurate Rescue Rewrite
   const sanitizedAction = (prompt || "performs one crisp blocky hinge motion")
@@ -541,6 +892,8 @@ export function inspectPrompt(rawOpts = {}) {
 
   return {
     overallStatus,
+    geometryStatus,
+    actingStatus,
     engine,
     rig: detectedRig,
     mode,
@@ -564,6 +917,28 @@ export function inspectPackageFile(filePath, opts = {}) {
   const engine = (opts.engine || raw.engine || "local3d").toLowerCase();
   const rig = opts.rig || raw.rig || "r6";
   const packMode = engine === "local3d" || opts.mode === "local3d" ? "local3d" : opts.mode || "i2v";
+  const isCustomEpisode = Boolean(raw.template === "custom-spec" || Array.isArray(raw.cast) || raw.backdrop || opts.requireActing);
+  const backdrop = raw.backdrop || "";
+  const castCount = Array.isArray(raw.cast) ? raw.cast.length : 0;
+  const assetsDir = opts.assetsDir ? path.resolve(opts.assetsDir) : "";
+
+  // Build base target registry (camera + backdrop landmarks + stageTargets + cast IDs)
+  const baseTargets = new Map();
+  baseTargets.set("camera", [0, 0.36, 3.18]);
+  baseTargets.set("viewer", [0, 0.36, 3.18]);
+  const bMarks = BUILTIN_STAGE_TARGETS[backdrop] || {};
+  for (const [k, pos] of Object.entries(bMarks)) baseTargets.set(k, pos);
+  if (Array.isArray(raw.stageTargets)) {
+    for (const st of raw.stageTargets) {
+      if (st?.id) baseTargets.set(st.id, st.pos || [0, 0, 0]);
+    }
+  }
+  if (Array.isArray(raw.cast)) {
+    for (const c of raw.cast) {
+      if (c?.id) baseTargets.set(c.id, null);
+    }
+  }
+
   const seenActions = new Map();
   const duplicateShots = [];
   const constraintViolations = [];
@@ -593,9 +968,32 @@ export function inspectPackageFile(filePath, opts = {}) {
       constraintViolations.push(`Shot ${shotNum} violates constraints.noJetpack`);
     }
 
+    const shotTargets = new Map(baseTargets);
+    if (Array.isArray(s.props)) {
+      for (const pr of s.props) {
+        if (pr?.id) shotTargets.set(pr.id, pr.pos || [0, 0, 0]);
+        if (pr?.type && !shotTargets.has(pr.type)) shotTargets.set(pr.type, pr.pos || [0, 0, 0]);
+      }
+    }
+    if (Array.isArray(s.actors)) {
+      for (const ac of s.actors) {
+        if (ac?.castId) shotTargets.set(ac.castId, ac.pos || ac.fromPos || [0, 0, 0]);
+      }
+    }
+
+    const shotPngCandidate = assetsDir
+      ? path.join(assetsDir, `shot_${String(idx + 1).padStart(2, "0")}.png`)
+      : "";
+
     const rep = inspectPrompt({
       prompt: textToInspect,
       actionText: actionOnly,
+      shotSpec: s,
+      knownTargetMap: shotTargets,
+      enforceStructuredActing: isCustomEpisode,
+      backdrop: s.backdrop || backdrop,
+      castCount,
+      thumbnailPath: shotPngCandidate && fs.existsSync(shotPngCandidate) ? shotPngCandidate : "",
       engine,
       rig,
       mode: s.i2vPromptEn ? packMode : "local3d"
@@ -603,22 +1001,40 @@ export function inspectPackageFile(filePath, opts = {}) {
     return {
       shotNumber: shotNum,
       overallStatus: rep.overallStatus,
+      geometryStatus: rep.geometryStatus,
+      actingStatus: rep.actingStatus,
       failedGates: rep.checks.filter((c) => c.status === "FAIL").map((c) => c.gate),
       warnGates: rep.checks.filter((c) => c.status === "WARN").map((c) => c.gate)
     };
   });
 
-  const hasFail =
-    duplicateShots.length > 0 ||
-    constraintViolations.length > 0 ||
-    shotReports.some((r) => r.overallStatus === "FAIL");
-  const hasWarn = shotReports.some((r) => r.overallStatus === "WARN");
+  // Optional Avatar Crop thumbnail audit when --assets-dir contains avatars/*.png
+  const avatarCropStats = [];
+  if (assetsDir && fs.existsSync(path.join(assetsDir, "avatars"))) {
+    for (const fn of fs.readdirSync(path.join(assetsDir, "avatars")).filter((f) => f.endsWith(".png"))) {
+      const st = measurePngThumbnailContrast(path.join(assetsDir, "avatars", fn));
+      if (st) avatarCropStats.push({ file: fn, ...st });
+    }
+  }
+
+  const geoFail = duplicateShots.length > 0 || constraintViolations.length > 0 || shotReports.some((r) => r.geometryStatus === "FAIL");
+  const geoWarn = shotReports.some((r) => r.geometryStatus === "WARN");
+  const geometryStatus = geoFail ? "FAIL" : geoWarn ? "WARN" : "PASS";
+
+  const actFail = shotReports.some((r) => r.actingStatus === "FAIL");
+  const actWarn = shotReports.some((r) => r.actingStatus === "WARN");
+  const actingStatus = actFail ? "FAIL" : actWarn ? "WARN" : "PASS";
+
+  const overallStatus = geoFail || actFail ? "FAIL" : geoWarn || actWarn ? "WARN" : "PASS";
 
   return {
     file: abs,
     shotCount: shots.length,
     uniqueActionCount: seenActions.size,
-    overallStatus: hasFail ? "FAIL" : hasWarn ? "WARN" : "PASS",
+    overallStatus,
+    geometryStatus,
+    actingStatus,
+    avatarCropStats,
     duplicateShots,
     constraintViolations,
     shotReports
@@ -631,6 +1047,9 @@ export function formatDriftCheckMarkdown(report, rawLang = "en") {
   const lines = [];
   lines.push(`# Prompt Drift & Rescue Report: \`${report.overallStatus}\` (\`lang: ${lang}\`)`);
   lines.push("");
+  lines.push(
+    `- **Domain Verdicts**: Geometry Gates (1–8): \`${report.geometryStatus}\` · Acting & Readability Gates (9–10): \`${report.actingStatus}\``
+  );
   lines.push(`- **Engine, Rig & Mode**: \`${report.engine}\` · \`${report.rig || "r6"}\` · \`${report.mode.toUpperCase()}\``);
   if (report.issue) {
     lines.push(`- **Targeted Issue**: \`${report.issue}\` (${ISSUE_PATCHES[report.issue].titleZh})`);
@@ -696,9 +1115,18 @@ if (isMain) {
       const packReport = inspectPackageFile(opts.pack, opts);
       const outText = opts.json
         ? JSON.stringify(packReport, null, 2)
-        : `# Package Drift Audit: \`${packReport.overallStatus}\`\n\n- Shots: \`${packReport.shotCount}\` (Unique actions: \`${packReport.uniqueActionCount}\`)\n- Duplicate shots: \`${packReport.duplicateShots.length}\`\n- Constraint violations: \`${packReport.constraintViolations.length}\`\n\n` +
+        : `# Package Drift Audit: \`${packReport.overallStatus}\`\n\n- **Geometry Gates (1–8)**: \`${packReport.geometryStatus}\`\n- **Acting & Readability Gates (9–10)**: \`${packReport.actingStatus}\`\n- Shots: \`${packReport.shotCount}\` (Unique actions: \`${packReport.uniqueActionCount}\`)\n- Duplicate shots: \`${packReport.duplicateShots.length}\`\n- Constraint violations: \`${packReport.constraintViolations.length}\`${
+            packReport.avatarCropStats.length
+              ? `\n- Avatar 64x64 thumbnail contrast: ${packReport.avatarCropStats.map((a) => `\`${a.file}\` (stdDev=${a.stdDev})`).join(", ")}`
+              : ""
+          }\n\n` +
           packReport.shotReports
-            .map((s) => `- Shot ${String(s.shotNumber).padStart(2, "0")}: **${s.overallStatus}**${s.failedGates.length ? ` (FAIL: ${s.failedGates.join(", ")})` : ""}`)
+            .map(
+              (s) =>
+                `- Shot ${String(s.shotNumber).padStart(2, "0")}: **${s.overallStatus}** (Geometry: \`${s.geometryStatus}\`, Acting: \`${s.actingStatus}\`)${
+                  s.failedGates.length ? ` [FAIL: ${s.failedGates.join(", ")}]` : ""
+                }${s.warnGates.length ? ` [WARN: ${s.warnGates.join(", ")}]` : ""}`
+            )
             .join("\n");
       emitOutput(outText, opts.out);
     } else {

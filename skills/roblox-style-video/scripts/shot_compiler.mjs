@@ -8,7 +8,36 @@
 
 import fs from "node:fs";
 import path from "node:path";
-import { buildAvatarSpec } from "./avatar_spec.mjs";
+import { buildAvatarSpec, buildCastSpec } from "./avatar_spec.mjs";
+
+export const ACTING_ANCHORS = {
+  "punchy-celebration": {
+    en: "punchy toy-comedy celebration beat, one immediately readable triumph instant, pupils tracking the prize, asymmetrical raised brows, blocky torso contrast against stubby solid limbs, readable without dialogue",
+    zh: "高张力玩具喜剧庆祝瞬间：只表达单一清晰胜利读点，瞳孔明确锁定战利品，眉毛高低上扬，方躯干与短粗实心方肢形成反差，遮住对白也能秒懂"
+  },
+  "deadpan-misunderstanding": {
+    en: "deadpan toy-comedy contrast still, one immediately readable silent gag, flat horizontal Chill (-_-) calm beside chaos, pupils tracking the absurd trigger, entire joke readable without dialogue",
+    zh: "冷面玩具喜剧反差定格：混乱旁保持死鱼眼(-_-)绝对淡定，瞳孔明确追踪荒诞触发源，只传达单一反差读点，无需字幕即可看懂笑点"
+  },
+  "guilty-glance": {
+    en: "guilty toy-comedy micro-acting beat, torso oriented away while pupils dart sideways to track the incriminating prop, asymmetrical eyebrows (one lowered, one raised), instant subtext without dialogue",
+    zh: "心虚偷瞄喜剧瞬间：身体朝向一侧而瞳孔斜向追踪关键道具，眉毛一高一低不对称，半秒读出角色小心思"
+  },
+  "overconfident-reveal": {
+    en: "overconfident toy-comedy setup beat, forward-leaning 2x2x1 torso, smug asymmetrical Check-It brow, key prop presented cleanly on the camera-facing plane, readable without dialogue",
+    zh: "自信亮牌玩具喜剧瞬间：2x2x1躯干前倾，挑眉坏笑，关键道具在朝向镜头的无遮挡平面清晰展示，遮住台词也能读懂"
+  },
+  "competitive-hesitation": {
+    en: "punchy toy-comedy decision instant, one immediately readable beat, pupils tracking the contested target, asymmetrical eyebrows, forward-leaning torso with feet still planted, readable without dialogue",
+    zh: "玩具喜剧抉择蓄力瞬间：只表达单一清晰动机，瞳孔死盯争夺目标，高低眉不对称，身体前倾但双脚未动，半秒读懂下一秒要冲刺"
+  },
+  "frozen-realization": {
+    en: "punchy toy-comedy reaction still, one immediately readable shock beat, rigid torso recoiled 10 degrees, wide O_O ring eyes with pupils locked on the cause of disaster, readable without dialogue",
+    zh: "玩具喜剧石化反应瞬间：刚性躯干后仰10度，震惊圆圈眼(O_O)瞳孔死锁翻车源头，遮住对白也能一眼读懂崩溃原因"
+  }
+};
+
+export const VALID_INTERACTION_INTENTS = new Set(["hold", "present", "tap", "slam", "point", "drop", "receive"]);
 
 const ENGINE_PROFILES = {
   local3d: { nativeClipSeconds: 4.0, label: "Local 3D Direct Video Engine (render_preview.mjs)" },
@@ -926,7 +955,77 @@ function expandTemplateBeats(baseShots, targetShotCount) {
   ];
 }
 
+function composeActingDirectives(shot = {}) {
+  const anchorKey = shot.actingAnchor && ACTING_ANCHORS[shot.actingAnchor] ? shot.actingAnchor : "";
+  const anchor = anchorKey ? ACTING_ANCHORS[anchorKey] : null;
+  const perf = shot.performance && typeof shot.performance === "object" ? shot.performance : {};
+  const inter = shot.interaction && typeof shot.interaction === "object" ? shot.interaction : null;
+
+  const momentPartsEn = [];
+  const momentPartsZh = [];
+  if (shot.beatIntent) momentPartsEn.push(`Beat intent: ${shot.beatIntent}`);
+  if (shot.beatIntentZh || shot.beatIntent) momentPartsZh.push(`表演动机：${shot.beatIntentZh || shot.beatIntent}`);
+  if (shot.audienceRead) momentPartsEn.push(`Instant audience read: ${shot.audienceRead}`);
+  if (shot.audienceReadZh || shot.audienceRead) momentPartsZh.push(`半秒观众读点：${shot.audienceReadZh || shot.audienceRead}`);
+  if (anchor) {
+    momentPartsEn.push(`Acting anchor (${anchorKey}): ${anchor.en}`);
+    momentPartsZh.push(`表演参考（${anchorKey}）：${anchor.zh}`);
+  }
+
+  const attnPartsEn = [];
+  const attnPartsZh = [];
+  if (perf.gazeTarget) {
+    attnPartsEn.push(`pupils tracking "${perf.gazeTarget}"`);
+    attnPartsZh.push(`瞳孔明确追踪「${perf.gazeTarget}」`);
+  }
+  if (perf.reactionCause) {
+    attnPartsEn.push(`triggered by ${perf.reactionCause}`);
+    attnPartsZh.push(`前因触发：${perf.reactionCauseZh || perf.reactionCause}`);
+  }
+  if (perf.eyebrows) {
+    attnPartsEn.push(`eyebrows: ${perf.eyebrows}`);
+    attnPartsZh.push(`眉型：${perf.eyebrows}`);
+  }
+  if (perf.bodyAttitude) {
+    attnPartsEn.push(`body attitude: ${perf.bodyAttitude}`);
+    attnPartsZh.push(`体态重心：${perf.bodyAttitude}`);
+  }
+
+  let interactionEn = "";
+  let interactionZh = "";
+  if (inter && inter.propId) {
+    const hand = inter.hand || "right";
+    const intent = inter.intent || "hold";
+    const contact = inter.contact || "flush-flat";
+    const vis = inter.visibility || "camera-facing";
+    interactionEn = `Hand-prop interaction: ${hand} fingerless solid 1x2x1 block hand executes "${intent}" on "${inter.propId}" (${contact} contact, ${vis} plane, never occluded by torso).`;
+    interactionZh = `手与道具关系：${hand}侧无指1x2x1实心平头方手对「${inter.propId}」执行「${intent}」（${contact}刚性接触，处于${vis}镜头可见面，严禁被身体遮挡）。`;
+  }
+
+  const leadPrefixEn = [
+    momentPartsEn.length > 0 ? `${momentPartsEn.join(" | ")}.` : "",
+    attnPartsEn.length > 0 ? `Attention & gaze: ${attnPartsEn.join(", ")}.` : "",
+    interactionEn
+  ]
+    .filter(Boolean)
+    .join(" ");
+
+  const leadPrefixZh = [
+    momentPartsZh.length > 0 ? `${momentPartsZh.join("｜")}。` : "",
+    attnPartsZh.length > 0 ? `注意力与视线：${attnPartsZh.join("，")}。` : "",
+    interactionZh
+  ]
+    .filter(Boolean)
+    .join("");
+
+  return { leadPrefixEn, leadPrefixZh };
+}
+
 function formatEnginePrompt(shot, subjectEn, subjectZh, envEn, envZh, engine, aspect, rig, isLoopFinal, shot1StartEn, shot1StartZh) {
+  const { leadPrefixEn, leadPrefixZh } = composeActingDirectives(shot);
+  const actEn = leadPrefixEn ? `${leadPrefixEn} ` : "";
+  const actZh = leadPrefixZh ? `${leadPrefixZh}` : "";
+
   const rigTailEn =
     rig === "r15"
       ? "Roblox R15 segmented blocky rig (2x2x1 torso, flush 1x2x1 rigid limb segments rotating strictly at mechanical 90-degree elbow/knee hinges, zero soft-body noodle bending, fingerless and clawless flat beveled block hands)"
@@ -946,44 +1045,45 @@ function formatEnginePrompt(shot, subjectEn, subjectZh, envEn, envZh, engine, as
   let i2vPromptEn = "";
   let i2vPromptZh = "";
 
+  // Prompt priority order: 1. Beat Moment & Gaze -> 2. Hand-Prop Interaction -> 3. Cast Anchor -> 4. Single Action & Camera -> 5. Geometry/World Guard
   switch (engine) {
     case "local3d":
-      i2vPromptEn = `[Local 3D Render · ${aspect}] ${shot.cameraEn}. Cast: ${subjectEn}. Single action: ${shot.actionEn}. Decal: ${shot.faceEn}. ${worldTailEn}`;
-      i2vPromptZh = `【本地3D直出渲染 · ${aspect}】${shot.cameraZh}。角色：${subjectZh}。单镜动作：${shot.actionZh}。贴图：${shot.faceZh}。${worldTailZh}`;
+      i2vPromptEn = `[Local 3D Render · ${aspect}] ${actEn}Cast: ${subjectEn}. Single action: ${shot.actionEn}. Decal: ${shot.faceEn}. Camera: ${shot.cameraEn}. ${worldTailEn}`;
+      i2vPromptZh = `【本地3D直出渲染 · ${aspect}】${actZh}角色：${subjectZh}。单镜动作：${shot.actionZh}。贴图：${shot.faceZh}。运镜：${shot.cameraZh}。${worldTailZh}`;
       break;
     case "hailuo":
-      i2vPromptEn = `${shot.hailuoTag || "[Static shot]"} (${aspect} vertical, ${rig} rig) Featuring ${subjectEn}. Single action: ${shot.actionEn}, showing ${shot.faceEn}. Props docked flush to flat block hands. ${worldTailEn}`;
-      i2vPromptZh = `${shot.hailuoTag || "[Static shot]"}（${aspect}竖屏，${rig}骨架）主体为${subjectZh}。单镜动作：${shot.actionZh}，面部呈现${shot.faceZh}。手持物与实心方手底面刚性吸附。${worldTailZh}`;
+      i2vPromptEn = `${shot.hailuoTag || "[Static shot]"} (${aspect} vertical, ${rig} rig) ${actEn}Featuring ${subjectEn}. Single action: ${shot.actionEn}, showing ${shot.faceEn}. Props docked flush to flat block hands. ${worldTailEn}`;
+      i2vPromptZh = `${shot.hailuoTag || "[Static shot]"}（${aspect}竖屏，${rig}骨架）${actZh}主体为${subjectZh}。单镜动作：${shot.actionZh}，面部呈现${shot.faceZh}。手持物与实心方手底面刚性吸附。${worldTailZh}`;
       break;
     case "seedance":
-      i2vPromptEn = `[Seedance First+Last Frame I2V · ${aspect}] ${shot.cameraEn}. ${subjectEn} ${shot.actionEn} with crisp Motor6D timing; ${shot.faceEn}. ${worldTailEn}`;
-      i2vPromptZh = `【即梦/Seedance首尾帧I2V · ${aspect}】${shot.cameraZh}。${subjectZh}${shot.actionZh}，${shot.faceZh}。动作干脆有刚体节奏感，${worldTailZh}`;
+      i2vPromptEn = `[Seedance First+Last Frame I2V · ${aspect}] ${actEn}${shot.cameraEn}. ${subjectEn}. Single action: ${shot.actionEn} with crisp Motor6D timing; ${shot.faceEn}. ${worldTailEn}`;
+      i2vPromptZh = `【即梦/Seedance首尾帧I2V · ${aspect}】${actZh}${shot.cameraZh}。${subjectZh}。单镜动作：${shot.actionZh}，${shot.faceZh}。动作干脆有刚体节奏感，${worldTailZh}`;
       break;
     case "wan":
-      i2vPromptEn = `${aspect} vertical 3D Roblox SmoothPlastic render. ${shot.cameraEn}. Subject: ${subjectEn} ${shot.actionEn}. Expression: ${shot.faceEn}. ${worldTailEn}`;
-      i2vPromptZh = `${aspect}竖屏3D纯正Roblox渲染，${shot.cameraZh}。主体：${subjectZh}${shot.actionZh}，${shot.faceZh}。${worldTailZh}`;
+      i2vPromptEn = `${aspect} vertical 3D Roblox SmoothPlastic render. ${actEn}${shot.cameraEn}. Subject: ${subjectEn}. Single action: ${shot.actionEn}. Expression: ${shot.faceEn}. ${worldTailEn}`;
+      i2vPromptZh = `${aspect}竖屏3D纯正Roblox渲染。${actZh}${shot.cameraZh}。主体：${subjectZh}。单镜动作：${shot.actionZh}，${shot.faceZh}。${worldTailZh}`;
       break;
     case "sora":
-      i2vPromptEn = `Camera (${aspect}, 35mm macro lens): ${shot.cameraEn}. Subject (${rig}): ${subjectEn}. Action: ${shot.actionEn} while maintaining ${shot.faceEn}. Physics: Strict rigid-body Motor6D hinge rotation, zero soft-body limb deformation, props welded flush to flat block hands. ${worldTailEn}`;
-      i2vPromptZh = `机位与镜头（${aspect}，35mm微距镜头）：${shot.cameraZh}。主体（${rig}）：${subjectZh}。动作：${shot.actionZh}，保持${shot.faceZh}。物理约束：严格刚体铰链转动、零软体弯曲变形、道具刚性贴合平头方手。${worldTailZh}`;
+      i2vPromptEn = `Camera (${aspect}, 35mm macro lens): ${shot.cameraEn}. ${actEn}Subject (${rig}): ${subjectEn}. Action: ${shot.actionEn} while maintaining ${shot.faceEn}. Physics: Strict rigid-body Motor6D hinge rotation, zero soft-body limb deformation, props welded flush to flat block hands. ${worldTailEn}`;
+      i2vPromptZh = `机位与镜头（${aspect}，35mm微距镜头）：${shot.cameraZh}。${actZh}主体（${rig}）：${subjectZh}。单镜动作：${shot.actionZh}，保持${shot.faceZh}。物理约束：严格刚体铰链转动、零软体弯曲变形、道具刚性贴合平头方手。${worldTailZh}`;
       break;
     case "runway":
-      i2vPromptEn = `Camera (${aspect}): ${shot.cameraEn}. Subject (${rig}): ${subjectEn}. Action: ${shot.actionEn} while maintaining ${shot.faceEn}. Physics: ${worldTailEn}`;
-      i2vPromptZh = `机位（${aspect}）：${shot.cameraZh}。主体（${rig}）：${subjectZh}。动作：${shot.actionZh}，${shot.faceZh}。物理约束：${worldTailZh}`;
+      i2vPromptEn = `Camera (${aspect}): ${shot.cameraEn}. ${actEn}Subject (${rig}): ${subjectEn}. Action: ${shot.actionEn} while maintaining ${shot.faceEn}. Physics: ${worldTailEn}`;
+      i2vPromptZh = `机位（${aspect}）：${shot.cameraZh}。${actZh}主体（${rig}）：${subjectZh}。单镜动作：${shot.actionZh}，${shot.faceZh}。物理约束：${worldTailZh}`;
       break;
     case "kling":
     default:
-      i2vPromptEn = `[Kling I2V · ${aspect}] ${subjectEn} ${shot.actionEn}. Facial decal: ${shot.faceEn}. Camera: ${shot.cameraEn}. ${worldTailEn}`;
-      i2vPromptZh = `【可灵I2V · ${aspect}】${subjectZh}${shot.actionZh}，${shot.faceZh}。运镜：${shot.cameraZh}。${worldTailZh}`;
+      i2vPromptEn = `[Kling I2V · ${aspect}] ${actEn}${subjectEn}. Single action: ${shot.actionEn}. Facial decal: ${shot.faceEn}. Camera: ${shot.cameraEn}. ${worldTailEn}`;
+      i2vPromptZh = `【可灵I2V · ${aspect}】${actZh}${subjectZh}。单镜动作：${shot.actionZh}，${shot.faceZh}。运镜：${shot.cameraZh}。${worldTailZh}`;
       break;
   }
 
   const firstFramePromptEn =
     shot.firstFrameEn ||
-    `${aspect} vertical keyframe still. ${shot.cameraEn}. ${subjectEn} positioned at the start of the beat (${shot.actionEn}), displaying ${shot.faceEn}. ${worldTailEn}`;
+    `${aspect} vertical keyframe still. ${actEn}${shot.cameraEn}. ${subjectEn} positioned at the start of the beat (${shot.actionEn}), displaying ${shot.faceEn}. ${worldTailEn}`;
   const firstFramePromptZh =
     shot.firstFrameZh ||
-    `${aspect}竖屏首帧关键帧静帧。${shot.cameraZh}。${subjectZh}处于动作起始位（${shot.actionZh}），面部呈现${shot.faceZh}。${worldTailZh}`;
+    `${aspect}竖屏首帧关键帧静帧。${actZh}${shot.cameraZh}。${subjectZh}处于动作起始位（${shot.actionZh}），面部呈现${shot.faceZh}。${worldTailZh}`;
 
   const lastFramePromptEn = isLoopFinal
     ? `[LOOP LOCK = REUSE SHOT 01 FIRST FRAME] ${shot1StartEn}`
@@ -1021,29 +1121,35 @@ const THEME3D_TO_ARCHETYPE = {
 function buildCastLocksFromSpec(castArray = [], defaultRig = "r6", defaultMaterial = "smooth-plastic") {
   return castArray.map((c, idx) => {
     const id = c.id || `actor_${idx + 1}`;
-    const themeHint = String(c.theme3d || c.theme || "").toLowerCase();
+    const vis = c.visualDNA && typeof c.visualDNA === "object" ? c.visualDNA : {};
+    const themeHint = String(vis.theme3d || c.theme3d || c.theme || "").toLowerCase();
+    const rawArch = vis.archetype || c.archetype;
     const resolvedArchetype =
-      c.archetype && c.archetype !== "classic-noob"
-        ? c.archetype
-        : THEME3D_TO_ARCHETYPE[themeHint] || c.archetype || "classic-noob";
+      rawArch && rawArch !== "classic-noob"
+        ? rawArch
+        : THEME3D_TO_ARCHETYPE[themeHint] || rawArch || "classic-noob";
     const built = buildAvatarSpec({
       archetype: resolvedArchetype,
       name: c.name || id,
-      rig: c.rig || defaultRig,
-      material: c.material || defaultMaterial,
-      face: c.face || "",
-      accessory: c.accessory || "",
-      accessoryZh: c.accessoryZh || "",
-      replaceAccessory: c.replaceAccessory || "",
-      replaceAccessoryZh: c.replaceAccessoryZh || "",
-      noAccessories: Boolean(c.noAccessories),
-      companion: c.companion || ""
+      rig: vis.rig || c.rig || defaultRig,
+      material: vis.material || c.material || defaultMaterial,
+      face: vis.face || c.face || "",
+      accessory: vis.accessory || c.accessory || "",
+      accessoryZh: vis.accessoryZh || c.accessoryZh || "",
+      replaceAccessory: vis.replaceAccessory || c.replaceAccessory || "",
+      replaceAccessoryZh: vis.replaceAccessoryZh || c.replaceAccessoryZh || "",
+      noAccessories: Boolean(vis.noAccessories ?? c.noAccessories),
+      companion: vis.companion || c.companion || "",
+      visualDNA: c.visualDNA,
+      performanceDNA: c.performanceDNA
     });
     return {
       id,
       name: built.name,
       rig: built.rig,
       archetype: built.archetype,
+      visualDNA: built.visualDNA,
+      performanceDNA: built.performanceDNA,
       shotAnchorEn: c.customDescEn || built.shotAnchorEn,
       shotAnchorZh: c.customDescZh || built.shotAnchorZh,
       turnaroundPromptEn: built.turnaroundPromptEn,
@@ -1113,6 +1219,13 @@ export function compileStoryboard(rawOpts = {}) {
       const isFinalShot = idx === specData.shots.length - 1;
       const prompts = formatEnginePrompt(
         {
+          beatIntent: s.beatIntent || "",
+          beatIntentZh: s.beatIntentZh || "",
+          audienceRead: s.audienceRead || "",
+          audienceReadZh: s.audienceReadZh || "",
+          actingAnchor: s.actingAnchor || "",
+          performance: s.performance || null,
+          interaction: s.interaction || null,
           actionEn: s.actionEn || "performs one crisp rigid blocky motion",
           actionZh: s.actionZh || s.actionEn || "执行单一刚性方块动作",
           faceEn: s.faceEn || "flat 2D Default Smile decal",
@@ -1153,6 +1266,16 @@ export function compileStoryboard(rawOpts = {}) {
         editorialTrimWindow: `0.00s–${(endSec - startSec).toFixed(2)}s (from ${engineProfile.nativeClipSeconds.toFixed(1)}s source clip)`,
         role: s.role || `Shot ${idx + 1}`,
         castIds: activeCast.map((c) => c.id),
+        beatIntent: s.beatIntent || "",
+        beatIntentZh: s.beatIntentZh || "",
+        audienceRead: s.audienceRead || "",
+        audienceReadZh: s.audienceReadZh || "",
+        actingAnchor: s.actingAnchor || "",
+        performance: s.performance || null,
+        interaction: s.interaction || null,
+        actors: s.actors || null,
+        props: s.props || null,
+        camera: s.camera || null,
         actionZh: s.actionZh || s.actionEn,
         actionEn: s.actionEn,
         faceZh: s.faceZh || s.faceEn,
@@ -1168,6 +1291,21 @@ export function compileStoryboard(rawOpts = {}) {
       };
     });
 
+    const castActingPack =
+      Array.isArray(specData.cast) && specData.cast.length > 0
+        ? buildCastSpec(
+            specData.cast.map((c, idx) => {
+              const vis = c.visualDNA && typeof c.visualDNA === "object" ? c.visualDNA : {};
+              const themeHint = String(vis.theme3d || c.theme3d || c.theme || "").toLowerCase();
+              const rawArch = vis.archetype || c.archetype;
+              const resolvedArchetype =
+                rawArch && rawArch !== "classic-noob" ? rawArch : THEME3D_TO_ARCHETYPE[themeHint] || rawArch || "classic-noob";
+              return { ...c, id: c.id || `actor_${idx + 1}`, archetype: resolvedArchetype };
+            }),
+            { rig, material }
+          )
+        : null;
+
     return {
       template: "custom-spec",
       title: `${specData.titleZh || specData.titleEn || "Custom Episode"} / ${specData.titleEn || specData.titleZh || "Custom Episode"}`,
@@ -1177,10 +1315,12 @@ export function compileStoryboard(rawOpts = {}) {
       rig,
       material,
       aspect,
-      constraints: specData.constraints || null,
       loop: isLoop,
       constraints: specData.constraints || {},
+      stageTargets: specData.stageTargets || [],
       cast: castLocks,
+      castActingSheetPromptEn: castActingPack ? castActingPack.actingSheetPromptEn : "",
+      castActingSheetPromptZh: castActingPack ? castActingPack.actingSheetPromptZh : "",
       durationSeconds: totalDuration,
       shotCount: compiledShots.length,
       workflowMode: engine === "local3d" ? "Direct Local 3D Render (render_preview.mjs --spec)" : "First-Frame I2V (首帧图生视频)",
@@ -1292,16 +1432,28 @@ export function formatStoryboardMarkdown(plan, rawLang = "en") {
     lines.push(`- **Locked Cast (${plan.cast.length})**: ${plan.cast.map((c) => `\`${c.id}\` (${c.name} · ${c.rig})`).join(", ")}`);
   }
   lines.push("");
+  if (plan.castActingSheetPromptEn) {
+    lines.push("## Optional Cast Acting Reference Sheet (Shared-Canvas Exploration)");
+    lines.push("");
+    lines.push("```text");
+    lines.push(useZhText && lang === "zh" ? plan.castActingSheetPromptZh : plan.castActingSheetPromptEn);
+    lines.push("```");
+    lines.push("");
+  }
   lines.push("## Beat Sheet Overview");
   lines.push("");
-  lines.push("| Shot | Exact Window | Beat Role | Single Action | Camera | SFX & Caption |");
-  lines.push("| --- | --- | --- | --- | --- | --- |");
+  lines.push("| Shot | Exact Window | Beat Role | Instant Read & Gaze | Single Action | Camera | SFX & Caption |");
+  lines.push("| --- | --- | --- | --- | --- | --- | --- |");
 
   for (const s of plan.shots) {
     const actionText = useZhText ? s.actionZh : s.actionEn;
     const cameraText = useZhText ? s.cameraZh : s.cameraEn;
+    const readText = useZhText
+      ? s.audienceReadZh || s.audienceRead || s.beatIntentZh || s.beatIntent || "—"
+      : s.audienceRead || s.beatIntent || "—";
+    const gazeTag = s.performance?.gazeTarget ? ` (\`gaze -> ${s.performance.gazeTarget}\`)` : "";
     lines.push(
-      `| ${String(s.shotNumber).padStart(2, "0")} | ${s.exactTimeWindow} | ${s.role} | ${actionText} | ${cameraText} | ${s.sfx} · 「${s.caption}」 |`
+      `| ${String(s.shotNumber).padStart(2, "0")} | ${s.exactTimeWindow} | ${s.role} | ${readText}${gazeTag} | ${actionText} | ${cameraText} | ${s.sfx} · 「${s.caption}」 |`
     );
   }
   lines.push("");
@@ -1311,6 +1463,16 @@ export function formatStoryboardMarkdown(plan, rawLang = "en") {
   for (const s of plan.shots) {
     lines.push(`### Shot ${String(s.shotNumber).padStart(2, "0")} (${s.exactTimeWindow} · ${s.editorialTrimWindow}) · ${s.role}`);
     lines.push("");
+    if (s.beatIntent || s.audienceRead || s.performance?.gazeTarget || s.interaction?.propId) {
+      const gazeNote = s.performance?.gazeTarget ? ` · Gaze: \`${s.performance.gazeTarget}\`` : "";
+      const browNote = s.performance?.eyebrows ? ` · Brows: \`${s.performance.eyebrows}\`` : "";
+      const interNote = s.interaction?.propId
+        ? ` · Interaction: \`${s.interaction.hand || "right"}:${s.interaction.intent || "hold"} -> ${s.interaction.propId} (${s.interaction.visibility || "camera-facing"})\``
+        : "";
+      lines.push(
+        `- **Acting Grammar**: ${useZhText ? s.audienceReadZh || s.audienceRead || s.beatIntentZh || s.beatIntent : s.audienceRead || s.beatIntent}${gazeNote}${browNote}${interNote}`
+      );
+    }
     if (lang !== "zh") {
       lines.push(`- **First-Frame Image Prompt (EN)**: \`${s.firstFramePromptEn}\``);
       if (showLastFrame) {

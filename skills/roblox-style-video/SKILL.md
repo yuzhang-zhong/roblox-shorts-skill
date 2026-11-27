@@ -6,7 +6,7 @@ description: |
   中文触发词包括 Roblox 视频生成、方块人短视频、R6/R15 动画、竖屏剧情、角色一致性与 AI 视频防串味。
 license: MIT
 metadata:
-  version: "1.6.3"
+  version: "1.7.0"
 ---
 
 # Roblox Style Video Skill
@@ -73,36 +73,43 @@ Default assumptions when unspecified:
 
 ## End-to-End Direct Video Workflow / 本地直出成片标准工作流
 
-### Step 1: Lock Cast & Companion DNA (`avatar_spec.mjs`)
+### Step 1: Lock Two-Layer Character DNA (`Visual DNA` + `Performance DNA`)
 
-Read `references/avatar-geometry-and-materials.md` and run `scripts/avatar_spec.mjs` with `--out` (supports single avatars, `--cast` multi-character ensembles, `--face` overrides, `--no-accessories` / `--replace-accessory`, and `--companion` non-human blocky pets):
+Read `references/avatar-geometry-and-materials.md` and run `scripts/avatar_spec.mjs` with `--out`. Every character locks **two** layers so cross-shot consistency preserves *how they act*, not just what they wear:
+- **Visual DNA**: `archetype`, `rig`, `material`, `face`, `BrickColor` palette, and stud locks (`2×2×1` torso, flush `1×2×1` limbs, fingerless block hands).
+- **Performance DNA**: `defaultTemperament`, `signatureGaze` (e.g. `side-eye-before-acting`), `signatureGesture`, `conflictReaction`, and `actingMomentEn/Zh` (used to build a unified **Cast Acting Sheet** where each panel shows `Identity + Signature Story Instant` instead of a static occupation label).
 
 ```bash
 node scripts/avatar_spec.mjs --cast "chibi-plush:Mo:chibi-blocky:sleepy,classic-noob:Noob:r6:deadpan" --lang zh-en --out ./my-episode/character_card.md
 ```
 
-### Step 2: Author a Custom Episode Spec JSON (`episode.json`)
+### Step 2: Author an Acting-Driven Episode Spec JSON (`episode.json`)
 
-Copy or adapt `templates/custom_story_spec.json` to define any custom story, multi-character cast, props, custom 3D blocks, camera moves, English `BillboardGui` chat bubbles, and retro SFX cues:
+Copy or adapt `templates/custom_story_spec.json` to define both **geometry** and **instant-acting semantics** (why the character looks, how the block hand contacts the prop, and what the audience reads in 0.5 seconds without dialogue):
 
 - **`slug`**: output filename prefix (renders `<slug>.mp4` and `<slug>.gif`).
 - **`backdrop`** (per episode or per shot): `subway_car` | `adoption_plaza` | `convenience_store` | `supermarket_aisle` | `neon_tower` | `bedroom` | `obby_sky` | `plaza` | `cafe` | `runway` | `kitchen` | `watchtower` | `street` | `hotel_corridor` | `lava_bridge` | `classroom` | `sand_court` | `studio`.
-- **`cast[]`**: `{ "id": "mo", "name": "Mo", "archetype": "chibi-plush", "theme3d": "commuter", "face": "deadpan", "backProp": "backpack_cyan", "customPalette": { "top": [244,142,178], "pants": [241,245,249] } }`.
-  - Built-in `theme3d` values: `theo` | `commuter` | `noob` | `guest` | `bacon` | `builderman` | `obby` | `y2k` | `chef` | `police` | `clerk` | `zombie` | `base-gray`.
+- **`cast[]`**: supports nested `visualDNA` + `performanceDNA` (`defaultTemperament`, `signatureGaze`, `signatureGesture`, `conflictReaction`, `actingMomentEn`, `actingMomentZh`) plus built-in `theme3d` (`theo` | `commuter` | `noob` | `guest` | `bacon` | `builderman` | `obby` | `y2k` | `chef` | `police` | `clerk` | `zombie` | `base-gray`).
+- **`stageTargets[]` & `props[].id`**: assign stable `id`s (e.g. `"empty_seat"`, `"center_strap"`, `"alarm_clock"`) so `gazeTarget` and `interaction.propId` bind deterministically in 3D space.
 - **`shots[]`** (`4` shots for 15s, `8` unique shots for 30s — 1 primary action per shot):
-  - **`camera`**: `{ "preset": "push_in" | "pull_out" | "close_up" | "hero_low" | "side_track" | "high_iso" | "wide_two_shot" | "wide_aisle" | "fall_follow", "shake": 0.04 }` (or explicit `"fromRo": [x,y,z], "toRo": [x,y,z], "ta": [x,y,z]`).
-  - **`actors[]`**: `{ "castId": "mo", "fromPos": [-0.6, 0, 0.1], "toPos": [0.2, 0, 0.1], "yaw": 0.4, "pose": "run", "expression": "shocked", "handPropR": "kettle" }`.
+  - **Instant-Acting Fields**:
+    - **`beatIntent` / `audienceRead`**: why the character reacts right now and the single unambiguous takeaway readable in half a second without captions.
+    - **`actingAnchor`**: brand-free toy-comedy performance template (`punchy-celebration` | `deadpan-misunderstanding` | `guilty-glance` | `overconfident-reveal` | `competitive-hesitation` | `frozen-realization`).
+    - **`performance`**: `{ "gazeTarget": "empty_seat", "reactionCause": "heard rival shift closer", "eyebrows": "left-up-right-down" | "right-up-left-down" | "furrowed" | "worried" | "raised" | "flat", "bodyAttitude": "lean-forward-8-degrees" | "recoil-back-10-degrees", "primaryEmotion": "competitive-anxiety" }`.
+    - **`interaction`**: `{ "actorId": "mo", "hand": "right" | "left" | "both", "propId": "empty_seat", "intent": "hold" | "present" | "tap" | "slam" | "point" | "drop" | "receive", "contact": "flush-flat" | "hover-near", "visibility": "camera-facing" }`.
+  - **`camera`**: `{ "preset": "push_in" | "pull_out" | "close_up" | "hero_low" | "side_track" | "high_iso" | "wide_two_shot" | "wide_aisle" | "fall_follow", "shake": 0.04 }`.
+  - **`actors[]`**: `{ "castId": "mo", "pos": [-0.62, 0, 0.14], "yaw": 0.22, "pose": "idle", "expression": "shocked", "brows": "left-up-right-down", "gaze": { "targetId": "empty_seat" }, "handPropR": "kettle" }`.
     - Supported `pose`: `idle` | `walk` | `run` | `sprint` | `jump` | `hop` | `cheer` | `wave` | `swat` | `slam` | `pour` | `recoil` | `sit` | `ride_cart` | `push_cart` | `zombie_walk` | `hang_strap` | `fall_rigid` | `faceplant` | `plank_fall` | `one_leg_freeze` | `head_turn` | `sword_slash`.
-    - Supported `expression`: `smile` | `deadpan` | `smirk` | `grin` | `shocked` | `tears` | `angry` | `dizzy` | `slam`.
+    - Supported `expression`: `smile` | `deadpan` | `sleepy` | `smirk` | `grin` | `shocked` | `tears` | `angry` | `dizzy` | `slam`.
     - Supported `handPropL` / `handPropR`: `mug` | `cola` | `boba` | `flashlight` | `sword` | `pencil` | `kettle` | `ramen_cup` | `mystery_egg` | `soda_pack` | `price_tag`.
-    - Supported `backProp`: `backpack_purple` | `backpack_cyan` | `jetpack`.
-  - **`props[]`**: `{ "type": "mystery_egg" | "neon_dragon" | "trade_popup" | "shopping_cart" | "ramen_cup" | "laser_bar" | "glass_pad" | "checkout_gate" | "alarm_clock" | "laptop", "pos": [x,y,z], "moveTo": [x2,y2,z2] }`.
-  - **`blocks[]`**: custom 3D rounded primitives `{ "shape": "box" | "cylinder" | "sphere", "pos": [x,y,z], "moveTo": [x2,y2,z2], "size": [hx,hy,hz], "color": [r,g,b], "roughness": 0.25 }`.
-  - **`chatEn`**: crisp English `BillboardGui` overhead speech bubble (`1–3` words, e.g. `"MYTHIC PET!!"`), plus `"sfxCue"`: `chime` | `boing` | `clack` | `siren` | `buzz` | `drop` | `win`.
+  - **`props[]` & `blocks[]`**: multi-part props (`mystery_egg` | `neon_dragon` | `trade_popup` | `shopping_cart` | `ramen_cup` | `laser_bar` | `glass_pad` | `checkout_gate` | `alarm_clock` | `laptop`) with `id`, `pos`, `moveTo`, `visiblePhase`, `scale`/`scaleTo`, plus rounded `blocks[]` primitives.
+  - **`chatEn`**: crisp English `BillboardGui` speech bubble (`1–4` words so the visual gag never depends on subtitle walls), plus `"sfxCue"`: `chime` | `boing` | `clack` | `siren` | `buzz` | `drop` | `win`.
 
-### Step 3: Compile Storyboard & Lint with 8-Gate Anti-Drift Checker
+### Step 3: Compile Acting-Prioritized Prompts & Audit All 10 Gates
 
-Compile the structured storyboard and verify all 8 gates (`Hand Lock`, `2D Face`, `Studless/Non-Voxel`, `Single-Action Budget`, `Rigid Physics`, `Trademark Cleanliness`, `Pet/Prop Topology`, `UI/Engine Guard`) pass with zero duplicate shots:
+`shot_compiler.mjs` places **Beat Intent -> Attention/Gaze -> Camera-Facing Hand-Prop Interaction** at the very front of every prompt before geometry/negative tails so external models never bury `pupils tracking ...`. Then `drift_check.mjs` reports **two separate domain verdicts** so geometry and acting quality are never conflated:
+- **Geometry Gates (1–8)**: `Hand Lock`, `2D Face`, `Studless/Non-Voxel`, `Single-Action Budget`, `Rigid Physics`, `Trademark Cleanliness`, `Pet/Prop Topology`, `UI/Engine Guard`.
+- **Acting & Readability Gates (9–10)**: `Performance & Interaction Completeness` (gaze target, reaction cause, single `audienceRead`, controlled interaction intent) + `Thumbnail & Safe-Zone Readability` (9:16 safe zone, non-occluded sightlines, `<=4`-word bubble, and `64×64` PNG crop contrast via `--assets-dir`).
 
 ```bash
 node scripts/shot_compiler.mjs --spec ./my-episode/episode.json --engine local3d --lang zh-en --out ./my-episode/storyboard.md
@@ -110,13 +117,16 @@ node scripts/shot_compiler.mjs --spec ./my-episode/episode.json --engine local3d
 node scripts/drift_check.mjs --pack ./my-episode/prompts.json --engine local3d --out ./my-episode/drift_report.md
 ```
 
-### Step 4: Render the Complete 9:16 Video Package Locally (`render_preview.mjs --spec`)
+### Step 4: Render the Multi-Sheet & 9:16 Video Package Locally (`render_preview.mjs --spec`)
 
-Render the 3-view turnaround sheet, shot keyframes, bilingual storyboard contact sheets, animated `.gif`, and `540x960` H.264 `.mp4` video with synthesized multi-shot audio directly into `--out-dir`:
+Render the complete deliverable suite—**1. Geometry Sheet** (`turnaround_sheet.en.png`), **2. Cast Acting Sheet** (`cast_acting_sheet.en.png`), **3. 256×256 Avatar Crops** (`avatars/<id>_avatar.png`), **4. Shot Keyframe Sheet** (`storyboard_sheet.en.png` + `shot_01..N.png`), plus `.gif` and exact-duration `540x960` H.264 `.mp4` video with audio—then run `--assets-dir` thumbnail verification:
 
 ```bash
 node scripts/render_preview.mjs --spec ./my-episode/episode.json --out-dir ./my-episode/assets --force
+node scripts/drift_check.mjs --pack ./my-episode/episode.json --assets-dir ./my-episode/assets --engine local3d --out ./my-episode/drift_report.md
 ```
+
+> **Hybrid boundary (Local 3D vs. External ImageGen)**: Keep local 3D (`render_preview.mjs --spec`) as the reproducible delivery backbone for locked proportions, pupil gaze tracking, exact shot durations, and zero cross-shot outfit drift. When using external ImageGen / I2V models, treat the unified **Cast Acting Sheet** as an optional director exploration board, and verify cropped avatars/hands per character rather than replacing the deterministic local 3D pipeline.
 
 ## Quality and Honesty Boundaries / 质量与边界说明
 

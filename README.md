@@ -108,10 +108,10 @@ Generic video prompts often produce human fingers, circular Lego floor/head stud
 | Skill component | Output |
 | --- | --- |
 | [`SKILL.md`](skills/roblox-style-video/SKILL.md) | Main Agent Skill entry point defining the 6 production modes (`Avatar`, `Storyboard`, `Prompt-Compile`, `Rescue`, `Remix`, `Render`) and 8 geometry invariants. |
-| [`shot_compiler.mjs`](scripts/shot_compiler.mjs) | Compiles custom `--spec <episode.json>` stories or 12 built-in templates into non-repeating 15s / 30s / 45s 9:16 beat sheets (`local3d`, Kling, Seedance, Hailuo, Wan, Sora, Runway). |
-| [`avatar_spec.mjs`](scripts/avatar_spec.mjs) | Character DNA card with `BrickColor` codes, `--cast` multi-character locks, `--companion` blocky pets, and a [three-view turnaround](assets/showcase/momo_turnaround_sheet.en.png) prompt. |
-| [`drift_check.mjs`](scripts/drift_check.mjs) | 8-gate Unicode-safe linter (`--prompt` or `--pack`) catching finger growth, Lego claws/bumps, brand logos, organic pet drift, R15 soft-body contradictions, and action overload. |
-| [`render_preview.mjs`](scripts/render_preview.mjs) | Direct local 3D `.mp4` / `.gif` / contact-sheet renderer (`--spec <episode.json> --out-dir <dir>`) with multi-part props, synthesized retro WAV audio, and exact per-shot timing. |
+| [`shot_compiler.mjs`](scripts/shot_compiler.mjs) | Acting-prioritized prompt compiler (`Beat Intent -> Gaze -> Camera-Facing Interaction -> Character DNA -> Single Action -> Geometry Guard`) for custom `--spec <episode.json>` stories or 12 built-in templates across `local3d`, Kling, Seedance, Hailuo, Wan, Sora, and Runway. |
+| [`avatar_spec.mjs`](scripts/avatar_spec.mjs) | Two-layer Character DNA (`Visual DNA` + `Performance DNA`), `--cast` multi-character locks, optional shared-canvas **Cast Acting Sheet** prompts, `--companion` blocky pets, and [three-view turnaround](assets/showcase/momo_turnaround_sheet.en.png) prompts. |
+| [`drift_check.mjs`](scripts/drift_check.mjs) | 10-gate Unicode-safe linter reporting separate **Geometry Gates (1–8)** and **Acting & Readability Gates (9–10)** (`gazeTarget`, camera-facing prop `interaction`, 9:16 safe zone, and `64×64` PNG thumbnail contrast via `--assets-dir`). |
+| [`render_preview.mjs`](scripts/render_preview.mjs) | Direct local 3D `.mp4` / `.gif` renderer (`--spec <episode.json> --out-dir <dir>`) with 1st-class 2D pupil tracking, asymmetrical brows, Cast Acting Sheets, `256×256` avatar crops, and exact per-shot timing (see [controlled A/B acting study](examples/subway-acting-versus-baseline/)). |
 
 [Avatar geometry and materials](references/avatar-geometry-and-materials.md) · [Classic gear and props](references/classic-roblox-catalog.md) · [Model prompt playbook](references/model-prompt-playbook.md) · [Drift fixes](references/rescue-and-anti-drift.md) · [Pacing and audio](references/short-video-beats-and-audio.md) · [12 story templates](references/viral-archetypes-catalog.md)
 

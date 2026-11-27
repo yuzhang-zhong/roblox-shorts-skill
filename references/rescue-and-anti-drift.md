@@ -42,3 +42,12 @@ When an AI video clip ruins the Roblox aesthetic, the cause is almost always one
 
 - **Blocky Pet / Creature Rule**: When adding pets, dragons, dogs, or monsters, lock `chamfered Roblox SmoothPlastic + Neon geometric primitives, flat 2D dot eyes, stubby clawless rectangular block paws, rigid hinged wing/tail plates (zero reptile scales, zero sharp claws/talons, zero realistic fur or leathery bat wings)`. Use `node scripts/avatar_spec.mjs --companion neon-dragon` to generate a ready-to-use Pet DNA block.
 - **Handheld Prop Docking Rule**: Blocky `1x2x1` arms have no fingers or claws, so never write `pinches`, `wraps fingers`, or `holds between thumb and index`. Always state that the prop (`kettle`, `ramen cup`, `Bloxy Cola`, `Linked Sword`, `flashlight`, `overhead subway strap`) is **docked / welded / parented flush against the flat bottom or front face of the solid `1x2x1` rectangular block hand**.
+
+### Case E: Upgrading Static Labels into Readable Acting (`Gates 9 & 10`)
+
+- **`missing-acting` (Gate 9 · Performance & Interaction Completeness)**: Even when Gates 1–8 (`geometryStatus: PASS`) hold, a shot falls flat if it only states a static role/prop label (`"A witch holding two potions"`). Always specify:
+  1. `beatIntent` & single `audienceRead` (the joke readable without dialogue);
+  2. `performance.gazeTarget` (`pupils tracking ...`) + `reactionCause` + `eyebrows`;
+  3. `interaction` (`hand`, `propId`, controlled `intent` in `hold|present|tap|slam|point|drop|receive`, and `visibility: "camera-facing"`).
+- **`poor-readability` (Gate 10 · Thumbnail & Safe-Zone Readability)**: Keep actor silhouettes separated (`|dx| >= 0.28` or depth-staggered), never park a standing actor in front of `gazeTarget`, keep `chatEn` to `<= 4` words, and pass `--assets-dir <dir>` to verify `64×64` thumbnail/avatar contrast. See [`examples/subway-acting-versus-baseline/`](../examples/subway-acting-versus-baseline/) for a controlled single-variable comparison.
+

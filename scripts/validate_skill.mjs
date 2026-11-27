@@ -125,7 +125,17 @@ const requiredFiles = [
   "examples/burnt-pizza-slapstick/assets/pizza_storyboard_sheet.zh.png",
   "examples/burnt-pizza-slapstick/assets/pizza_storyboard_sheet.en.png",
   "examples/burnt-pizza-slapstick/assets/burnt_pizza_slapstick.gif",
-  "examples/burnt-pizza-slapstick/assets/burnt_pizza_slapstick.mp4"
+  "examples/burnt-pizza-slapstick/assets/burnt_pizza_slapstick.mp4",
+  "examples/subway-acting-versus-baseline/README.md",
+  "examples/subway-acting-versus-baseline/baseline_spec.json",
+  "examples/subway-acting-versus-baseline/acting_rich_spec.json",
+  "examples/subway-acting-versus-baseline/drift_baseline.md",
+  "examples/subway-acting-versus-baseline/drift_acting_rich.md",
+  "examples/subway-acting-versus-baseline/assets/baseline_vs_acting_comparison.en.png",
+  "examples/subway-acting-versus-baseline/assets/baseline_vs_acting_comparison.zh.png",
+  "examples/subway-acting-versus-baseline/assets/acting_rich/cast_acting_sheet.en.png",
+  "examples/subway-acting-versus-baseline/assets/acting_rich/avatars/mo_avatar.png",
+  "examples/subway-acting-versus-baseline/assets/acting_rich/subway_acting_rich.mp4"
 ];
 
 for (const rel of requiredFiles) {

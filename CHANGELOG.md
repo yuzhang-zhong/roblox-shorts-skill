@@ -1,5 +1,12 @@
 # Changelog
 
+## 1.7.0
+
+- Upgraded episode & character schema from appearance-only locks to an executable **Acting & Attention Grammar**: split Character DNA into `visualDNA` + `performanceDNA` (`defaultTemperament`, `signatureGaze`, `signatureGesture`, `conflictReaction`, `actingMoment`), added stable stage/prop IDs, and added structured shot fields (`beatIntent`, `audienceRead`, `actingAnchor`, `performance.gazeTarget` / `reactionCause` / `eyebrows` / `bodyAttitude`, and camera-facing `interaction` with controlled `hold | present | tap | slam | point | drop | receive` intents).
+- Upgraded `scripts/shot_compiler.mjs` and `scripts/avatar_spec.mjs` to prioritize instant-acting cues (`Beat intent -> Gaze & Attention -> Camera-facing Hand-Prop Interaction -> Character DNA -> Single Action & Camera -> Geometry Guard`), added 6 brand-free toy-comedy `ACTING_ANCHORS`, and added optional shared-canvas **Cast Acting Sheet** prompts (`actingSheetPromptEn/Zh`).
+- Upgraded `scripts/render_preview.mjs` and `scripts/compose_boards.ps1` with 1st-class 2D decal pupil tracking (`gazeX`/`gazeY` solved from 3D `gazeTarget` coordinates), asymmetrical eyebrows (`left-up-right-down`, `right-up-left-down`, `furrowed`, `worried`, `raised`), executable arm-prop interaction poses, rendered **Cast Acting Sheets** (`cast_acting_sheet.en.png` / `.zh.png`), and `256x256` **Avatar Crops** (`avatars/<castId>_avatar.png`).
+- Expanded `scripts/drift_check.mjs` from 8 gates to **10 gates** with separate `geometryStatus` (Gates 1–8) and `actingStatus` (Gates 9–10: `Performance & Interaction Completeness` + `Thumbnail & Safe-Zone Readability`, including `64x64` PNG crop contrast checks via `--assets-dir`), plus a single-variable controlled A/B showcase in `examples/subway-acting-versus-baseline/`.
+
 ## 1.6.3
 
 - Fixed installable Skill bundle validation on Windows by normalizing relative paths before comparing file inventories.

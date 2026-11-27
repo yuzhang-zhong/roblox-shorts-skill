@@ -108,10 +108,10 @@ node scripts/drift_check.mjs --pack templates/custom_story_spec.json --engine lo
 | Skill 组件 | 输出 |
 | --- | --- |
 | [`SKILL.md`](skills/roblox-style-video/SKILL.md) | Agent Skill 主入口说明，定义 6 种工作模式（角色设定、分镜、提示词编译、翻车修复、二创、3D 预演）与 8 项几何防变形约束。 |
-| [`shot_compiler.mjs`](scripts/shot_compiler.mjs) | 支持自定义 `--spec <episode.json>` 剧本或 12 套内置模板，生成零重复的 15s / 30s / 45s 竖屏分镜与多引擎提示词（`local3d`、可灵、即梦、海螺、万相、Sora、Runway）。 |
-| [`avatar_spec.mjs`](scripts/avatar_spec.mjs) | 角色设定卡、`BrickColor` 色号、`--cast` 多角色同框锁、`--companion` 方块神宠与首帧[三视图参考卡](assets/showcase/momo_turnaround_sheet.zh.png)。 |
-| [`drift_check.mjs`](scripts/drift_check.mjs) | 8 门中英 Unicode 防跑偏审查器（支持 `--prompt` 与 `--pack` 整包审计），拦截五指、乐高圆粒/钩爪、官方商标、写实鳞爪神宠、R15 面条臂及动作超载。 |
-| [`render_preview.mjs`](scripts/render_preview.mjs) | 本地 3D 视频直出引擎（`--spec <episode.json> --out-dir <dir>`），无需外部平台即可按分镜精确时长合成 H.264 `.mp4`（含复古合成音效）、`.gif` 与分镜表。 |
+| [`shot_compiler.mjs`](scripts/shot_compiler.mjs) | 按表演优先级组织提示词（瞬间动机 -> 瞳孔视线 -> 朝向镜头的手部道具交互 -> 角色双层 DNA -> 单动作运镜 -> 几何负向锁），支持 `--spec <episode.json>` 与 12 套模板。 |
+| [`avatar_spec.mjs`](scripts/avatar_spec.mjs) | 双层角色设定（`Visual DNA` 外观比例 + `Performance DNA` 表演习惯）、`--cast` 同图角色瞬间表演设定板提示词、`--companion` 方块神宠与首帧[三视图参考卡](assets/showcase/momo_turnaround_sheet.zh.png)。 |
+| [`drift_check.mjs`](scripts/drift_check.mjs) | 10 门中英防跑偏与可读性审查器，独立汇报 **几何门（1–8）** 与 **表演可读性门（9–10：视线目标、可见面交互、竖屏安全区与 `--assets-dir` 64×64 缩略图对比度）**。 |
+| [`render_preview.mjs`](scripts/render_preview.mjs) | 本地 3D 视频直出引擎（`--spec <episode.json> --out-dir <dir>`），支持一等公民瞳孔追踪、不对称高低眉、角色表演设定板、256×256 头像裁切图与精确分镜时长合成（含[单变量 A/B 表演对照实验](examples/subway-acting-versus-baseline/)）。 |
 
 [角色比例与材质](references/avatar-geometry-and-materials.md) · [经典道具词库](references/classic-roblox-catalog.md) · [各模型提示词](references/model-prompt-playbook.md) · [跑偏修复](references/rescue-and-anti-drift.md) · [镜头节奏与音效](references/short-video-beats-and-audio.md) · [12 套分镜模板](references/viral-archetypes-catalog.md)
 

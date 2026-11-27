@@ -110,6 +110,66 @@ foreach ($lang in @("zh", "en")) {
 }
 }
 
+# 1b. Cast Acting Reference Sheet (.zh.png and .en.png — Identity + Signature Acting Moment)
+if ($manifest.castActingSheet -and $manifest.castActingSheet.panels.Count -gt 0 -and (Test-Path (Join-Path $rawDir $manifest.castActingSheet.panels[0].file))) {
+  $ca = $manifest.castActingSheet
+  $pCount = $ca.panels.Count
+  $cols = [Math]::Min(4, [Math]::Max(1, $pCount))
+  $rows = [Math]::Ceiling($pCount / [double]$cols)
+  $sheetW = 24 + $cols * 412
+  $sheetH = 20 + $rows * 564
+  $fSubZh = New-Object System.Drawing.Font("Microsoft YaHei UI", 9.0, [System.Drawing.FontStyle]::Regular)
+  $fSubEn = New-Object System.Drawing.Font("Segoe UI", 9.0, [System.Drawing.FontStyle]::Regular)
+  $bSubText = New-Object System.Drawing.SolidBrush((New-Color 71 85 105))
+  $sfCenter = New-Object System.Drawing.StringFormat
+  $sfCenter.Alignment = [System.Drawing.StringAlignment]::Center
+  $sfCenter.LineAlignment = [System.Drawing.StringAlignment]::Near
+
+  foreach ($lang in @("zh", "en")) {
+    $bmp = New-Object System.Drawing.Bitmap([int]$sheetW, [int]$sheetH)
+    $g = [System.Drawing.Graphics]::FromImage($bmp)
+    $g.SmoothingMode = [System.Drawing.Drawing2D.SmoothingMode]::AntiAlias
+    $g.TextRenderingHint = [System.Drawing.Text.TextRenderingHint]::ClearTypeGridFit
+    $g.FillRectangle($bBg, 0, 0, [int]$sheetW, [int]$sheetH)
+
+    $fontTitle = if ($lang -eq "zh") { $fLabelZh } else { $fLabelEn }
+    $fontSub = if ($lang -eq "zh") { $fSubZh } else { $fSubEn }
+
+    for ($i = 0; $i -lt $pCount; $i++) {
+      $pn = $ca.panels[$i]
+      $cIdx = $i % $cols
+      $rIdx = [Math]::Floor($i / [double]$cols)
+      $px = 20 + $cIdx * 412
+      $py = 18 + $rIdx * 548
+      Fill-RoundedRect $g $bCard $px $py 396 534 14
+      Draw-RoundedRect $g $pCardBorder $px $py 396 534 14
+
+      $img = [System.Drawing.Image]::FromFile((Join-Path $rawDir $pn.file))
+      $g.DrawImage($img, ($px + 8), ($py + 8), 380, 460)
+      $img.Dispose()
+
+      $tStr = if ($lang -eq "zh") { $pn.titleZh } else { $pn.titleEn }
+      $mStr = if ($lang -eq "zh") { $pn.momentZh } else { $pn.momentEn }
+      $tsz = $g.MeasureString($tStr, $fontTitle)
+      $g.DrawString($tStr, $fontTitle, $bDarkText, ($px + (396 - $tsz.Width) / 2), ($py + 471))
+      $subRect = New-Object System.Drawing.RectangleF(($px + 14), ($py + 495), 368, 36)
+      $g.DrawString($mStr, $fontSub, $bSubText, $subRect, $sfCenter)
+    }
+
+    $outPath = if ($lang -eq "zh") { $ca.outZh } else { $ca.outEn }
+    $bmp.Save($outPath, [System.Drawing.Imaging.ImageFormat]::Png)
+    if ($lang -eq "en" -and $ca.outDefault) {
+      $bmp.Save($ca.outDefault, [System.Drawing.Imaging.ImageFormat]::Png)
+    }
+    $g.Dispose()
+    $bmp.Dispose()
+  }
+  $sfCenter.Dispose()
+  $fSubZh.Dispose()
+  $fSubEn.Dispose()
+  $bSubText.Dispose()
+}
+
 # 2. Clean 4-Way Anti-Drift Comparison (.zh.png and .en.png)
 $dInfo = $manifest.drift
 if (Test-Path (Join-Path $rawDir $dInfo.panels[0].file)) {
