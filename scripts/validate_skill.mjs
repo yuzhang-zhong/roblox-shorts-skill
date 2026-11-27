@@ -7,7 +7,7 @@
 import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
-import { BUNDLE_FILES } from "./sync_skill_bundle.mjs";
+import { BUNDLE_FILES, normalizeRelativePath } from "./sync_skill_bundle.mjs";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(__dirname, "..");
@@ -222,7 +222,7 @@ for (const rf of readmeFiles) {
 function collectBundleFiles(directory, relativeRoot = "") {
   const files = [];
   for (const entry of fs.readdirSync(directory, { withFileTypes: true })) {
-    const relativePath = path.join(relativeRoot, entry.name);
+    const relativePath = normalizeRelativePath(path.join(relativeRoot, entry.name));
     const absolutePath = path.join(directory, entry.name);
     if (entry.isDirectory()) {
       files.push(...collectBundleFiles(absolutePath, relativePath));

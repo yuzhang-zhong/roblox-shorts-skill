@@ -11,6 +11,7 @@ import { compileStoryboard, formatStoryboardMarkdown } from "../scripts/shot_com
 import { inspectPrompt, inspectPackageFile, formatDriftCheckMarkdown } from "../scripts/drift_check.mjs";
 import { computeEpisodeTimingPlan, buildEpisodeWavBuffer } from "../scripts/render_preview.mjs";
 import { auditLocalDiscovery } from "../scripts/discovery_audit.mjs";
+import { normalizeRelativePath } from "../scripts/sync_skill_bundle.mjs";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(__dirname, "..");
@@ -187,6 +188,7 @@ test("discovery audit covers fixed multilingual query intents and install surfac
   assert.equal(report.expectedSkill, "roblox-style-video");
   assert.ok(report.checks.length >= 10);
   assert.equal(report.passed, true, JSON.stringify(report.checks.filter((check) => !check.passed)));
+  assert.equal(normalizeRelativePath("agents\\openai.yaml"), "agents/openai.yaml");
 });
 
 test("render_preview produces a valid PNG from the documented custom episode spec without ffmpeg", { timeout: 60_000 }, () => {
@@ -220,5 +222,5 @@ test("validate_skill CLI verifies repository files, versions, and manifests", ()
     cwd: ROOT,
     encoding: "utf8"
   });
-  assert.match(out, /roblox-style-video v1\.6\.2 package is valid/);
+  assert.match(out, /roblox-style-video v1\.6\.3 package is valid/);
 });

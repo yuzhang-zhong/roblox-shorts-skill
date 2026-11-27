@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.6.3
+
+- Fixed installable Skill bundle validation on Windows by normalizing relative paths before comparing file inventories.
+- Added a regression assertion for Windows-style separators and retained the Linux/Windows Node 18/22 CI matrix.
+
 ## 1.6.2
 
 - Added a fixed multilingual discovery query set and `scripts/discovery_audit.mjs` for deterministic local preflight plus optional live `gh skill search` verification.

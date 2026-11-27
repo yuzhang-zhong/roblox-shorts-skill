@@ -6,7 +6,7 @@ description: |
   中文触发词包括 Roblox 视频生成、方块人短视频、R6/R15 动画、竖屏剧情、角色一致性与 AI 视频防串味。
 license: MIT
 metadata:
-  version: "1.6.2"
+  version: "1.6.3"
 ---
 
 # Roblox Style Video Skill
