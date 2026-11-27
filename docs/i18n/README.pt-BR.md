@@ -63,7 +63,7 @@ Folhas de contato de quatro tomadas em seis gêneros clássicos, combinando troc
 Instale com o comando oficial de Skills do GitHub. O pacote autossuficiente fica em [`skills/roblox-style-video/`](../../skills/roblox-style-video/) e a entrada é [`SKILL.md`](../../skills/roblox-style-video/SKILL.md).
 
 ```bash
-gh skill install yuzhang-zhong/roblox-style-video roblox-style-video
+gh skill install yuzhang-zhong/roblox-style-video roblox-style-video@v1.7.0
 ```
 
 Acione o skill `roblox-style-video` no chat do seu agente:

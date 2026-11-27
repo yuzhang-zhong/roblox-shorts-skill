@@ -15,7 +15,7 @@
 
 ## Quick Install & Verification
 ```bash
-gh skill install yuzhang-zhong/roblox-style-video roblox-style-video
+gh skill install yuzhang-zhong/roblox-style-video roblox-style-video@v1.7.0
 npx skills add https://github.com/yuzhang-zhong/roblox-style-video --skill roblox-style-video
 npm run validate && npm run test:discovery && npm test
 ```

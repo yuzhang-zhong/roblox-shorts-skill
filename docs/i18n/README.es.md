@@ -63,7 +63,7 @@ Hojas de contacto de cuatro planos en seis géneros clásicos, combinando cambio
 Instálalo con el comando oficial de Skills de GitHub. El paquete independiente está en [`skills/roblox-style-video/`](../../skills/roblox-style-video/) y su entrada es [`SKILL.md`](../../skills/roblox-style-video/SKILL.md).
 
 ```bash
-gh skill install yuzhang-zhong/roblox-style-video roblox-style-video
+gh skill install yuzhang-zhong/roblox-style-video roblox-style-video@v1.7.0
 ```
 
 Invoca el skill `roblox-style-video` en el chat de tu agente:

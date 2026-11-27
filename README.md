@@ -9,13 +9,45 @@ An installable Agent Skill for **Roblox video generation** in Claude Code, Curso
 [![Node.js 18+ for the CLI](https://img.shields.io/badge/Node.js-18%2B-268354?style=flat-square)](#skill-workflow-and-quick-start)
 [![MIT license](https://img.shields.io/badge/License-MIT-2563eb?style=flat-square)](LICENSE)
 
-**[Install](#install-as-an-agent-skill)** · [Video examples](#video-examples) · [Scene boards](#scene-boards-and-shot-pacing) · [Skill guide](skills/roblox-style-video/SKILL.md)
+**[See the subway comparison](#subway-acting-comparison)** · [Install v1.7.0](#install-as-an-agent-skill) · [Video examples](#video-examples) · [Skill guide](skills/roblox-style-video/SKILL.md)
 
 **English** · [简体中文](README.zh-CN.md) · [繁體中文](docs/i18n/README.zh-TW.md) · [日本語](docs/i18n/README.ja.md) · [한국어](docs/i18n/README.ko.md) · [Español](docs/i18n/README.es.md) · [Français](docs/i18n/README.fr.md) · [Deutsch](docs/i18n/README.de.md) · [Português](docs/i18n/README.pt-BR.md) · [Русский](docs/i18n/README.ru.md)
 
 </div>
 
-> **Quick answer:** `roblox-style-video` is a coding-agent Skill for generating Roblox-style 9:16 short videos **without Roblox Studio**, manual keyframing, or paid API keys. It directly renders local MP4/GIF animatics, 2D pupil-tracked Cast Acting Sheets, character turnaround sheets, 4-shot storyboards, model-specific Kling/Seedance/Hailuo/Wan/Sora/Runway prompts, and 10-gate anti-drift checks (stopping five fingers on blocky hands, Lego claws/studs, and deadpan eyes).
+The local renderer needs no Roblox Studio, manual keyframing, or video-model API key. It runs on Node.js 18+ and uses `ffmpeg` to package MP4/GIF previews.
+
+<a name="subway-acting-comparison"></a>
+
+## One subway scene, rendered twice
+
+Both local animatics use the same cast, set, camera and timing. In the acting version, Mo looks from the empty seat to Noob, raises a brow and points to the seat.
+
+[Geometry-only baseline (MP4)](examples/subway-acting-versus-baseline/assets/baseline/subway_baseline.mp4) · [Acting version (MP4)](examples/subway-acting-versus-baseline/assets/acting_rich/subway_acting_rich.mp4) · [Comparison sheet and inputs](examples/subway-acting-versus-baseline/README.md)
+
+## Install as an Agent Skill
+
+Use the [v1.7.0 Git tag](https://github.com/yuzhang-zhong/roblox-style-video/tree/v1.7.0) for the acting workflow shown above. The version pin avoids resolving to an older published GitHub Release.
+
+```bash
+gh skill install yuzhang-zhong/roblox-style-video roblox-style-video@v1.7.0
+```
+
+If your host has no installer, copy the entire [tagged Skill directory](https://github.com/yuzhang-zhong/roblox-style-video/tree/v1.7.0/skills/roblox-style-video) into its Skills folder. Keep `SKILL.md`, `scripts/`, `references/`, `templates/`, and `assets/` together.
+
+To install from the repository's default branch with the cross-agent Skills CLI instead:
+
+```bash
+npx skills add https://github.com/yuzhang-zhong/roblox-style-video --skill roblox-style-video
+```
+
+Try this in your agent chat:
+
+```text
+Use $roblox-style-video to generate a 15-second 9:16 short set in a dim hotel corridor (doors-horror):
+an R6 avatar in a blue hoodie sweeps a flashlight past Door 050 when the lights flicker.
+Produce the local MP4/GIF animatic, character geometry lock, 4-shot storyboard, and optional Sora / Kling I2V prompts.
+```
 
 <a name="examples-and-local-3d-previews"></a>
 
@@ -63,30 +95,6 @@ Four-shot contact sheets across six game genres, pairing camera angle changes wi
   <img src="docs/pipeline.en.svg" width="860" alt="Five-step Roblox Style Video Skill workflow: Lock Avatar DNA, 3D Animatic and I2V, 9:16 Storyboard, Engine Prompts, and Anti-Drift Lint" />
 </p>
 
-### Install as an Agent Skill
-
-Install from GitHub with the official Skill command:
-
-```bash
-gh skill install yuzhang-zhong/roblox-style-video roblox-style-video
-```
-
-Or install through the cross-agent Skills CLI:
-
-```bash
-npx skills add https://github.com/yuzhang-zhong/roblox-style-video --skill roblox-style-video
-```
-
-The installer uses the self-contained package at [`skills/roblox-style-video/`](skills/roblox-style-video/). For hosts without either installer, copy that directory into the host's Skills folder, keeping its `SKILL.md`, `scripts/`, `references/`, `templates/`, and `assets/` together.
-
-Trigger the `roblox-style-video` skill in your agent chat:
-
-```text
-Use $roblox-style-video to generate a 15-second 9:16 short set in a dim hotel corridor (doors-horror):
-an R6 avatar in a blue hoodie sweeps a flashlight past Door 050 when the lights flicker.
-Produce the local MP4/GIF animatic, character geometry lock, 4-shot storyboard, and optional Sora / Kling I2V prompts.
-```
-
 ### Run the skill's CLI tools directly
 
 Every helper script bundled inside the skill also runs standalone from the repository root on Node.js 18+ using only the standard library (no `npm install` or API keys).
@@ -126,8 +134,8 @@ Generic video prompts often produce human fingers, circular Lego floor/head stud
 
 | Check | Current evidence | Last verified |
 | --- | --- | --- |
-| Package validation and tests | `npm run validate` and 8/8 Node tests pass, including a real PNG render smoke test | 2026-11-27 |
-| Standard GitHub Skill package | `gh skill publish --dry-run`, remote preview, and pinned `@v1.6.1` installation passed | 2026-11-27 |
+| Package validation and tests | `npm run validate` and 9/9 Node tests on `v1.7.0` pass, including a PNG render smoke test | 2026-11-27 |
+| Standard GitHub Skill package | The `v1.7.0` bundle was installed from a Git archive with `gh skill install --from-local`. Remote installation of `v1.7.0` was not verified in that run. | 2026-11-27 |
 | Linux and Windows compatibility | CI matrix covers Node 18 and 22 after this release | Each push and pull request |
 | Agent UI recommendation | Manual query protocol is provided; no automated pass is claimed until results are recorded | Per release |
 | Web-model discovery | Monthly measurement is defined; search placement is not yet inferred from local metadata tests | Monthly / after placement changes |

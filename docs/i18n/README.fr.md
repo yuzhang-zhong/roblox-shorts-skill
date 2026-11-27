@@ -63,7 +63,7 @@ Planches contacts de quatre plans sur six genres de jeux, associant changements 
 Installez-le avec la commande officielle GitHub Skills. Le paquet autonome se trouve dans [`skills/roblox-style-video/`](../../skills/roblox-style-video/) et son entrée est [`SKILL.md`](../../skills/roblox-style-video/SKILL.md).
 
 ```bash
-gh skill install yuzhang-zhong/roblox-style-video roblox-style-video
+gh skill install yuzhang-zhong/roblox-style-video roblox-style-video@v1.7.0
 ```
 
 Appelez le skill `roblox-style-video` dans la conversation de votre agent :

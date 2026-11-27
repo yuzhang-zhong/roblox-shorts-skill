@@ -2,20 +2,52 @@
 
 # Roblox Style Video Skill
 
-一套面向 Claude Code、Cursor、GitHub Copilot 与 Codex 的可安装 **Agent Skill**：围绕 **Roblox 视频生成**，锁住 R6/R15 方块角色一致性，制作 9:16 竖屏分镜，在本地直接输出 MP4/GIF 动态成片，并可按需编译可灵、即梦、海螺、万相、Sora 或 Runway 的图生/文生视频提示词。
+一套面向 Claude Code、Cursor、GitHub Copilot 与 Codex 的 **Roblox 视频生成 Agent Skill**。从故事生成 R6/R15 方块角色、9:16 分镜和本地 MP4/GIF 动态预演，也可编译可灵、即梦、海螺、万相、Sora 或 Runway 的图生/文生视频提示词。
 
 [![Agent Skill](https://img.shields.io/badge/Agent_Skill-SKILL.md-0f172a?style=flat-square)](skills/roblox-style-video/SKILL.md)
 [![Skill validation](https://github.com/yuzhang-zhong/roblox-style-video/actions/workflows/skill-validation.yml/badge.svg)](https://github.com/yuzhang-zhong/roblox-style-video/actions/workflows/skill-validation.yml)
 [![命令行需要 Node.js 18+](https://img.shields.io/badge/Node.js-18%2B-268354?style=flat-square)](#skill-工作流与安装使用)
 [![MIT 许可证](https://img.shields.io/badge/License-MIT-2563eb?style=flat-square)](LICENSE)
 
-**[安装](#作为-agent-skill-安装调用)** · [短片示例](#短片示例) · [分镜与场景图](#分镜拆解与多题材场景表) · [Skill 指南](skills/roblox-style-video/SKILL.md)
+**[看地铁片段对比](#subway-acting-comparison)** · [安装 v1.7.0](#作为-agent-skill-安装调用) · [短片示例](#短片示例) · [Skill 指南](skills/roblox-style-video/SKILL.md)
 
 [English](README.md) · **简体中文** · [繁體中文](docs/i18n/README.zh-TW.md) · [日本語](docs/i18n/README.ja.md) · [한국어](docs/i18n/README.ko.md) · [Español](docs/i18n/README.es.md) · [Français](docs/i18n/README.fr.md) · [Deutsch](docs/i18n/README.de.md) · [Português](docs/i18n/README.pt-BR.md) · [Русский](docs/i18n/README.ru.md)
 
 </div>
 
-> **一句话结论：** `roblox-style-video` 是面向 Roblox 风格 9:16 短视频的 Agent Skill，不只是提示词合集。它可以直接在本地生成 MP4/GIF 动态预演、角色三视图、分镜图、角色防串味报告和可选的多模型视频提示词，不需要视频平台账号或 API Key。
+本地渲染不需要 Roblox Studio、手动打关键帧或视频模型 API Key。命令行需要 Node.js 18+，打包 MP4/GIF 需要 `ffmpeg`。
+
+<a name="subway-acting-comparison"></a>
+
+## 同一个地铁场景，两种表演
+
+两段本地预演使用相同的角色、场景、机位和时长。表演版里，Mo 先看空座再看 Noob，挑起一侧眉毛，抬手指向座位。
+
+[只锁定几何比例的基线（MP4）](examples/subway-acting-versus-baseline/assets/baseline/subway_baseline.mp4) · [加入表演的版本（MP4）](examples/subway-acting-versus-baseline/assets/acting_rich/subway_acting_rich.mp4) · [中文对比图](examples/subway-acting-versus-baseline/assets/baseline_vs_acting_comparison.zh.png) · [示例输入](examples/subway-acting-versus-baseline/README.md)
+
+## 作为 Agent Skill 安装调用
+
+复现上方片段的表演流程，请指定 [v1.7.0 Git 标签](https://github.com/yuzhang-zhong/roblox-style-video/tree/v1.7.0)，避免安装命令选到更早的 GitHub Release。
+
+```bash
+gh skill install yuzhang-zhong/roblox-style-video roblox-style-video@v1.7.0
+```
+
+宿主没有安装器时，可以把[该标签的完整 Skill 目录](https://github.com/yuzhang-zhong/roblox-style-video/tree/v1.7.0/skills/roblox-style-video)复制到宿主的 Skills 文件夹。保留 `SKILL.md`、`scripts/`、`references/`、`templates/` 与 `assets/`。
+
+如果想用跨 Agent 的 Skills CLI 从默认分支安装：
+
+```bash
+npx skills add https://github.com/yuzhang-zhong/roblox-style-video --skill roblox-style-video
+```
+
+在 Agent 对话中试一下：
+
+```text
+使用 $roblox-style-video 生成一支 15 秒 9:16 竖屏短片，场景用惊悚酒店走廊（doors-horror）：
+穿蓝卫衣的 R6 小人举着手电筒走过 050 号木门时壁灯突然闪烁，身后出现白眼，最后躲进木衣柜。
+请直接输出本地 MP4/GIF、角色比例锁、4 镜头分镜表，以及可选的可灵 / Sora 图生视频提示词。
+```
 
 <a name="示例与本地-3d-预览"></a>
 
@@ -63,30 +95,6 @@
   <img src="docs/pipeline.zh.svg" width="860" alt="Roblox Style Video Skill 五步工作流：锁定角色比例、三视图与本地预演、9:16 竖屏分镜、多模型提示词、防串味检查" />
 </p>
 
-### 作为 Agent Skill 安装调用
-
-推荐使用 GitHub 官方 Skill 命令安装：
-
-```bash
-gh skill install yuzhang-zhong/roblox-style-video roblox-style-video
-```
-
-也可以使用跨 Agent 的 Skills CLI：
-
-```bash
-npx skills add https://github.com/yuzhang-zhong/roblox-style-video --skill roblox-style-video
-```
-
-安装器会读取自包含的 [`skills/roblox-style-video/`](skills/roblox-style-video/) 目录。如果宿主暂不支持安装器，请把整个目录复制到宿主的 Skills 文件夹，保留其中的 `SKILL.md`、`scripts/`、`references/`、`templates/` 与 `assets/`。
-
-在 Agent 对话中直接调用 `roblox-style-video` Skill：
-
-```text
-使用 $roblox-style-video 生成一支 15 秒 9:16 竖屏短片，场景用惊悚酒店走廊（doors-horror）：
-穿蓝卫衣的 R6 小人举着手电筒走过 050 号木门时壁灯突然闪烁，身后出现白眼，最后躲进木衣柜。
-请直接输出本地 MP4/GIF、角色比例锁、4 镜头分镜表，以及可选的可灵 / Sora 图生视频提示词。
-```
-
 ### 直接运行 Skill 内置命令行脚本
 
 Skill 内附的四支脚本也可在普通克隆的仓库根目录独立运行，基于 Node.js 18+ 标准库，无需 `npm install` 或 API Key。
@@ -126,8 +134,8 @@ node scripts/drift_check.mjs --pack templates/custom_story_spec.json --engine lo
 
 | 检查项 | 当前证据 | 最近验证 |
 | --- | --- | --- |
-| 包结构与测试 | `npm run validate` 与 8/8 项 Node 测试通过，包含一次真实 PNG 渲染冒烟测试 | 2026-11-27 |
-| GitHub 标准 Skill 安装 | `gh skill publish --dry-run`、远端预览及固定 `@v1.6.1` 安装通过 | 2026-11-27 |
+| 包结构与测试 | `v1.7.0` 的 `npm run validate` 与 9/9 项 Node 测试通过，含 PNG 渲染冒烟测试 | 2026-11-27 |
+| GitHub 标准 Skill 包 | 从 `v1.7.0` 标签导出后，`gh skill install --from-local` 安装通过。本次未验证 `v1.7.0` 远端安装。 | 2026-11-27 |
 | Linux / Windows 兼容 | CI 将在 Node 18 与 Node 22 上分别验证 | 每次 push / pull request |
 | Agent UI 推荐结果 | 已提供固定查询手工协议；没有记录结果前不宣称通过 | 每次发布 |
 | 网页模型可发现性 | 月度测量流程已定义；不会用本地元数据测试推断真实搜索排名 | 每月 / 外部收录变化后 |

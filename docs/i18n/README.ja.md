@@ -63,7 +63,7 @@ AI コーディングエージェントから呼び出すと、アイデアを 1
 GitHub の公式 Skill コマンドでインストールできます。自己完結型パッケージは [`skills/roblox-style-video/`](../../skills/roblox-style-video/) にあり、エントリポイントは [`SKILL.md`](../../skills/roblox-style-video/SKILL.md) です。
 
 ```bash
-gh skill install yuzhang-zhong/roblox-style-video roblox-style-video
+gh skill install yuzhang-zhong/roblox-style-video roblox-style-video@v1.7.0
 ```
 
 チャットから `roblox-style-video` スキルを呼び出します：

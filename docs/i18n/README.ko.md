@@ -63,7 +63,7 @@ AI 코딩 에이전트에서 이 Skill을 호출하면, 숏폼 아이디어를 1
 GitHub 공식 Skill 명령으로 설치할 수 있습니다. 독립 패키지는 [`skills/roblox-style-video/`](../../skills/roblox-style-video/)에 있고, 진입점은 [`SKILL.md`](../../skills/roblox-style-video/SKILL.md)입니다.
 
 ```bash
-gh skill install yuzhang-zhong/roblox-style-video roblox-style-video
+gh skill install yuzhang-zhong/roblox-style-video roblox-style-video@v1.7.0
 ```
 
 에이전트 채팅에서 `roblox-style-video` 스킬을 호출합니다:

@@ -63,7 +63,7 @@
 使用 GitHub 官方 Skill 命令安裝，自包含套件位於 [`skills/roblox-style-video/`](../../skills/roblox-style-video/)，入口為 [`SKILL.md`](../../skills/roblox-style-video/SKILL.md)。
 
 ```bash
-gh skill install yuzhang-zhong/roblox-style-video roblox-style-video
+gh skill install yuzhang-zhong/roblox-style-video roblox-style-video@v1.7.0
 ```
 
 在 Agent 對話中呼叫 `roblox-style-video` Skill：

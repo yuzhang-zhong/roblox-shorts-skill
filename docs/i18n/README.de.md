@@ -63,7 +63,7 @@ Vier-Shot-Kontaktbögen über sechs Spielgenres hinweg mit Perspektivwechseln un
 Installieren Sie den Skill mit dem offiziellen GitHub-Skill-Befehl. Das eigenständige Paket liegt unter [`skills/roblox-style-video/`](../../skills/roblox-style-video/), der Einstieg ist [`SKILL.md`](../../skills/roblox-style-video/SKILL.md).
 
 ```bash
-gh skill install yuzhang-zhong/roblox-style-video roblox-style-video
+gh skill install yuzhang-zhong/roblox-style-video roblox-style-video@v1.7.0
 ```
 
 Rufen Sie den Skill `roblox-style-video` im Agent-Chat auf:

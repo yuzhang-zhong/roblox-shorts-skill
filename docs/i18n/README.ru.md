@@ -63,7 +63,7 @@
 Установите Skill официальной командой GitHub. Самодостаточный пакет находится в [`skills/roblox-style-video/`](../../skills/roblox-style-video/), а точка входа — [`SKILL.md`](../../skills/roblox-style-video/SKILL.md).
 
 ```bash
-gh skill install yuzhang-zhong/roblox-style-video roblox-style-video
+gh skill install yuzhang-zhong/roblox-style-video roblox-style-video@v1.7.0
 ```
 
 Вызовите skill `roblox-style-video` в чате агента:
