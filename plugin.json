@@ -1,0 +1,27 @@
+{
+  "$schema": "https://agent-plugins.org/schemas/1.0.0/plugin.schema.json",
+  "name": "roblox-style-video",
+  "description": "Roblox video generation for R6/R15 blocky avatars: generate 9:16 shorts, storyboards, offline MP4/GIF animatics, I2V/T2V prompts, and anti-drift checks.",
+  "version": "1.7.0",
+  "author": {
+    "name": "Yuzhang Zhong",
+    "url": "https://github.com/yuzhang-zhong"
+  },
+  "homepage": "https://github.com/yuzhang-zhong/roblox-style-video",
+  "repository": "https://github.com/yuzhang-zhong/roblox-style-video",
+  "license": "MIT",
+  "keywords": [
+    "roblox",
+    "roblox-video",
+    "ai-video",
+    "video-generation",
+    "r6",
+    "r15",
+    "short-video",
+    "storyboard",
+    "machinima",
+    "kling",
+    "seedance",
+    "sora"
+  ]
+}
