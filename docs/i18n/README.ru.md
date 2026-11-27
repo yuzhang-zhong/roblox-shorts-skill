@@ -4,11 +4,11 @@
 
 **Agent Skill** (`SKILL.md` + справочные руководства + автономные CLI-инструменты без зависимостей) для Claude Code, Cursor, GitHub Copilot и Codex: фиксация пропорций R6, раскадровка вертикальных `9:16` роликов в блочном стиле Roblox, компиляция покадровых промптов и локальный 3D-предпросмотр.
 
-[![Agent Skill](https://img.shields.io/badge/Agent_Skill-SKILL.md-0f172a?style=flat-square)](../../SKILL.md)
+[![Agent Skill](https://img.shields.io/badge/Agent_Skill-SKILL.md-0f172a?style=flat-square)](../../skills/roblox-style-video/SKILL.md)
 [![Node.js 18+ для CLI](https://img.shields.io/badge/Node.js-18%2B-268354?style=flat-square)](#рабочий-процесс-skill-и-быстрый-старт)
 [![Лицензия MIT](https://img.shields.io/badge/License-MIT-2563eb?style=flat-square)](../../LICENSE)
 
-**[Видеопримеры](#видеопримеры)** · [Сцены и ритм кадров](#раскадровки-сцен-и-ритм-монтажа) · [Рабочий процесс и старт](#рабочий-процесс-skill-и-быстрый-старт) · [Руководство Skill](../../SKILL.md)
+**[Видеопримеры](#видеопримеры)** · [Сцены и ритм кадров](#раскадровки-сцен-и-ритм-монтажа) · [Рабочий процесс и старт](#рабочий-процесс-skill-и-быстрый-старт) · [Руководство Skill](../../skills/roblox-style-video/SKILL.md)
 
 [English](../../README.md) · [简体中文](../../README.zh-CN.md) · [繁體中文](README.zh-TW.md) · [日本語](README.ja.md) · [한국어](README.ko.md) · [Español](README.es.md) · [Français](README.fr.md) · [Deutsch](README.de.md) · [Português](README.pt-BR.md) · **Русский**
 
@@ -60,10 +60,10 @@
 
 ### Установка в качестве Agent Skill
 
-Склонируйте репозиторий в каталог skills вашего агента. После установки агент читает [`SKILL.md`](../../SKILL.md), подгружает справочники из [`references/`](../../references/) и автоматически запускает скрипты Node.js. Указанный ниже путь предназначен для Codex; для GitHub Copilot используйте `~/.copilot/skills/roblox-style-video`, а для Claude Code и Cursor — настроенную папку skills.
+Установите Skill официальной командой GitHub. Самодостаточный пакет находится в [`skills/roblox-style-video/`](../../skills/roblox-style-video/), а точка входа — [`SKILL.md`](../../skills/roblox-style-video/SKILL.md).
 
 ```bash
-git clone https://github.com/yuzhang-zhong/roblox-style-video.git ~/.codex/skills/roblox-style-video
+gh skill install yuzhang-zhong/roblox-style-video roblox-style-video
 ```
 
 Вызовите skill `roblox-style-video` в чате агента:
@@ -94,7 +94,7 @@ node scripts/render_preview.mjs --only tornado,chase,doors
 
 | Компонент Skill | Результат |
 | --- | --- |
-| [`SKILL.md`](../../SKILL.md) | Главная точка входа Agent Skill: описывает 6 режимов работы (`Avatar`, `Storyboard`, `Prompt-Compile`, `Rescue`, `Remix`, `Render`) и 8 геометрических инвариантов. |
+| [`SKILL.md`](../../skills/roblox-style-video/SKILL.md) | Главная точка входа Agent Skill: описывает 6 режимов работы (`Avatar`, `Storyboard`, `Prompt-Compile`, `Rescue`, `Remix`, `Render`) и 8 геометрических инвариантов. |
 | [`shot_compiler.mjs`](../../scripts/shot_compiler.mjs) | Раскадровка `9:16` и I2V/T2V-промпты по 12 шаблонам историй для Kling, Seedance, Hailuo, Wan, Sora и Runway. |
 | [`avatar_spec.mjs`](../../scripts/avatar_spec.mjs) | Карта ДНК персонажа с кодами `BrickColor`, фиксацией пропорций и промптом для [листа разворота в трёх ракурсах](../../assets/showcase/momo_turnaround_sheet.en.png). |
 | [`drift_check.mjs`](../../scripts/drift_check.mjs) | Диагностический отчёт и исправленный промпт при риске появления пальцев, деталей Lego, логотипов брендов или перегрузки действиями. |

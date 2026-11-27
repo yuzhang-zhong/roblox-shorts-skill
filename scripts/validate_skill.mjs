@@ -7,6 +7,7 @@
 import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
+import { BUNDLE_FILES } from "./sync_skill_bundle.mjs";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(__dirname, "..");
@@ -25,7 +26,7 @@ function readUtf8(relPath) {
 }
 
 const requiredFiles = [
-  "SKILL.md",
+  "skills/roblox-style-video/SKILL.md",
   "README.md",
   "README.zh-CN.md",
   "docs/i18n/README.zh-TW.md",
@@ -61,6 +62,7 @@ const requiredFiles = [
   "scripts/shot_compiler.mjs",
   "scripts/drift_check.mjs",
   "scripts/render_preview.mjs",
+  "scripts/sync_skill_bundle.mjs",
   "assets/showcase/momo_turnaround_sheet.zh.png",
   "assets/showcase/momo_turnaround_sheet.en.png",
   "assets/showcase/drift_rescue_comparison.zh.png",
@@ -126,7 +128,7 @@ for (const rel of requiredFiles) {
   readUtf8(rel);
 }
 
-const skillText = readUtf8("SKILL.md");
+const skillText = readUtf8("skills/roblox-style-video/SKILL.md");
 const fmMatch = skillText.match(/^---\r?\n([\s\S]*?)\r?\n---\r?\n/);
 if (!fmMatch) {
   fail("SKILL.md must begin with YAML frontmatter");
@@ -165,7 +167,7 @@ if (versions.size !== 1) {
 }
 
 const firstSentence =
-  "Agent Skill to generate Roblox-style R6 and blocky avatar 9:16 short videos with locked proportions, storyboards, and model-specific prompts.";
+  "Roblox video generation for R6/R15 blocky avatars: generate 9:16 shorts, storyboards, offline MP4/GIF animatics, I2V/T2V prompts, and anti-drift checks.";
 for (const [label, desc] of [
   ["package.json", pkg.description],
   [".claude-plugin/plugin.json", claudePlugin.description],
@@ -175,6 +177,14 @@ for (const [label, desc] of [
   if (desc !== firstSentence) {
     fail(`Description mismatch in ${label}: ${desc}`);
   }
+}
+
+if (!fm.includes(firstSentence)) {
+  fail("SKILL.md description must start with the canonical package description");
+}
+
+if (JSON.parse(readUtf8("assets/library/catalog.json")).version !== skillVersion) {
+  fail("assets/library/catalog.json version must match the Skill version");
 }
 
 const iconSvg = readUtf8("assets/icon.svg");
@@ -202,6 +212,43 @@ for (const rf of readmeFiles) {
   }
   if (txt.split(/\r?\n/).length < 95) {
     fail(`Incomplete README detected in ${rf}`);
+  }
+}
+
+function collectBundleFiles(directory, relativeRoot = "") {
+  const files = [];
+  for (const entry of fs.readdirSync(directory, { withFileTypes: true })) {
+    const relativePath = path.join(relativeRoot, entry.name);
+    const absolutePath = path.join(directory, entry.name);
+    if (entry.isDirectory()) {
+      files.push(...collectBundleFiles(absolutePath, relativePath));
+    } else if (entry.isFile()) {
+      files.push(relativePath);
+    }
+  }
+  return files;
+}
+
+const bundleRoot = path.join(ROOT, "skills", "roblox-style-video");
+if (!fs.existsSync(bundleRoot)) {
+  fail("Missing installable Skill package: skills/roblox-style-video");
+}
+
+const expectedBundleFiles = new Set(BUNDLE_FILES);
+for (const relativePath of collectBundleFiles(bundleRoot)) {
+  if (!expectedBundleFiles.has(relativePath)) {
+    fail(`Unexpected file in installable Skill package: ${relativePath}`);
+  }
+}
+
+for (const relativePath of BUNDLE_FILES) {
+  const source = path.join(ROOT, relativePath);
+  const bundled = path.join(bundleRoot, relativePath);
+  if (!fs.existsSync(bundled)) {
+    fail(`Missing bundled file: skills/roblox-style-video/${relativePath}`);
+  }
+  if (relativePath !== "SKILL.md" && !fs.readFileSync(source).equals(fs.readFileSync(bundled))) {
+    fail(`Installable Skill package is stale: run npm run sync:skill (${relativePath})`);
   }
 }
 

@@ -2,17 +2,19 @@
 
 # Roblox Style Video Skill
 
-一套面向 Claude Code、Cursor、GitHub Copilot 与 Codex 的 **Agent Skill**（`SKILL.md` + 领域词库 + 零依赖命令行脚本）：锁住 R6 方块比例，拆解 9:16 竖屏四镜分镜，逐镜编译视频生成提示词，并在本地离线预演动态成片。
+一套面向 Claude Code、Cursor、GitHub Copilot 与 Codex 的可安装 **Agent Skill**：围绕 **Roblox 视频生成**，锁住 R6/R15 方块角色一致性，制作 9:16 竖屏分镜，在本地直接输出 MP4/GIF 动态成片，并可按需编译可灵、即梦、海螺、万相、Sora 或 Runway 的图生/文生视频提示词。
 
-[![Agent Skill](https://img.shields.io/badge/Agent_Skill-SKILL.md-0f172a?style=flat-square)](SKILL.md)
+[![Agent Skill](https://img.shields.io/badge/Agent_Skill-SKILL.md-0f172a?style=flat-square)](skills/roblox-style-video/SKILL.md)
 [![命令行需要 Node.js 18+](https://img.shields.io/badge/Node.js-18%2B-268354?style=flat-square)](#skill-工作流与安装使用)
 [![MIT 许可证](https://img.shields.io/badge/License-MIT-2563eb?style=flat-square)](LICENSE)
 
-**[短片示例](#短片示例)** · [分镜与场景图](#分镜拆解与多题材场景表) · [Skill 工作流与安装](#skill-工作流与安装使用) · [Skill 指南](SKILL.md)
+**[安装](#作为-agent-skill-安装调用)** · [短片示例](#短片示例) · [分镜与场景图](#分镜拆解与多题材场景表) · [Skill 指南](skills/roblox-style-video/SKILL.md)
 
 [English](README.md) · **简体中文** · [繁體中文](docs/i18n/README.zh-TW.md) · [日本語](docs/i18n/README.ja.md) · [한국어](docs/i18n/README.ko.md) · [Español](docs/i18n/README.es.md) · [Français](docs/i18n/README.fr.md) · [Deutsch](docs/i18n/README.de.md) · [Português](docs/i18n/README.pt-BR.md) · [Русский](docs/i18n/README.ru.md)
 
 </div>
+
+> **一句话结论：** `roblox-style-video` 是面向 Roblox 风格 9:16 短视频的 Agent Skill，不只是提示词合集。它可以直接在本地生成 MP4/GIF 动态预演、角色三视图、分镜图、角色防串味报告和可选的多模型视频提示词，不需要视频平台账号或 API Key。
 
 <a name="示例与本地-3d-预览"></a>
 
@@ -62,18 +64,26 @@
 
 ### 作为 Agent Skill 安装调用
 
-将本仓库克隆到宿主工具的 Skills 目录后，AI 编程助手会自动按需读取 [`SKILL.md`](SKILL.md) 与 [`references/`](references/) 参考手册并调用本地脚本。下方路径用于 Codex；GitHub Copilot 使用 `~/.copilot/skills/roblox-style-video`，Claude Code 与 Cursor 放入各自配置的 Skills 目录即可。
+推荐使用 GitHub 官方 Skill 命令安装：
 
 ```bash
-git clone https://github.com/yuzhang-zhong/roblox-style-video.git ~/.codex/skills/roblox-style-video
+gh skill install yuzhang-zhong/roblox-style-video roblox-style-video
 ```
+
+也可以使用跨 Agent 的 Skills CLI：
+
+```bash
+npx skills add https://github.com/yuzhang-zhong/roblox-style-video --skill roblox-style-video
+```
+
+安装器会读取自包含的 [`skills/roblox-style-video/`](skills/roblox-style-video/) 目录。如果宿主暂不支持安装器，请把整个目录复制到宿主的 Skills 文件夹，保留其中的 `SKILL.md`、`scripts/`、`references/`、`templates/` 与 `assets/`。
 
 在 Agent 对话中直接调用 `roblox-style-video` Skill：
 
 ```text
-使用 $roblox-style-video 规划一支 15 秒 9:16 竖屏短片，场景用惊悚酒店走廊（doors-horror）：
+使用 $roblox-style-video 生成一支 15 秒 9:16 竖屏短片，场景用惊悚酒店走廊（doors-horror）：
 穿蓝卫衣的 R6 小人举着手电筒走过 050 号木门时壁灯突然闪烁，身后出现白眼，最后躲进木衣柜。
-请给出角色比例锁、4 镜头分镜表和可灵 / Sora 图生视频提示词。
+请直接输出本地 MP4/GIF、角色比例锁、4 镜头分镜表，以及可选的可灵 / Sora 图生视频提示词。
 ```
 
 ### 直接运行 Skill 内置命令行脚本
@@ -96,13 +106,20 @@ node scripts/drift_check.mjs --pack templates/custom_story_spec.json --engine lo
 
 | Skill 组件 | 输出 |
 | --- | --- |
-| [`SKILL.md`](SKILL.md) | Agent Skill 主入口说明，定义 6 种工作模式（角色设定、分镜、提示词编译、翻车修复、二创、3D 预演）与 8 项几何防变形约束。 |
+| [`SKILL.md`](skills/roblox-style-video/SKILL.md) | Agent Skill 主入口说明，定义 6 种工作模式（角色设定、分镜、提示词编译、翻车修复、二创、3D 预演）与 8 项几何防变形约束。 |
 | [`shot_compiler.mjs`](scripts/shot_compiler.mjs) | 支持自定义 `--spec <episode.json>` 剧本或 12 套内置模板，生成零重复的 15s / 30s / 45s 竖屏分镜与多引擎提示词（`local3d`、可灵、即梦、海螺、万相、Sora、Runway）。 |
 | [`avatar_spec.mjs`](scripts/avatar_spec.mjs) | 角色设定卡、`BrickColor` 色号、`--cast` 多角色同框锁、`--companion` 方块神宠与首帧[三视图参考卡](assets/showcase/momo_turnaround_sheet.zh.png)。 |
 | [`drift_check.mjs`](scripts/drift_check.mjs) | 8 门中英 Unicode 防跑偏审查器（支持 `--prompt` 与 `--pack` 整包审计），拦截五指、乐高圆粒/钩爪、官方商标、写实鳞爪神宠、R15 面条臂及动作超载。 |
 | [`render_preview.mjs`](scripts/render_preview.mjs) | 本地 3D 视频直出引擎（`--spec <episode.json> --out-dir <dir>`），无需外部平台即可按分镜精确时长合成 H.264 `.mp4`（含复古合成音效）、`.gif` 与分镜表。 |
 
 [角色比例与材质](references/avatar-geometry-and-materials.md) · [经典道具词库](references/classic-roblox-catalog.md) · [各模型提示词](references/model-prompt-playbook.md) · [跑偏修复](references/rescue-and-anti-drift.md) · [镜头节奏与音效](references/short-video-beats-and-audio.md) · [12 套分镜模板](references/viral-archetypes-catalog.md)
+
+## 常见问题
+
+- **这只是提示词合集吗？** 不是。本地 3D 渲染器会输出 9:16 MP4/GIF、分镜图、角色三视图与合成音频；外部视频模型提示词是可选增强。
+- **它匹配哪些需求？** Roblox 视频生成、R6/R15 或方块角色动画、机摄短片（machinima）、跑酷剧情、搞笑/恐怖/动作短片、抖音/小红书/TikTok/YouTube Shorts 分镜与角色一致性修复。
+- **本地生成需要 API Key 吗？** 不需要视频模型账号或 API Key。命令行需要 Node.js 18+，MP4/GIF 打包还需要 `ffmpeg`。
+- **支持哪些 Agent 和模型？** 支持 GitHub Copilot、Codex、Claude Code、Cursor、Gemini CLI 等 Agent Skills 宿主；提示词覆盖可灵、即梦/Seedance、海螺、万相、Sora 与 Runway。
 
 ## 语言
 

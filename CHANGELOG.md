@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.6.1
+
+- Added a synchronized, self-contained `skills/roblox-style-video/` distribution package so GitHub Skill search, preview, install, and publish can discover the project without changing the existing root workflow.
+- Reworked Agent-facing descriptions, README quick answers, install commands, and package keywords around concrete search intents such as Roblox video generation, R6/R15 animation, machinima, 9:16 shorts, offline MP4/GIF output, I2V/T2V prompts, and anti-drift checks.
+- Added `scripts/sync_skill_bundle.mjs` and package validation so the installable Skill bundle stays byte-for-byte aligned with the repository source.
+
 ## 1.6.0
 
 - Added a self-contained declarative 3D episode video engine (`node scripts/render_preview.mjs --spec <episode.json> --out-dir <dir>`) that directly renders custom multi-shot `540x960` H.264 `.mp4` videos (with synthesized retro Roblox audio), `.gif`s, bilingual 4/8-shot storyboard sheets, and 3-view character turnaround sheets for any custom story without requiring external video platforms.

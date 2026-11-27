@@ -2,17 +2,19 @@
 
 # Roblox Style Video Skill
 
-An Agent Skill (`SKILL.md` + reference playbooks + offline CLI tools) for Claude Code, Cursor, GitHub Copilot, and Codex to plan 9:16 Roblox-style blocky avatar shorts, lock R6 proportions, compile shot-by-shot video prompts, and preview cuts locally.
+An installable Agent Skill for **Roblox video generation** in Claude Code, Cursor, GitHub Copilot, and Codex. It turns a story into consistent R6/R15 blocky-avatar characters, 9:16 storyboards, offline MP4/GIF animatics, and optional Kling, Seedance, Hailuo, Wan, Sora, or Runway I2V/T2V prompt packs.
 
-[![Agent Skill](https://img.shields.io/badge/Agent_Skill-SKILL.md-0f172a?style=flat-square)](SKILL.md)
+[![Agent Skill](https://img.shields.io/badge/Agent_Skill-SKILL.md-0f172a?style=flat-square)](skills/roblox-style-video/SKILL.md)
 [![Node.js 18+ for the CLI](https://img.shields.io/badge/Node.js-18%2B-268354?style=flat-square)](#skill-workflow-and-quick-start)
 [![MIT license](https://img.shields.io/badge/License-MIT-2563eb?style=flat-square)](LICENSE)
 
-**[Video examples](#video-examples)** · [Scene boards](#scene-boards-and-shot-pacing) · [Skill workflow & quick start](#skill-workflow-and-quick-start) · [Skill guide](SKILL.md)
+**[Install](#install-as-an-agent-skill)** · [Video examples](#video-examples) · [Scene boards](#scene-boards-and-shot-pacing) · [Skill guide](skills/roblox-style-video/SKILL.md)
 
 **English** · [简体中文](README.zh-CN.md) · [繁體中文](docs/i18n/README.zh-TW.md) · [日本語](docs/i18n/README.ja.md) · [한국어](docs/i18n/README.ko.md) · [Español](docs/i18n/README.es.md) · [Français](docs/i18n/README.fr.md) · [Deutsch](docs/i18n/README.de.md) · [Português](docs/i18n/README.pt-BR.md) · [Русский](docs/i18n/README.ru.md)
 
 </div>
+
+> **Quick answer:** `roblox-style-video` is a coding-agent Skill for generating Roblox-style 9:16 short videos, not only video prompts. It can directly produce local MP4/GIF animatics, character turnaround sheets, storyboard images, model-specific prompts, and anti-drift reports without a video-model account or API key.
 
 <a name="examples-and-local-3d-previews"></a>
 
@@ -62,18 +64,26 @@ Four-shot contact sheets across six game genres, pairing camera angle changes wi
 
 ### Install as an Agent Skill
 
-Clone this skill into your agent host's skills directory. Once installed, the agent reads [`SKILL.md`](SKILL.md), loads the relevant prompt guides from [`references/`](references/), and runs the Node.js scripts automatically when you ask for a Roblox-style short. This path is for Codex; use `~/.copilot/skills/roblox-style-video` for GitHub Copilot, or your configured skills folder in Claude Code and Cursor.
+Install from GitHub with the official Skill command:
 
 ```bash
-git clone https://github.com/yuzhang-zhong/roblox-style-video.git ~/.codex/skills/roblox-style-video
+gh skill install yuzhang-zhong/roblox-style-video roblox-style-video
 ```
+
+Or install through the cross-agent Skills CLI:
+
+```bash
+npx skills add https://github.com/yuzhang-zhong/roblox-style-video --skill roblox-style-video
+```
+
+The installer uses the self-contained package at [`skills/roblox-style-video/`](skills/roblox-style-video/). For hosts without either installer, copy that directory into the host's Skills folder, keeping its `SKILL.md`, `scripts/`, `references/`, `templates/`, and `assets/` together.
 
 Trigger the `roblox-style-video` skill in your agent chat:
 
 ```text
-Use $roblox-style-video to plan a 15-second 9:16 short set in a dim hotel corridor (doors-horror):
+Use $roblox-style-video to generate a 15-second 9:16 short set in a dim hotel corridor (doors-horror):
 an R6 avatar in a blue hoodie sweeps a flashlight past Door 050 when the lights flicker.
-Give me the character geometry lock, a 4-shot storyboard, and Sora / Kling I2V prompts.
+Produce the local MP4/GIF animatic, character geometry lock, 4-shot storyboard, and optional Sora / Kling I2V prompts.
 ```
 
 ### Run the skill's CLI tools directly
@@ -96,13 +106,20 @@ Generic video prompts often produce human fingers, circular Lego floor/head stud
 
 | Skill component | Output |
 | --- | --- |
-| [`SKILL.md`](SKILL.md) | Main Agent Skill entry point defining the 6 production modes (`Avatar`, `Storyboard`, `Prompt-Compile`, `Rescue`, `Remix`, `Render`) and 8 geometry invariants. |
+| [`SKILL.md`](skills/roblox-style-video/SKILL.md) | Main Agent Skill entry point defining the 6 production modes (`Avatar`, `Storyboard`, `Prompt-Compile`, `Rescue`, `Remix`, `Render`) and 8 geometry invariants. |
 | [`shot_compiler.mjs`](scripts/shot_compiler.mjs) | Compiles custom `--spec <episode.json>` stories or 12 built-in templates into non-repeating 15s / 30s / 45s 9:16 beat sheets (`local3d`, Kling, Seedance, Hailuo, Wan, Sora, Runway). |
 | [`avatar_spec.mjs`](scripts/avatar_spec.mjs) | Character DNA card with `BrickColor` codes, `--cast` multi-character locks, `--companion` blocky pets, and a [three-view turnaround](assets/showcase/momo_turnaround_sheet.en.png) prompt. |
 | [`drift_check.mjs`](scripts/drift_check.mjs) | 8-gate Unicode-safe linter (`--prompt` or `--pack`) catching finger growth, Lego claws/bumps, brand logos, organic pet drift, R15 soft-body contradictions, and action overload. |
 | [`render_preview.mjs`](scripts/render_preview.mjs) | Direct local 3D `.mp4` / `.gif` / contact-sheet renderer (`--spec <episode.json> --out-dir <dir>`) with multi-part props, synthesized retro WAV audio, and exact per-shot timing. |
 
 [Avatar geometry and materials](references/avatar-geometry-and-materials.md) · [Classic gear and props](references/classic-roblox-catalog.md) · [Model prompt playbook](references/model-prompt-playbook.md) · [Drift fixes](references/rescue-and-anti-drift.md) · [Pacing and audio](references/short-video-beats-and-audio.md) · [12 story templates](references/viral-archetypes-catalog.md)
+
+## Frequently asked
+
+- **Is this only a prompt collection?** No. The local 3D renderer produces 9:16 MP4/GIF animatics, storyboard sheets, turnaround images, and synthesized audio; external-model prompt packs are optional.
+- **Which Roblox video use cases does it match?** Roblox AI video generation, R6/R15 or blocky-avatar animation, machinima, Obby stories, Roblox-style comedy, horror, action, and TikTok/YouTube/Douyin short-video storyboards.
+- **Does the local workflow require API keys?** No video-model account or API key is required. Node.js 18+ runs the CLI; MP4/GIF packaging additionally requires `ffmpeg`.
+- **Which agents and video models are supported?** The Skill format works with GitHub Copilot, Codex, Claude Code, Cursor, Gemini CLI, and other Agent Skills hosts. Prompt compilation covers Kling, Seedance/Jimeng, Hailuo MiniMax, Wan, Sora, and Runway.
 
 ## Languages
 

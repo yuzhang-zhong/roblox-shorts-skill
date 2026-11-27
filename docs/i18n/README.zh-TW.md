@@ -4,11 +4,11 @@
 
 一套面向 Claude Code、Cursor、GitHub Copilot 與 Codex 的 **Agent Skill**（`SKILL.md` + 領域參考手冊 + 零依賴命令列腳本）：鎖住 R6 方塊比例、拆解 9:16 直式四鏡分鏡、逐鏡編譯影片提示詞，並在本機離線預演動態成片。
 
-[![Agent Skill](https://img.shields.io/badge/Agent_Skill-SKILL.md-0f172a?style=flat-square)](../../SKILL.md)
+[![Agent Skill](https://img.shields.io/badge/Agent_Skill-SKILL.md-0f172a?style=flat-square)](../../skills/roblox-style-video/SKILL.md)
 [![命令列需要 Node.js 18+](https://img.shields.io/badge/Node.js-18%2B-268354?style=flat-square)](#skill-工作流與安裝使用)
 [![MIT 授權條款](https://img.shields.io/badge/License-MIT-2563eb?style=flat-square)](../../LICENSE)
 
-**[短片範例](#短片範例)** · [分鏡與場景圖](#分鏡拆解與多題材場景表) · [Skill 工作流與安裝](#skill-工作流與安裝使用) · [Skill 指南](../../SKILL.md)
+**[短片範例](#短片範例)** · [分鏡與場景圖](#分鏡拆解與多題材場景表) · [Skill 工作流與安裝](#skill-工作流與安裝使用) · [Skill 指南](../../skills/roblox-style-video/SKILL.md)
 
 [English](../../README.md) · [简体中文](../../README.zh-CN.md) · **繁體中文** · [日本語](README.ja.md) · [한국어](README.ko.md) · [Español](README.es.md) · [Français](README.fr.md) · [Deutsch](README.de.md) · [Português](README.pt-BR.md) · [Русский](README.ru.md)
 
@@ -60,10 +60,10 @@
 
 ### 作為 Agent Skill 安裝呼叫
 
-將本儲存庫複製到宿主工具的 Skills 目錄後，AI 助手會自動讀取 [`SKILL.md`](../../SKILL.md) 與 [`references/`](../../references/) 參考手冊並呼叫本機腳本。下方路徑適用於 Codex；GitHub Copilot 請用 `~/.copilot/skills/roblox-style-video`，Claude Code 與 Cursor 放入各自設定的 Skills 目錄即可。
+使用 GitHub 官方 Skill 命令安裝，自包含套件位於 [`skills/roblox-style-video/`](../../skills/roblox-style-video/)，入口為 [`SKILL.md`](../../skills/roblox-style-video/SKILL.md)。
 
 ```bash
-git clone https://github.com/yuzhang-zhong/roblox-style-video.git ~/.codex/skills/roblox-style-video
+gh skill install yuzhang-zhong/roblox-style-video roblox-style-video
 ```
 
 在 Agent 對話中呼叫 `roblox-style-video` Skill：
@@ -94,7 +94,7 @@ node scripts/render_preview.mjs --only tornado,chase,doors
 
 | Skill 組件 | 輸出內容 |
 | --- | --- |
-| [`SKILL.md`](../../SKILL.md) | Agent Skill 主入口定義，涵蓋 6 種工作模式（角色設定、分鏡、提示詞編譯、翻車修復、二創、3D 預演）與 8 項幾何不變量。 |
+| [`SKILL.md`](../../skills/roblox-style-video/SKILL.md) | Agent Skill 主入口定義，涵蓋 6 種工作模式（角色設定、分鏡、提示詞編譯、翻車修復、二創、3D 預演）與 8 項幾何不變量。 |
 | [`shot_compiler.mjs`](../../scripts/shot_compiler.mjs) | 內建 12 套短片模板，編譯適配 Kling、Seedance、Hailuo、Wan、Sora 與 Runway 的 9:16 分鏡與 I2V/T2V 提示詞。 |
 | [`avatar_spec.mjs`](../../scripts/avatar_spec.mjs) | 角色 DNA 設定卡、`BrickColor` 色號、方塊比例鎖與首幀[三視圖參考卡](../../assets/showcase/momo_turnaround_sheet.en.png)提示詞。 |
 | [`drift_check.mjs`](../../scripts/drift_check.mjs) | 檢查真人手指、樂高圓粒/夾爪、品牌浮水印與單鏡多動作超載，並輸出修補後的提示詞。 |

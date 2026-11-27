@@ -184,5 +184,5 @@ test("validate_skill CLI verifies repository files, versions, and manifests", ()
     cwd: ROOT,
     encoding: "utf8"
   });
-  assert.match(out, /roblox-style-video v1\.6\.0 package is valid/);
+  assert.match(out, /roblox-style-video v1\.6\.1 package is valid/);
 });

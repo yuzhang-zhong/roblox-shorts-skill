@@ -1,7 +1,7 @@
 {
   "name": "roblox-style-video",
-  "description": "Agent Skill to generate Roblox-style R6 and blocky avatar 9:16 short videos with locked proportions, storyboards, and model-specific prompts.",
-  "version": "1.6.0",
+  "description": "Roblox video generation for R6/R15 blocky avatars: generate 9:16 shorts, storyboards, offline MP4/GIF animatics, I2V/T2V prompts, and anti-drift checks.",
+  "version": "1.6.1",
   "author": {
     "name": "yuzhang-zhong",
     "url": "https://github.com/yuzhang-zhong"
@@ -9,6 +9,6 @@
   "homepage": "https://github.com/yuzhang-zhong/roblox-style-video",
   "repository": "https://github.com/yuzhang-zhong/roblox-style-video",
   "license": "MIT",
-  "keywords": ["roblox", "ai-video", "short-video", "storyboard", "prompt-engineering", "kling", "seedance", "wan"],
-  "skills": ["./"]
+  "keywords": ["roblox", "roblox-video", "ai-video", "video-generation", "r6", "r15", "short-video", "storyboard", "machinima", "kling", "seedance", "wan"],
+  "skills": ["./skills/roblox-style-video"]
 }

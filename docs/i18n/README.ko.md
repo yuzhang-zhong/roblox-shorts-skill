@@ -4,11 +4,11 @@
 
 Claude Code, Cursor, GitHub Copilot, Codex용 **Agent Skill** (`SKILL.md` + 레퍼런스 가이드 + 무의존성 오프라인 CLI 도구). R6 블록 아바타 비율 고정, 9:16 세로형 숏폼 4컷 스토리보드 설계, 모델별 비디오 프롬프트 컴파일, 로컬 3D 애니매틱 프리뷰를 지원합니다.
 
-[![Agent Skill](https://img.shields.io/badge/Agent_Skill-SKILL.md-0f172a?style=flat-square)](../../SKILL.md)
+[![Agent Skill](https://img.shields.io/badge/Agent_Skill-SKILL.md-0f172a?style=flat-square)](../../skills/roblox-style-video/SKILL.md)
 [![CLI Node.js 18+ 필요](https://img.shields.io/badge/Node.js-18%2B-268354?style=flat-square)](#skill-워크플로-및-빠른-시작)
 [![MIT License](https://img.shields.io/badge/License-MIT-2563eb?style=flat-square)](../../LICENSE)
 
-**[비디오 예제](#비디오-예제)** · [장면 보드 및 컷 구성](#장면-보드-및-컷-템포) · [워크플로 및 빠른 시작](#skill-워크플로-및-빠른-시작) · [Skill 가이드](../../SKILL.md)
+**[비디오 예제](#비디오-예제)** · [장면 보드 및 컷 구성](#장면-보드-및-컷-템포) · [워크플로 및 빠른 시작](#skill-워크플로-및-빠른-시작) · [Skill 가이드](../../skills/roblox-style-video/SKILL.md)
 
 [English](../../README.md) · [简体中文](../../README.zh-CN.md) · [繁體中文](README.zh-TW.md) · [日本語](README.ja.md) · **한국어** · [Español](README.es.md) · [Français](README.fr.md) · [Deutsch](README.de.md) · [Português](README.pt-BR.md) · [Русский](README.ru.md)
 
@@ -60,10 +60,10 @@ AI 코딩 에이전트에서 이 Skill을 호출하면, 숏폼 아이디어를 1
 
 ### Agent Skill로 설치하기
 
-에이전트 호스트의 skills 디렉터리에 이 저장소를 클론하면, 에이전트가 [`SKILL.md`](../../SKILL.md)와 [`references/`](../../references/) 가이드를 읽고 내장 Node.js 스크립트를 자동으로 실행합니다. 아래 경로는 Codex 기준이며, GitHub Copilot은 `~/.copilot/skills/roblox-style-video`, Claude Code와 Cursor는 각 도구의 skills 폴더를 사용하세요.
+GitHub 공식 Skill 명령으로 설치할 수 있습니다. 독립 패키지는 [`skills/roblox-style-video/`](../../skills/roblox-style-video/)에 있고, 진입점은 [`SKILL.md`](../../skills/roblox-style-video/SKILL.md)입니다.
 
 ```bash
-git clone https://github.com/yuzhang-zhong/roblox-style-video.git ~/.codex/skills/roblox-style-video
+gh skill install yuzhang-zhong/roblox-style-video roblox-style-video
 ```
 
 에이전트 채팅에서 `roblox-style-video` 스킬을 호출합니다:
@@ -94,7 +94,7 @@ node scripts/render_preview.mjs --only tornado,chase,doors
 
 | Skill 구성 요소 | 출력 결과 |
 | --- | --- |
-| [`SKILL.md`](../../SKILL.md) | Agent Skill 메인 엔트리 문서. 6가지 제작 모드(`Avatar`, `Storyboard`, `Prompt-Compile`, `Rescue`, `Remix`, `Render`)와 8가지 기하학 불변 규칙 정의. |
+| [`SKILL.md`](../../skills/roblox-style-video/SKILL.md) | Agent Skill 메인 엔트리 문서. 6가지 제작 모드(`Avatar`, `Storyboard`, `Prompt-Compile`, `Rescue`, `Remix`, `Render`)와 8가지 기하학 불변 규칙 정의. |
 | [`shot_compiler.mjs`](../../scripts/shot_compiler.mjs) | 12종의 숏폼 템플릿을 기반으로 Kling, Seedance, Hailuo, Wan, Sora, Runway용 9:16 비트시트 및 I2V/T2V 프롬프트 컴파일. |
 | [`avatar_spec.mjs`](../../scripts/avatar_spec.mjs) | `BrickColor` 코드와 블록 비율이 고정된 캐릭터 DNA 카드 및 [3면도 턴어라운드 시트](../../assets/showcase/momo_turnaround_sheet.en.png) 프롬프트 생성. |
 | [`drift_check.mjs`](../../scripts/drift_check.mjs) | 사람 손가락 생성, 레고 집게손·돌기, 상표 로고 혼입, 단일 컷 다중 동작 과부하를 진단하고 보정된 프롬프트 출력. |

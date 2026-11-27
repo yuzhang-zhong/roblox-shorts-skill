@@ -4,11 +4,11 @@
 
 Um **Agent Skill** (`SKILL.md` + guias de referência + ferramentas CLI offline sem dependências) para Claude Code, Cursor, GitHub Copilot e Codex que planeja curtas verticais `9:16` de avatares blocky estilo Roblox, trava proporções R6, compila prompts tomada a tomada e renderiza prévias 3D localmente.
 
-[![Agent Skill](https://img.shields.io/badge/Agent_Skill-SKILL.md-0f172a?style=flat-square)](../../SKILL.md)
+[![Agent Skill](https://img.shields.io/badge/Agent_Skill-SKILL.md-0f172a?style=flat-square)](../../skills/roblox-style-video/SKILL.md)
 [![Node.js 18+ para a CLI](https://img.shields.io/badge/Node.js-18%2B-268354?style=flat-square)](#fluxo-do-skill-e-início-rápido)
 [![Licença MIT](https://img.shields.io/badge/License-MIT-2563eb?style=flat-square)](../../LICENSE)
 
-**[Exemplos em vídeo](#exemplos-em-vídeo)** · [Pranchas de cenas](#pranchas-de-cenas-e-ritmo-de-tomadas) · [Fluxo do Skill e início rápido](#fluxo-do-skill-e-início-rápido) · [Guia do Skill](../../SKILL.md)
+**[Exemplos em vídeo](#exemplos-em-vídeo)** · [Pranchas de cenas](#pranchas-de-cenas-e-ritmo-de-tomadas) · [Fluxo do Skill e início rápido](#fluxo-do-skill-e-início-rápido) · [Guia do Skill](../../skills/roblox-style-video/SKILL.md)
 
 [English](../../README.md) · [简体中文](../../README.zh-CN.md) · [繁體中文](README.zh-TW.md) · [日本語](README.ja.md) · [한국어](README.ko.md) · [Español](README.es.md) · [Français](README.fr.md) · [Deutsch](README.de.md) · **Português** · [Русский](README.ru.md)
 
@@ -60,10 +60,10 @@ Folhas de contato de quatro tomadas em seis gêneros clássicos, combinando troc
 
 ### Instalar como Agent Skill
 
-Clone este repositório no diretório de skills do seu agente. Depois de instalado, o agente lê [`SKILL.md`](../../SKILL.md), carrega os guias em [`references/`](../../references/) e executa automaticamente os scripts Node.js. O caminho abaixo é para o Codex; use `~/.copilot/skills/roblox-style-video` no GitHub Copilot ou a pasta de skills configurada no Claude Code e no Cursor.
+Instale com o comando oficial de Skills do GitHub. O pacote autossuficiente fica em [`skills/roblox-style-video/`](../../skills/roblox-style-video/) e a entrada é [`SKILL.md`](../../skills/roblox-style-video/SKILL.md).
 
 ```bash
-git clone https://github.com/yuzhang-zhong/roblox-style-video.git ~/.codex/skills/roblox-style-video
+gh skill install yuzhang-zhong/roblox-style-video roblox-style-video
 ```
 
 Acione o skill `roblox-style-video` no chat do seu agente:
@@ -94,7 +94,7 @@ Prompts genéricos costumam gerar dedos humanos, garras em C ou pinos circulares
 
 | Componente do Skill | Saída |
 | --- | --- |
-| [`SKILL.md`](../../SKILL.md) | Ponto de entrada principal do Agent Skill definindo os 6 modos de produção (`Avatar`, `Storyboard`, `Prompt-Compile`, `Rescue`, `Remix`, `Render`) e 8 invariantes geométricas. |
+| [`SKILL.md`](../../skills/roblox-style-video/SKILL.md) | Ponto de entrada principal do Agent Skill definindo os 6 modos de produção (`Avatar`, `Storyboard`, `Prompt-Compile`, `Rescue`, `Remix`, `Render`) e 8 invariantes geométricas. |
 | [`shot_compiler.mjs`](../../scripts/shot_compiler.mjs) | Escaleta `9:16` e prompts I2V/T2V em 12 modelos de histórias para Kling, Seedance, Hailuo, Wan, Sora e Runway. |
 | [`avatar_spec.mjs`](../../scripts/avatar_spec.mjs) | Ficha de DNA do personagem com códigos `BrickColor`, trava de proporções e prompt de [folha turnaround de três vistas](../../assets/showcase/momo_turnaround_sheet.en.png). |
 | [`drift_check.mjs`](../../scripts/drift_check.mjs) | Relatório diagnóstico e prompt corrigido contra dedos humanos, peças Lego, logotipos de marca ou excesso de ações por clipe. |

@@ -4,11 +4,11 @@
 
 Claude Code・Cursor・GitHub Copilot・Codex 向けの **Agent Skill**（`SKILL.md` + リファレンスガイド + 依存関係ゼロの CLI ツール）。R6 ブロックアバターの比率固定、9:16 縦型ショート動画の 4 カット構成、モデル別プロンプト生成、ローカル 3D プレビューを一貫して行います。
 
-[![Agent Skill](https://img.shields.io/badge/Agent_Skill-SKILL.md-0f172a?style=flat-square)](../../SKILL.md)
+[![Agent Skill](https://img.shields.io/badge/Agent_Skill-SKILL.md-0f172a?style=flat-square)](../../skills/roblox-style-video/SKILL.md)
 [![CLI は Node.js 18+ 対応](https://img.shields.io/badge/Node.js-18%2B-268354?style=flat-square)](#skill-ワークフローとクイックスタート)
 [![MIT License](https://img.shields.io/badge/License-MIT-2563eb?style=flat-square)](../../LICENSE)
 
-**[動画サンプル](#動画サンプル)** · [シーンボードと尺配分](#シーンボードとカット割り) · [ワークフローと導入](#skill-ワークフローとクイックスタート) · [Skill ガイド](../../SKILL.md)
+**[動画サンプル](#動画サンプル)** · [シーンボードと尺配分](#シーンボードとカット割り) · [ワークフローと導入](#skill-ワークフローとクイックスタート) · [Skill ガイド](../../skills/roblox-style-video/SKILL.md)
 
 [English](../../README.md) · [简体中文](../../README.zh-CN.md) · [繁體中文](README.zh-TW.md) · **日本語** · [한국어](README.ko.md) · [Español](README.es.md) · [Français](README.fr.md) · [Deutsch](README.de.md) · [Português](README.pt-BR.md) · [Русский](README.ru.md)
 
@@ -60,10 +60,10 @@ AI コーディングエージェントから呼び出すと、アイデアを 1
 
 ### Agent Skill として導入する
 
-お使いのエージェントの skills ディレクトリにクローンすると、エージェントが [`SKILL.md`](../../SKILL.md) と [`references/`](../../references/) を読み込み、Node.js スクリプトを自動実行します。以下のパスは Codex 用です（GitHub Copilot は `~/.copilot/skills/roblox-style-video`、Claude Code や Cursor は各ツールの skills フォルダを使用してください）。
+GitHub の公式 Skill コマンドでインストールできます。自己完結型パッケージは [`skills/roblox-style-video/`](../../skills/roblox-style-video/) にあり、エントリポイントは [`SKILL.md`](../../skills/roblox-style-video/SKILL.md) です。
 
 ```bash
-git clone https://github.com/yuzhang-zhong/roblox-style-video.git ~/.codex/skills/roblox-style-video
+gh skill install yuzhang-zhong/roblox-style-video roblox-style-video
 ```
 
 チャットから `roblox-style-video` スキルを呼び出します：
@@ -94,7 +94,7 @@ node scripts/render_preview.mjs --only tornado,chase,doors
 
 | Skill コンポーネント | 出力内容 |
 | --- | --- |
-| [`SKILL.md`](../../SKILL.md) | Agent Skill のエントリ定義。6 つの制作モード（`Avatar` / `Storyboard` / `Prompt-Compile` / `Rescue` / `Remix` / `Render`）と 8 つの形状ルールを規定。 |
+| [`SKILL.md`](../../skills/roblox-style-video/SKILL.md) | Agent Skill のエントリ定義。6 つの制作モード（`Avatar` / `Storyboard` / `Prompt-Compile` / `Rescue` / `Remix` / `Render`）と 8 つの形状ルールを規定。 |
 | [`shot_compiler.mjs`](../../scripts/shot_compiler.mjs) | 12 種類のストーリーテンプレートから、Kling・Seedance・Hailuo・Wan・Sora・Runway 向けの 9:16 絵コンテと I2V/T2V プロンプトを生成。 |
 | [`avatar_spec.mjs`](../../scripts/avatar_spec.mjs) | `BrickColor` コード・比率ロック付きのキャラクター DNA カードと、[三面図シート](../../assets/showcase/momo_turnaround_sheet.en.png)用プロンプトを生成。 |
 | [`drift_check.mjs`](../../scripts/drift_check.mjs) | 5 本指の生成、レゴ風パーツ、ブランドロゴ混入、1 カット内の動作過多を診断し、修正済みプロンプトを出力。 |

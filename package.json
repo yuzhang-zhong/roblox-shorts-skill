@@ -1,34 +1,45 @@
 {
   "name": "roblox-style-video",
-  "version": "1.6.0",
+  "version": "1.6.1",
   "private": false,
   "type": "module",
-  "description": "Agent Skill to generate Roblox-style R6 and blocky avatar 9:16 short videos with locked proportions, storyboards, and model-specific prompts.",
+  "description": "Roblox video generation for R6/R15 blocky avatars: generate 9:16 shorts, storyboards, offline MP4/GIF animatics, I2V/T2V prompts, and anti-drift checks.",
+  "homepage": "https://github.com/yuzhang-zhong/roblox-style-video#install-as-an-agent-skill",
   "license": "MIT",
   "repository": "github:yuzhang-zhong/roblox-style-video",
   "keywords": [
     "agent-skill",
+    "agent-skills",
     "codex-skill",
     "copilot-skill",
     "claude-skill",
     "roblox",
+    "roblox-video",
+    "roblox-animation",
     "ai-video",
+    "video-generation",
+    "image-to-video",
+    "text-to-video",
+    "vertical-video",
+    "machinima",
+    "r6",
+    "r15",
     "kling",
     "seedance",
     "wan",
     "sora",
-    "short-video",
-    "pi-package"
+    "short-video"
   ],
   "scripts": {
     "avatar": "node scripts/avatar_spec.mjs",
     "compile": "node scripts/shot_compiler.mjs",
     "check": "node scripts/drift_check.mjs",
     "render": "node scripts/render_preview.mjs",
+    "sync:skill": "node scripts/sync_skill_bundle.mjs",
     "validate": "node scripts/validate_skill.mjs",
     "test": "node --test tests/run_tests.mjs"
   },
   "pi": {
-    "skills": ["./"]
+    "skills": ["./skills/roblox-style-video"]
   }
 }

@@ -1,11 +1,12 @@
 ---
 name: roblox-style-video
 description: |
-  Agent Skill to generate Roblox-style R6 and blocky avatar 9:16 short videos with locked proportions, storyboards, and model-specific prompts.
-  Use when the user wants to generate Roblox-style avatar videos, blocky 3D character shorts, Douyin/Xiaohongshu/TikTok Roblox skits, R6/R15/chibi-plush character turnaround sheets, or prompts for Kling (可灵), Seedance/Jimeng (即梦), Hailuo MiniMax (海螺), Wan (通义万相), Sora, or Runway, or when fixing AI video defects such as human fingers, Lego C-claws/studs, Minecraft voxels, realistic faces, or rubbery limbs.
+  Roblox video generation for R6/R15 blocky avatars: generate 9:16 shorts, storyboards, offline MP4/GIF animatics, I2V/T2V prompts, and anti-drift checks.
+  Use when the user wants Roblox AI videos, Roblox-style avatar animation, blocky 3D character shorts, machinima, Obby skits, Douyin/Xiaohongshu/TikTok or YouTube Shorts, character turnaround sheets, or prompts for Kling (可灵), Seedance/Jimeng (即梦), Hailuo MiniMax (海螺), Wan (通义万相), Sora, or Runway. Also use for fixing inconsistent Roblox characters, human fingers, Lego C-claws/studs, Minecraft voxels, realistic faces, or rubbery limbs.
+  中文触发词包括 Roblox 视频生成、方块人短视频、R6/R15 动画、竖屏剧情、角色一致性与 AI 视频防串味。
 license: MIT
 metadata:
-  version: "1.6.0"
+  version: "1.6.1"
 ---
 
 # Roblox Style Video Skill
@@ -132,4 +133,4 @@ node scripts/render_preview.mjs --spec ./my-episode/episode.json --out-dir ./my-
 - [`references/viral-archetypes-catalog.md`](references/viral-archetypes-catalog.md): 12 reusable short-video templates with shot-by-shot breakdowns.
 - [`references/classic-roblox-catalog.md`](references/classic-roblox-catalog.md): classic Roblox avatars, outfits, gear, and 2D face decals.
 - [`templates/`](templates/): blank markdown templates for character cards, storyboards, and shot prompts.
-- [`examples/`](examples/): 12 complete checked-in short-video packages (`monday-alarm-meltdown`, `obby-sky-run`, `duo-bestie-contrast`, `cozy-cafe-tycoon`, `runway-outfit-drop`, `burnt-pizza-slapstick`, `disaster-tower-tornado`, `brookhaven-police-chase`, `doors-flashlight-hallway`, `crossroads-sword-duel`, `classroom-exam-panic`, `red-light-freeze`) with rendered PNG sheets, GIFs, and MP4 videos.
+- [`examples/`](https://github.com/yuzhang-zhong/roblox-style-video/tree/main/examples): 12 complete checked-in short-video packages (`monday-alarm-meltdown`, `obby-sky-run`, `duo-bestie-contrast`, `cozy-cafe-tycoon`, `runway-outfit-drop`, `burnt-pizza-slapstick`, `disaster-tower-tornado`, `brookhaven-police-chase`, `doors-flashlight-hallway`, `crossroads-sword-duel`, `classroom-exam-panic`, `red-light-freeze`) with rendered PNG sheets, GIFs, and MP4 videos.
